@@ -3,15 +3,71 @@ import {View,Text,TextInput,StyleSheet,TouchableOpacity,Pressable,StatusBar} fro
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as WebBrowser from "expo-web-browser"
+import * as Google from "expo-auth-session/providers/google"
+import { useAuth } from "../context/authContext";
+
+type UserData = {
+    name?: string;
+    email?: string;
+    picture?: string;
+};
+WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
   const [selectedTab, setSelectedTab] = useState<"login" | "signup">("login");
   const [phone, setPhone] = useState("");
+  const { login } = useAuth();
+  
+  const [request, response, promptAsync] = Google.useAuthRequest({
+      androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
+      iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID, 
+      webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID
+  })
 
-  function loginWithGoogle(){
-    console.log("Login Google");
-    
+  const handleGoogleSignIn = async () => {
+    try {
+      await promptAsync();
+      // response will update asynchronously and trigger the effect above
+    } catch (e) {
+      console.log("Error starting Google login:", e);
+    }
+  };
+
+  React.useEffect(() => {
+    handleSignInWithGoogle();
+  }, [response]);
+  async function handleSignInWithGoogle() {
+    if (response?.type === "success") {
+      const token = response.authentication?.accessToken;
+      if (token) {
+        const user = await getUserInfo(token);
+        if (user) {
+          // Tell the authContext that we are logged in
+          console.log("login : ", token, " - - ", user);
+          
+          await login(user);
+          // after this, app/_layout.tsx will see `user` and switch to (tabs)
+        }
+      }
+    } else if (response?.type === "error") {
+      console.log("Google login error:", response.error);
+    }
   }
+  const getUserInfo = async (token: string) => {
+    try {
+      const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const user = await res.json();
+      // console.log("user :", user);
+      return user; // return to handleSignInWithGoogle
+    } catch (error) {
+      console.log("Error fetching user info", error);
+      return null;
+    }
+  };
 
   return (
     <LinearGradient
@@ -20,9 +76,9 @@ export default function LoginScreen() {
       end={{ x: 1, y: 1 }}
       style={styles.gradient}
     >
-      <StatusBar barStyle="light-content" />
-
-      <SafeAreaView style={styles.safe}>
+    
+    <SafeAreaView style={styles.safe}>
+        <StatusBar barStyle="light-content" />
         <View style={styles.topSection}>
           <View style={styles.headerTextContainer}>
             <Text style={styles.title}>Get Started now</Text>
@@ -96,7 +152,7 @@ export default function LoginScreen() {
             <View style={styles.dividerLine} />
           </View>
 
-          <TouchableOpacity style={styles.googleButton} onPress={loginWithGoogle}>
+          <TouchableOpacity style={styles.googleButton} onPress={handleGoogleSignIn}>
             <View style={styles.googleIcon}>
               <AntDesign name="google" size={24} color="black" />
             </View>
@@ -109,9 +165,9 @@ export default function LoginScreen() {
 }
 
 const CARD_RADIUS = 20;
-
 const styles = StyleSheet.create({
   gradient: {
+    flex: 1,
   },
   safe: {
     flex: 1,

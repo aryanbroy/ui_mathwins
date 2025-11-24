@@ -5,7 +5,8 @@ import { ActivityIndicator, View } from "react-native";
 
 function RootNavigator() {
   const { user, loading } = useAuth();
-
+  console.log(user);
+  
   if (loading) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
