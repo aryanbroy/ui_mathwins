@@ -1,12 +1,18 @@
 import Header from '@/components/Header';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Index() {
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.safe}>
       <Header />
-      <Text>Home tab here</Text>
     </SafeAreaView>
   );
-}
+};
+
+const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: "#6A5AE0",
+  },
+});

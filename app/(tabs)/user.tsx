@@ -1,28 +1,23 @@
 import { useAuth } from '@/context/authContext';
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Switch,
-  TouchableOpacity,
-  StatusBar,
-  ScrollView,
-  Image,
-} from "react-native";
+import { View, Text, StyleSheet, Switch, TouchableOpacity, StatusBar, ScrollView, Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Feather, Ionicons, MaterialIcons, Entypo } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialIcons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import useAppTheme from '@/context/useAppTheme';
+
 
 export default function UserProfileScreen() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [darkModeEnabled, setDarkModeEnabled] = useState(false);
-
+  
   const { user } = useAuth();
   const displayName = user?.name;
   const displayEmail = user?.email;
   const googleAvtar = user?.picture;
 
+  const { isDarkMode } = useAppTheme();
+  console.log("isDarkMode : ",isDarkMode);
+  
   return (
       <SafeAreaView style={styles.safe}>
         <StatusBar barStyle="light-content" />
@@ -35,7 +30,6 @@ export default function UserProfileScreen() {
           {/* Header / Avatar section */}
           <View style={styles.header}>
             <View style={styles.avatarWrapper}>
-              {/* replace with user.picture if you have it */}
               <Image
                 source={{ uri: googleAvtar }}
                 style={styles.avatarImage}
@@ -47,20 +41,19 @@ export default function UserProfileScreen() {
 
             <TouchableOpacity style={styles.editProfileButton}>
               <View style={styles.editIconWrapper}>
-                <Feather name="edit-2" size={14} color="#ffffff" />
+                <MaterialCommunityIcons name="account-edit" size={24} color="#6A5AE0" />
               </View>
               <Text style={styles.editProfileText}>Edit Profile</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Card with settings */}
-            <LinearGradient
-              colors={["#FFCCD7", "#6A5AE0"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-              style={styles.gradient}
-            >
-          <View style={styles.card}>
+          <LinearGradient
+            colors={["#FFCCD7", "#6A5AE0"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={styles.gradient}
+          >
+            <View style={styles.card}>
               {/* Notifications */}
               <View style={styles.row}>
                 <View style={styles.rowLeft}>
@@ -70,8 +63,9 @@ export default function UserProfileScreen() {
                 <Switch
                   value={notificationsEnabled}
                   onValueChange={setNotificationsEnabled}
-                  trackColor={{ false: "#E3E3E3", true: "#6A4DFB" }}
-                  thumbColor="#ffffff"
+                  trackColor={{false: '#767577', true: '#81b0ff'}}
+                  thumbColor={notificationsEnabled ? '#f4f3f4' : '#000'}
+                  ios_backgroundColor="#3e3e3e"
                 />
               </View>
 
@@ -83,7 +77,7 @@ export default function UserProfileScreen() {
                 </View>
                 <View style={styles.togglePill}>
                   <Feather
-                    name={darkModeEnabled ? "moon" : "sun"}
+                    name={isDarkMode ? "moon" : "sun"}
                     size={16}
                     color="#000"
                   />
@@ -140,8 +134,8 @@ export default function UserProfileScreen() {
                 </View>
                 <Entypo name="chevron-right" size={18} color="#B0B0B0" />
               </TouchableOpacity>
-          </View>
-            </LinearGradient>
+            </View>
+          </LinearGradient>
         </ScrollView>
       </SafeAreaView>
   );
@@ -160,7 +154,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: "center",
-    paddingTop: 24,
+    paddingTop: 60,
     paddingBottom: 32,
   },
   avatarWrapper: {
@@ -170,7 +164,7 @@ const styles = StyleSheet.create({
     borderWidth: 5,
     borderColor: "#000",
     overflow: "hidden",
-    backgroundColor: "#FFD4A3",
+    backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
@@ -196,15 +190,15 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingVertical: 10,
+    borderRadius: 100,
     backgroundColor: "rgba(255,255,255,0.2)",
   },
   editIconWrapper: {
-    width: 22,
-    height: 22,
-    borderRadius: 11,
-    backgroundColor: "#6A4DFB",
+    width: 30,
+    height: 30,
+    borderRadius: 100,
+    backgroundColor: "#fff",
     justifyContent: "center",
     alignItems: "center",
     marginRight: 8,

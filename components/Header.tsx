@@ -1,37 +1,34 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAuth } from '@/context/authContext';
 
 export default function Header() {
+
+  const {user} = useAuth();
+
   return (
     <View style={styles.container}>
-      <LinearGradient
-        colors={['#6B5FDE', '#7B6FEE', '#8B7FFE']}
-        style={styles.gradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
-        <View style={styles.content}>
-          <View style={styles.leftSection}>
-            <View style={styles.welcomeContainer}>
-              <Text style={styles.welcomeText}>Welcome</Text>
-              <Text style={styles.username}>Aryan</Text>
-            </View>
-            <View style={styles.coinContainer}>
-              <Text style={styles.coinEmoji}>🪙</Text>
-              <Text style={styles.coinText}>2,000/2,000 coins</Text>
-            </View>
+      <View style={styles.content}>
+        <View style={styles.leftSection}>
+          <View style={styles.welcomeContainer}>
+            <Text style={styles.welcomeText}>Welcome</Text>
+            <Text style={styles.username}>Aryan</Text>
           </View>
-
-          <View style={styles.avatarContainer}>
-            <View style={styles.avatarBorder}>
-              <Image
-                source={require('../assets/images/avatar.webp')}
-                style={styles.avatar}
-              />
-            </View>
+          <View style={styles.coinContainer}>
+            <Text style={styles.coinEmoji}>🪙</Text>
+            <Text style={styles.coinText}>2,000 / 2,000 coins</Text>
           </View>
         </View>
-      </LinearGradient>
+
+        <View style={styles.avatarContainer}>
+          <View style={styles.avatarBorder}>
+            <Image
+              source={{ uri: user?.picture}}
+              style={styles.avatar}
+            />
+          </View>
+        </View>
+      </View>
     </View>
   );
 }
@@ -48,6 +45,8 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   content: {
+    paddingHorizontal: 20,
+    paddingVertical: 5,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -91,7 +90,8 @@ const styles = StyleSheet.create({
   avatar: {
     width: 54,
     height: 54,
-    borderRadius: 27,
+    borderWidth: 3,
+    borderRadius: 100,
   },
   coinContainer: {
     flexDirection: 'row',
@@ -99,12 +99,12 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   coinEmoji: {
-    fontSize: 16,
+    fontSize: 20,
     marginRight: 6,
   },
   coinText: {
     fontSize: 14,
     color: '#FFFFFF',
-    fontWeight: '500',
+    fontWeight: "400",
   },
 });

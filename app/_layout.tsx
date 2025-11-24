@@ -1,4 +1,3 @@
-// app/_layout.tsx
 import { Stack } from "expo-router";
 import { useAuth, AuthProvider } from "../context/authContext";
 import { ActivityIndicator, View } from "react-native";
@@ -16,13 +15,14 @@ function RootNavigator() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      {user ? (
-        <Stack.Screen name="(tabs)" />   // protected tab routes
-      ) : (
-        <Stack.Screen name="login" />    // public
-      )}
-    </Stack>
+      <Stack screenOptions={{ headerShown: false }}>
+          {/* {user ? (
+            <Stack.Screen name="(tabs)" />   // protected tab routes
+          ) : (
+            <Stack.Screen name="login" />    // public
+          )} */}
+          <Stack.Screen name="(tabs)" />
+      </Stack>
   );
 }
 
