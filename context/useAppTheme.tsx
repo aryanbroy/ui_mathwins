@@ -106,6 +106,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const toggleDarkMode = async () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
+    console.log("mode: ", newMode);
+    
     await AsyncStorage.setItem("darkMode", JSON.stringify(newMode));
   };
 

@@ -6,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as WebBrowser from "expo-web-browser"
 import * as Google from "expo-auth-session/providers/google"
 import { useAuth } from "../context/authContext";
+import useAppTheme from "@/context/useAppTheme";
 
 type UserData = {
     name?: string;
@@ -18,6 +19,7 @@ export default function LoginScreen() {
   const [selectedTab, setSelectedTab] = useState<"login" | "signup">("login");
   const [phone, setPhone] = useState("");
   const { login } = useAuth();
+  const {toggleDarkMode, isDarkMode } = useAppTheme(); 
   
   const [request, response, promptAsync] = Google.useAuthRequest({
       androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
@@ -88,9 +90,17 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.themeToggleContainer}>
-            <View style={styles.themeToggle}>
-              <Text style={styles.themeIcon}>☀️</Text>
-            </View>
+            <TouchableOpacity onPress={toggleDarkMode}>
+              {
+                isDarkMode ? 
+                <View style={styles.themeToggleDark}>
+                  <Text style={styles.themeIcon}>🌙</Text>
+                </View> :
+                <View style={styles.themeToggleLight}>
+                  <Text style={styles.themeIcon}>☀️</Text>
+                </View> 
+              }
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -196,17 +206,28 @@ const styles = StyleSheet.create({
     top: CARD_RADIUS,
     right: 24,
   },
-  themeToggle: {
+  themeToggleLight: {
     width: 64,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "rgba(255,255,255,0.9)",
+    backgroundColor: "rgba(255,255,255,0.7)",
     justifyContent: "center",
     alignItems: "flex-end",
     paddingHorizontal: 6,
   },
+  themeToggleDark: {
+    width: 64,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "rgba(0,0,0,0.7)",
+    justifyContent: "center",
+    alignItems: "flex-start",
+    paddingHorizontal: 6,
+  },
   themeIcon: {
-    fontSize: 16,
+    fontSize: 20,
+    shadowColor: "#000",
+    marginBottom: 2,
   },
 
   card: {

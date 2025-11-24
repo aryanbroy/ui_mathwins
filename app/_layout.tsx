@@ -1,6 +1,7 @@
 import { Stack } from "expo-router";
 import { useAuth, AuthProvider } from "../context/authContext";
 import { ActivityIndicator, View } from "react-native";
+import { ThemeProvider } from "@/context/useAppTheme";
 
 function RootNavigator() {
   const { user, loading } = useAuth();
@@ -15,6 +16,7 @@ function RootNavigator() {
   }
 
   return (
+    <ThemeProvider>
       <Stack screenOptions={{ headerShown: false }}>
           {user ? (
             <Stack.Screen name="(tabs)" />   // protected tab routes
@@ -23,6 +25,7 @@ function RootNavigator() {
           )}
           {/* <Stack.Screen name="(tabs)" /> */}
       </Stack>
+    </ThemeProvider>
   );
 }
 

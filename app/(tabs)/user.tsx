@@ -15,8 +15,8 @@ export default function UserProfileScreen() {
   const displayEmail = user?.email;
   const googleAvtar = user?.picture;
 
-  const { isDarkMode } = useAppTheme();
-  console.log("isDarkMode : ",isDarkMode);
+  const { isDarkMode, toggleDarkMode } = useAppTheme();
+  // console.log("isDarkMode : ",isDarkMode);
   
   return (
       <SafeAreaView style={styles.safe}>
@@ -75,13 +75,15 @@ export default function UserProfileScreen() {
                   <Feather name="sun" size={22} style={styles.rowIcon} />
                   <Text style={styles.rowLabel}>Dark Mode</Text>
                 </View>
-                <View style={styles.togglePill}>
-                  <Feather
-                    name={isDarkMode ? "moon" : "sun"}
-                    size={16}
-                    color="#000"
-                  />
-                </View>
+                <TouchableOpacity onPress={toggleDarkMode}>
+                  <View style={styles.togglePill}>
+                    <Feather
+                      name={isDarkMode ? "moon" : "sun"}
+                      size={16}
+                      color="#000"
+                    />
+                  </View>
+                </TouchableOpacity>
               </View>
 
               {/* Rate App */}
