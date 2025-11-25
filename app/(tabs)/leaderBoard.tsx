@@ -1,9 +1,25 @@
-import { View, Text } from 'react-native';
+import BackgroundTextTexture from '@/components/BackgroundTextTexture';
+import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, StyleSheet } from 'react-native';
 
 export default function LeaderBoard() {
   return (
-    <View>
-      <Text>LeaderBoard tab</Text>
-    </View>
+    <LinearGradient
+      colors={["#6315FF", "#FFCCD7"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.gradient}
+    >
+      <View>
+        <BackgroundTextTexture></BackgroundTextTexture>
+        <Text>LeaderBoard tab</Text>
+      </View>
+    </LinearGradient>
   );
 }
+
+const styles = StyleSheet.create({
+    gradient: {
+      flex: 1,
+    }
+});

@@ -7,6 +7,7 @@ import * as WebBrowser from "expo-web-browser"
 import * as Google from "expo-auth-session/providers/google"
 import { useAuth } from "../context/authContext";
 import useAppTheme from "@/context/useAppTheme";
+import BackgroundTexture from "@/components/BackgroundTexture";
 
 type UserData = {
     name?: string;
@@ -78,8 +79,8 @@ export default function LoginScreen() {
       end={{ x: 1, y: 1 }}
       style={styles.gradient}
     >
-    
     <SafeAreaView style={styles.safe}>
+      <BackgroundTexture></BackgroundTexture>
         <StatusBar barStyle="light-content" />
         <View style={styles.topSection}>
           <View style={styles.headerTextContainer}>
@@ -105,6 +106,12 @@ export default function LoginScreen() {
         </View>
 
         <View style={styles.card}>
+          <LinearGradient
+            colors={isDarkMode ? ["#242424", "#000"] : ["#FFF", "#FFCCD7"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={styles.gradient2}
+          >
           <View style={styles.tabRow}>
             <Pressable
               style={[
@@ -141,7 +148,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.fieldGroup}>
-            <Text style={styles.label}>Enter phone number</Text>
+            <Text style={isDarkMode ? styles.lebelDark : styles.label}>Enter phone number</Text>
             <TextInput
               style={styles.input}
               placeholder="+91 xxxx-xxx-xxx"
@@ -168,6 +175,7 @@ export default function LoginScreen() {
             </View>
             <Text style={styles.googleText}>Continue with Google</Text>
           </TouchableOpacity>
+          </LinearGradient>
         </View>
       </SafeAreaView>
     </LinearGradient>
@@ -178,6 +186,13 @@ const CARD_RADIUS = 20;
 const styles = StyleSheet.create({
   gradient: {
     flex: 1,
+  },
+  gradient2: {
+    flex: 1,
+    paddingHorizontal: 24,
+    paddingTop: 24,
+    borderTopLeftRadius: CARD_RADIUS,
+    borderTopRightRadius: CARD_RADIUS,
   },
   safe: {
     flex: 1,
@@ -213,7 +228,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(255,255,255,0.7)",
     justifyContent: "center",
     alignItems: "flex-end",
-    paddingHorizontal: 6,
+    paddingHorizontal: 5,
   },
   themeToggleDark: {
     width: 64,
@@ -222,7 +237,7 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0,0,0,0.7)",
     justifyContent: "center",
     alignItems: "flex-start",
-    paddingHorizontal: 6,
+    paddingHorizontal: 5,
   },
   themeIcon: {
     fontSize: 20,
@@ -232,11 +247,11 @@ const styles = StyleSheet.create({
 
   card: {
     flex: 1.4,
-    backgroundColor: "#FFFFFF",
-    borderTopLeftRadius: CARD_RADIUS,
-    borderTopRightRadius: CARD_RADIUS,
-    paddingHorizontal: 24,
-    paddingTop: 24,
+    // backgroundColor: "#FFF",
+    // borderTopLeftRadius: CARD_RADIUS,
+    // borderTopRightRadius: CARD_RADIUS,
+    // paddingHorizontal: 24,
+    // paddingTop: 24,
     shadowColor: "#000",
     shadowOpacity: 0.1,
     shadowRadius: 10,
@@ -282,6 +297,11 @@ const styles = StyleSheet.create({
     color: "#000",
     marginBottom: 8,
   },
+  lebelDark: {
+    fontSize: 14,
+    color: "#6C7278",
+    marginBottom: 8,
+  },
   input: {
     borderWidth: 1,
     borderColor: "#000",
@@ -289,7 +309,18 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     fontSize: 16,
+    backgroundColor: "#FFF",
     color: "#000",
+  },
+  inputDark: {
+    borderWidth: 1,
+    borderColor: "#FFF",
+    borderRadius: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    fontSize: 16,
+    backgroundColor: "#FFF",
+    color: "#828282",
   },
   primaryButton: {
     backgroundColor: "#6A4DFB",
@@ -303,7 +334,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
-
   dividerRow: {
     flexDirection: "row",
     alignItems: "center",

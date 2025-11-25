@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#FFFFFF',
+    color: '#F0F0F0',
   },
   username: {
     fontSize: 16,
