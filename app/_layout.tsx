@@ -18,12 +18,13 @@ function RootNavigator() {
   return (
     <ThemeProvider>
       <Stack screenOptions={{ headerShown: false }}>
-          {user ? (
+          {/* {user ? (
             <Stack.Screen name="(tabs)" />   // protected tab routes
           ) : (
             <Stack.Screen name="login" />    // public
-          )}
-          {/* <Stack.Screen name="(tabs)" /> */}
+          )} */}
+          <Stack.Screen name="(tabs)" />
+          {/* <Stack.Screen name="login" /> */}
       </Stack>
     </ThemeProvider>
   );

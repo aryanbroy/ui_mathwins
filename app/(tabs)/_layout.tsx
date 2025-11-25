@@ -1,11 +1,22 @@
 import { Tabs } from 'expo-router';
 import { Gift, Home, Trophy, User } from 'lucide-react-native';
 import { ThemeProvider } from '../../context/useAppTheme';
+import { BlurView } from 'expo-blur';
+import { Platform, StyleSheet } from 'react-native';
+import useAppTheme from '../../context/useAppTheme';
+import { isDynamicPart } from 'expo-router/build/fork/getPathFromState-forks';
 
 export default function TabLayout() {
+  const {isDarkMode} = useAppTheme();
   return (
     <ThemeProvider>
-      <Tabs screenOptions={{ headerShown: false }}>
+      <Tabs screenOptions={{ 
+        headerShown: false, 
+        tabBarActiveTintColor: "#6A5AE0",
+        tabBarStyle: {
+          backgroundColor: "white",
+        },
+      }}>
         <Tabs.Screen
           name="index"
           options={{

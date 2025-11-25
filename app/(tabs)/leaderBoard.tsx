@@ -1,4 +1,4 @@
-import BackgroundTextTexture from '@/components/BackgroundTextTexture';
+import BackgroundTexture from '@/components/BackgroundTexture';
 import { LinearGradient } from 'expo-linear-gradient';
 import { View, Text, StyleSheet } from 'react-native';
 
@@ -11,7 +11,7 @@ export default function LeaderBoard() {
       style={styles.gradient}
     >
       <View>
-        <BackgroundTextTexture></BackgroundTextTexture>
+        <BackgroundTexture></BackgroundTexture>
         <Text>LeaderBoard tab</Text>
       </View>
     </LinearGradient>

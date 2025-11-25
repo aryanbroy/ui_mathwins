@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     page: {
         flex:1,
         position: "absolute",
-        opacity: 0.3,
+        opacity: 0.2,
     },
     box: {
         width: 400,
