@@ -1,32 +1,25 @@
 import { View, Text, Image, StyleSheet } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '@/context/authContext';
 
 export default function Header() {
-
-  const {user} = useAuth();
+  const { user } = useAuth();
 
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.leftSection}>
-          <View style={styles.welcomeContainer}>
-            <Text style={styles.welcomeText}>Welcome</Text>
-            <Text style={styles.username}>Aryan</Text>
-          </View>
-          <View style={styles.coinContainer}>
-            <Text style={styles.coinEmoji}>🪙</Text>
-            <Text style={styles.coinText}>2,000 / 2,000 coins</Text>
-          </View>
+    <View style={styles.content}>
+      <View style={styles.leftSection}>
+        <View style={styles.welcomeContainer}>
+          <Text style={styles.welcomeText}>Welcome</Text>
+          <Text style={styles.username}>Aryan</Text>
         </View>
+        <View style={styles.coinContainer}>
+          <Text style={styles.coinEmoji}>🪙</Text>
+          <Text style={styles.coinText}>2,000 / 2,000 coins</Text>
+        </View>
+      </View>
 
-        <View style={styles.avatarContainer}>
-          <View style={styles.avatarBorder}>
-            <Image
-              source={{ uri: user?.picture}}
-              style={styles.avatar}
-            />
-          </View>
+      <View style={styles.avatarContainer}>
+        <View style={styles.avatarBorder}>
+          <Image source={{ uri: user?.picture }} style={styles.avatar} />
         </View>
       </View>
     </View>
@@ -34,23 +27,16 @@ export default function Header() {
 }
 
 const styles = StyleSheet.create({
-  gradient: {
-    paddingTop: 40,
-    paddingBottom: 20,
-    paddingHorizontal: 10,
-    borderBottomLeftRadius: 20,
-    borderBottomRightRadius: 20,
-  },
   container: {
     width: '100%',
   },
   content: {
-    paddingHorizontal: 20,
-    paddingVertical: 5,
+    paddingTop: 5,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+
   leftSection: {
     flex: 1,
     marginRight: 15,
@@ -105,6 +91,6 @@ const styles = StyleSheet.create({
   coinText: {
     fontSize: 14,
     color: '#FFFFFF',
-    fontWeight: "400",
+    fontWeight: '400',
   },
 });
