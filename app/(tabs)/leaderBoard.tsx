@@ -1,4 +1,4 @@
-import BackgroundTexture from '@/components/BackgroundTexture';
+import BackgroundTexture from '@/components/Texture/BackgroundTexture';
 import { LinearGradient } from 'expo-linear-gradient';
 import { View, Text, StyleSheet } from 'react-native';
 

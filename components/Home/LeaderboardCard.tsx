@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 
 type Props = {
   rank: number;
@@ -42,7 +43,7 @@ export default function LeaderboardCard({
       <View
         style={[styles.medalWrapper, { backgroundColor: medalBg[medalColor] }]}
       >
-        <Text style={styles.medalIcon}>👑</Text>
+        <MaterialCommunityIcons name="crown" size={32} color="#FFF" />
       </View>
     </View>
   );
@@ -72,7 +73,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    borderWidth: 1,
+    borderWidth: 3,
     borderColor: '#D0D4E0',
     alignItems: 'center',
     justifyContent: 'center',
@@ -91,6 +92,8 @@ const styles = StyleSheet.create({
     width: 52,
     height: 52,
     borderRadius: 26,
+    borderWidth: 2,
+    borderColor: "#000",
     backgroundColor: '#C956FF', // placeholder; replace with Image
   },
 

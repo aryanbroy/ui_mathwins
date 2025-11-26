@@ -19,127 +19,127 @@ export default function UserProfileScreen() {
   // console.log("isDarkMode : ",isDarkMode);
   
   return (
-      <SafeAreaView style={styles.safe}>
-        <StatusBar barStyle="light-content" />
+      <ScrollView
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingBottom: 32 }}
+        showsVerticalScrollIndicator={false}
+      >
+        <SafeAreaView style={styles.safe}>
+          <StatusBar barStyle="light-content" />
 
-        <ScrollView
-          style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 32 }}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Header / Avatar section */}
-          <View style={styles.header}>
-            <View style={styles.avatarWrapper}>
-              <Image
-                source={{ uri: googleAvtar }}
-                style={styles.avatarImage}
-              />
-            </View>
-
-            <Text style={styles.nameText}>{displayName}</Text>
-            <Text style={styles.emailText}>{displayEmail}</Text>
-
-            <TouchableOpacity style={styles.editProfileButton}>
-              <View style={styles.editIconWrapper}>
-                <MaterialCommunityIcons name="account-edit" size={24} color="#6A5AE0" />
-              </View>
-              <Text style={styles.editProfileText}>Edit Profile</Text>
-            </TouchableOpacity>
-          </View>
-
-          <LinearGradient
-            colors={["#FFCCD7", "#6A5AE0"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={styles.gradient}
-          >
-            <View style={styles.card}>
-              {/* Notifications */}
-              <View style={styles.row}>
-                <View style={styles.rowLeft}>
-                  <Feather name="bell" size={22} style={styles.rowIcon} />
-                  <Text style={styles.rowLabel}>Notifications</Text>
-                </View>
-                <Switch
-                  value={notificationsEnabled}
-                  onValueChange={setNotificationsEnabled}
-                  trackColor={{false: '#767577', true: '#81b0ff'}}
-                  thumbColor={notificationsEnabled ? '#f4f3f4' : '#000'}
-                  ios_backgroundColor="#3e3e3e"
+            {/* Header / Avatar section */}
+            <View style={styles.header}>
+              <View style={styles.avatarWrapper}>
+                <Image
+                  source={{ uri: googleAvtar }}
+                  style={styles.avatarImage}
                 />
               </View>
 
-              {/* Dark Mode */}
-              <View style={styles.row}>
-                <View style={styles.rowLeft}>
-                  <Feather name="sun" size={22} style={styles.rowIcon} />
-                  <Text style={styles.rowLabel}>Dark Mode</Text>
-                </View>
-                <TouchableOpacity onPress={toggleDarkMode}>
-                  <View style={styles.togglePill}>
-                    <Feather
-                      name={isDarkMode ? "moon" : "sun"}
-                      size={16}
-                      color="#000"
-                    />
-                  </View>
-                </TouchableOpacity>
-              </View>
+              <Text style={styles.nameText}>{displayName}</Text>
+              <Text style={styles.emailText}>{displayEmail}</Text>
 
-              {/* Rate App */}
-              <TouchableOpacity style={styles.row}>
-                <View style={styles.rowLeft}>
-                  <Ionicons
-                    name="star"
-                    size={22}
-                    style={[styles.rowIcon, { color: "#FFC107" }]}
-                  />
-                  <Text style={styles.rowLabel}>Rate App</Text>
+              <TouchableOpacity style={styles.editProfileButton}>
+                <View style={styles.editIconWrapper}>
+                  <MaterialCommunityIcons name="account-edit" size={24} color="#6A5AE0" />
                 </View>
-              </TouchableOpacity>
-
-              {/* Refer to earn */}
-              <TouchableOpacity style={styles.row}>
-                <View style={styles.rowLeft}>
-                  <Feather name="share-2" size={22} style={styles.rowIcon} />
-                  <Text style={styles.rowLabel}>Refer to earn</Text>
-                </View>
-              </TouchableOpacity>
-
-              {/* Privacy Policy */}
-              <TouchableOpacity style={styles.row}>
-                <View style={styles.rowLeft}>
-                  <Feather name="lock" size={22} style={styles.rowIcon} />
-                  <Text style={styles.rowLabel}>Privacy Policy</Text>
-                </View>
-                <Entypo name="chevron-right" size={18} color="#B0B0B0" />
-              </TouchableOpacity>
-
-              {/* Terms & Conditions */}
-              <TouchableOpacity style={styles.row}>
-                <View style={styles.rowLeft}>
-                  <MaterialIcons
-                    name="description"
-                    size={22}
-                    style={styles.rowIcon}
-                  />
-                  <Text style={styles.rowLabel}>Terms & Conditions</Text>
-                </View>
-                <Entypo name="chevron-right" size={18} color="#B0B0B0" />
-              </TouchableOpacity>
-
-              {/* Contact Us */}
-              <TouchableOpacity style={styles.row}>
-                <View style={styles.rowLeft}>
-                  <Feather name="mail" size={22} style={styles.rowIcon} />
-                  <Text style={styles.rowLabel}>Contact Us</Text>
-                </View>
-                <Entypo name="chevron-right" size={18} color="#B0B0B0" />
+                <Text style={styles.editProfileText}>Edit Profile</Text>
               </TouchableOpacity>
             </View>
-          </LinearGradient>
-        </ScrollView>
-      </SafeAreaView>
+
+            <LinearGradient
+              colors={["#FFCCD7", "#6A5AE0"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 0, y: 1 }}
+              style={styles.gradient}
+            >
+              <View style={styles.card}>
+                {/* Notifications */}
+                <View style={styles.row}>
+                  <View style={styles.rowLeft}>
+                    <Feather name="bell" size={22} style={styles.rowIcon} />
+                    <Text style={styles.rowLabel}>Notifications</Text>
+                  </View>
+                  <Switch
+                    value={notificationsEnabled}
+                    onValueChange={setNotificationsEnabled}
+                    trackColor={{false: '#767577', true: '#81b0ff'}}
+                    thumbColor={notificationsEnabled ? '#f4f3f4' : '#000'}
+                    ios_backgroundColor="#3e3e3e"
+                  />
+                </View>
+
+                {/* Dark Mode */}
+                <View style={styles.row}>
+                  <View style={styles.rowLeft}>
+                    <Feather name="sun" size={22} style={styles.rowIcon} />
+                    <Text style={styles.rowLabel}>Dark Mode</Text>
+                  </View>
+                  <TouchableOpacity onPress={toggleDarkMode}>
+                    <View style={styles.togglePill}>
+                      <Feather
+                        name={isDarkMode ? "moon" : "sun"}
+                        size={16}
+                        color="#000"
+                      />
+                    </View>
+                  </TouchableOpacity>
+                </View>
+
+                {/* Rate App */}
+                <TouchableOpacity style={styles.row}>
+                  <View style={styles.rowLeft}>
+                    <Ionicons
+                      name="star"
+                      size={22}
+                      style={[styles.rowIcon, { color: "#FFC107" }]}
+                    />
+                    <Text style={styles.rowLabel}>Rate App</Text>
+                  </View>
+                </TouchableOpacity>
+
+                {/* Refer to earn */}
+                <TouchableOpacity style={styles.row}>
+                  <View style={styles.rowLeft}>
+                    <Feather name="share-2" size={22} style={styles.rowIcon} />
+                    <Text style={styles.rowLabel}>Refer to earn</Text>
+                  </View>
+                </TouchableOpacity>
+
+                {/* Privacy Policy */}
+                <TouchableOpacity style={styles.row}>
+                  <View style={styles.rowLeft}>
+                    <Feather name="lock" size={22} style={styles.rowIcon} />
+                    <Text style={styles.rowLabel}>Privacy Policy</Text>
+                  </View>
+                  <Entypo name="chevron-right" size={18} color="#B0B0B0" />
+                </TouchableOpacity>
+
+                {/* Terms & Conditions */}
+                <TouchableOpacity style={styles.row}>
+                  <View style={styles.rowLeft}>
+                    <MaterialIcons
+                      name="description"
+                      size={22}
+                      style={styles.rowIcon}
+                    />
+                    <Text style={styles.rowLabel}>Terms & Conditions</Text>
+                  </View>
+                  <Entypo name="chevron-right" size={18} color="#B0B0B0" />
+                </TouchableOpacity>
+
+                {/* Contact Us */}
+                <TouchableOpacity style={styles.row}>
+                  <View style={styles.rowLeft}>
+                    <Feather name="mail" size={22} style={styles.rowIcon} />
+                    <Text style={styles.rowLabel}>Contact Us</Text>
+                  </View>
+                  <Entypo name="chevron-right" size={18} color="#B0B0B0" />
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
+        </SafeAreaView>
+      </ScrollView>
   );
 }
 

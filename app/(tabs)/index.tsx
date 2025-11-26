@@ -1,10 +1,10 @@
-import BackgroundTexture from '@/components/BackgroundTexture';
+import BackgroundTexture from '@/components/Texture/BackgroundTexture';
 import Header from '@/components/Header';
 import HomeBtn from '@/components/Home/HomeBtn';
 import LeaderboardCard from '@/components/Home/LeaderboardCard';
 import TournamentCards from '@/components/TournamentCards/TournamentCards';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export const dummyUsers = [
@@ -30,24 +30,20 @@ export const dummyUsers = [
 
 export default function Index() {
   return (
-    <SafeAreaView style={styles.safe}>
-      <BackgroundTexture></BackgroundTexture>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
-        <LinearGradient
-          colors={['#6315FF', '#FFCCD7']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.topGradient}
-        >
+    <ScrollView
+      bounces={false}
+      alwaysBounceVertical={false}
+      showsVerticalScrollIndicator={false}
+      contentContainerStyle={styles.contentContainer}
+    >
+      <SafeAreaView style={styles.safe}>
+        <View style={styles.topGradient}>
           <BackgroundTexture />
 
           <Header />
           <Text style={{ paddingBottom: 20 }}>Progress bar</Text>
           <TournamentCards />
-        </LinearGradient>
+        </View>
 
         <LinearGradient
           colors={['#FEE1F3', '#DAB7FF', '#A88BFF']}
@@ -66,26 +62,26 @@ export default function Index() {
           ))}
           <HomeBtn onPress={() => console.log('btn pressed')} />
         </LinearGradient>
-      </ScrollView>
-    </SafeAreaView>
+      </SafeAreaView>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: '#A88BFF',
+    backgroundColor: '#6A5AE0',
   },
-  scrollContent: {
-    paddingBottom: 24,
+  contentContainer: {
+    padding: 0, 
+    margin: 0,
   },
   topGradient: {
     width: '100%',
+    // backgroundColor: "#6A5AE0",
     paddingHorizontal: 20,
-    paddingVertical: 5,
   },
   bottomGradient: {
-    marginTop: -15,
     width: '100%',
     borderRadius: 20,
     overflow: 'hidden',

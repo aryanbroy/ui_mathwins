@@ -1,10 +1,13 @@
 import { View, Text, StyleSheet } from 'react-native';
+import CardTexture1 from '../Texture/CardTexture1';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function InstantCard() {
   return (
     <View style={styles.smallCard}>
+      <CardTexture1></CardTexture1>
       {/* Icon placeholder */}
-      <View style={styles.smallIconPlaceholder} />
+      <Ionicons name="sparkles-sharp" size={30} color="#FFF" style={styles.smallIconPlaceholder}/>
       <Text style={styles.smallTitle}>QUICK</Text>
       <Text style={styles.smallTitle}>TOURNAMENT</Text>
       <Text style={styles.smallReset}>Resets in: 20min 10 sec</Text>
@@ -16,21 +19,15 @@ const CARD_RADIUS = 16;
 const styles = StyleSheet.create({
   smallCard: {
     flex: 1,
-    backgroundColor: '#FFC6D3',
+    paddingVertical: 20,
+    backgroundColor: '#FFC3CE',
     borderRadius: CARD_RADIUS,
-    paddingVertical: 18,
-    paddingHorizontal: 10,
     alignItems: 'center',
-    marginRight: 8,
+    justifyContent: "center",
+    overflow: "hidden"
   },
   smallIconPlaceholder: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    borderWidth: 2,
-    borderColor: '#F46E8A',
     marginBottom: 10,
-    // TODO: replace with your SVG or Image
   },
   smallTitle: {
     fontSize: 14,

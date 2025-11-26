@@ -2,15 +2,23 @@ import { StyleSheet, Text, View } from 'react-native';
 import DailyCard from './DailyCard';
 import SoloCard from './SoloCard';
 import InstantCard from './InstantCard';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function TournamentCards() {
   return (
     <View style={styles.container}>
       <View style={styles.lifelineCard}>
-        <Text style={styles.lifelineLabel}>
-          Lifelines- <Text style={styles.lifelineValue}>10/10</Text>
-        </Text>
-        <Text style={styles.lifelineSubText}>Lorem Ipsum dolor sit</Text>
+        <LinearGradient
+          colors={['#FFA3B7', '#FFC0C0']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.gradient}
+        >
+          <Text style={styles.lifelineLabel}>
+            Lifelines- <Text style={styles.lifelineValue}>10/10</Text>
+            <Text style={styles.lifelineSubText}>Lorem Ipsum dolor sit</Text>
+          </Text>
+        </LinearGradient>
       </View>
       <DailyCard />
       <View style={styles.bottomRow}>
@@ -27,16 +35,21 @@ const styles = StyleSheet.create({
   container: {
     paddingBottom: 24,
   },
+  gradient: {
+    flex: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+  },
   lifelineCard: {
-    backgroundColor: '#FF99B4', // light pink
     borderRadius: CARD_RADIUS,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
   },
   lifelineLabel: {
+    flex: 1,
+    alignItems: "center",
     fontSize: 16,
     fontWeight: '600',
     color: '#4A1B2F',
@@ -45,13 +58,14 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   lifelineSubText: {
-    marginLeft: 12,
-    fontSize: 12,
+    marginLeft: 10,
+    fontSize: 14,
     color: '#4A1B2F',
     opacity: 0.8,
   },
   bottomRow: {
     flexDirection: 'row',
+    gap: 10,
     justifyContent: 'space-between',
   },
 });

@@ -7,7 +7,7 @@ import * as WebBrowser from "expo-web-browser"
 import * as Google from "expo-auth-session/providers/google"
 import { useAuth } from "../context/authContext";
 import useAppTheme from "@/context/useAppTheme";
-import BackgroundTexture from "@/components/BackgroundTexture";
+import BackgroundTexture from "@/components/Texture/BackgroundTexture";
 
 type UserData = {
     name?: string;
