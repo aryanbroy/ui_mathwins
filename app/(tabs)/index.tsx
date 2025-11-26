@@ -1,20 +1,95 @@
 import BackgroundTexture from '@/components/BackgroundTexture';
 import Header from '@/components/Header';
-import { View, Text, StyleSheet } from 'react-native';
+import HomeBtn from '@/components/Home/HomeBtn';
+import LeaderboardCard from '@/components/Home/LeaderboardCard';
+import TournamentCards from '@/components/TournamentCards/TournamentCards';
+import { LinearGradient } from 'expo-linear-gradient';
+import { ScrollView, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+
+export const dummyUsers = [
+  {
+    rank: 1,
+    name: 'UjwalXMathwins',
+    points: 1850,
+    medalColor: 'gold',
+  },
+  {
+    rank: 2,
+    name: 'AbhilashXMathwins',
+    points: 1620,
+    medalColor: 'silver',
+  },
+  {
+    rank: 3,
+    name: 'RahulXMathwins',
+    points: 1510,
+    medalColor: 'bronze',
+  },
+];
 
 export default function Index() {
   return (
     <SafeAreaView style={styles.safe}>
       <BackgroundTexture></BackgroundTexture>
-      <Header />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <LinearGradient
+          colors={['#6315FF', '#FFCCD7']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.topGradient}
+        >
+          <BackgroundTexture />
+
+          <Header />
+          <Text style={{ paddingBottom: 20 }}>Progress bar</Text>
+          <TournamentCards />
+        </LinearGradient>
+
+        <LinearGradient
+          colors={['#FEE1F3', '#DAB7FF', '#A88BFF']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.bottomGradient}
+        >
+          {dummyUsers.map(({ rank, name, medalColor, points }) => (
+            <LeaderboardCard
+              key={rank}
+              rank={rank}
+              name={name}
+              medalColor={medalColor as any}
+              points={points}
+            />
+          ))}
+          <HomeBtn onPress={() => console.log('btn pressed')} />
+        </LinearGradient>
+      </ScrollView>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#6A5AE0",
+    backgroundColor: '#A88BFF',
+  },
+  scrollContent: {
+    paddingBottom: 24,
+  },
+  topGradient: {
+    width: '100%',
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+  },
+  bottomGradient: {
+    marginTop: -15,
+    width: '100%',
+    borderRadius: 20,
+    overflow: 'hidden',
+    paddingVertical: 20,
+    paddingHorizontal: 16,
   },
 });
