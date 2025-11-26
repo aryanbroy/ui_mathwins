@@ -14,15 +14,15 @@ export default function BackgroundTextTexture() {
     return (
         <View style={styles.page}>
             <View style={styles.header}>
-                <MaterialCommunityIcons name="math-compass" size={70} color="black" style={styles.compass} />
-                <AntDesign name="code-sandbox" size={60} color="black" style={styles.sandbox}/>
+                <MaterialCommunityIcons name="math-compass" size={70} color="#FFF" style={styles.compass} />
+                <AntDesign name="code-sandbox" size={90} color="#FFF" style={styles.sandbox}/>
                 <View style={styles.holoCicrcle1}></View>
                 <View style={styles.holoCicrcle2}></View>
                 <View style={styles.holoCicrcle3}></View>
                 <View style={styles.holoCicrcle4}></View>
                 <View style={styles.holoCicrcle5}></View>
-                <MaterialCommunityIcons name="brain" size={60} color="black" style={styles.brain}/>
-                <MaterialCommunityIcons name="vector-triangle" size={60} color="black" style={styles.triangle}/>
+                <MaterialCommunityIcons name="brain" size={60} color="#FFF" style={styles.brain}/>
+                <MaterialCommunityIcons name="vector-triangle" size={60} color="#FFF" style={styles.triangle}/>
             </View>
             <View style={styles.textBg}>
                 <Text style={styles.mainText}>MATHEMATICS</Text>
@@ -52,11 +52,12 @@ const styles = StyleSheet.create({
     },
     sandbox: {
         position: "absolute",
-        top: 50,
+        top: 30,
         left: 0,
     },
     holoCicrcle1: {
         position: "absolute",
+        borderColor: "#FFF", 
         borderWidth: 2,
         borderRadius: 100,
         width: 30,
@@ -66,6 +67,7 @@ const styles = StyleSheet.create({
     },
     holoCicrcle2: {
         position: "absolute",
+        borderColor: "#FFF", 
         borderWidth: 2,
         borderRadius: 100,
         width: 30,
@@ -75,6 +77,7 @@ const styles = StyleSheet.create({
     },
     holoCicrcle3: {
         position: "absolute",
+        borderColor: "#FFF", 
         borderWidth: 2,
         borderRadius: 100,
         width: 15,
@@ -84,6 +87,7 @@ const styles = StyleSheet.create({
     },
     holoCicrcle4: {
         position: "absolute",
+        borderColor: "#FFF", 
         borderWidth: 2,
         borderRadius: 100,
         width: 15,
@@ -93,6 +97,7 @@ const styles = StyleSheet.create({
     },
     holoCicrcle5: {
         position: "absolute",
+        borderColor: "#FFF", 
         borderWidth: 2,
         borderRadius: 100,
         width: 15,
@@ -116,12 +121,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         paddingBottom: 10,
-        backgroundColor: "#000"
+        backgroundColor: "#FFF"
     },
     mainText: {
         fontSize: 50,
         fontWeight: 900,
-        color: "#FFF",
+        color: "#000",
         position: "relative",
     },
 });
