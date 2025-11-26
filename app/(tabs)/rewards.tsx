@@ -1,4 +1,4 @@
-import BackgroundTexture from '@/components/BackgroundTexture';
+import BackgroundTextTexture from '@/components/BackgroundTextTexture';
 import { LinearGradient } from 'expo-linear-gradient';
 import { View, Text, StyleSheet } from 'react-native';
 
@@ -11,8 +11,8 @@ export default function Rewards() {
       style={styles.gradient}
     >
       <View>
-        <BackgroundTexture></BackgroundTexture>
-        <Text>Rewards Tab</Text>
+        <BackgroundTextTexture></BackgroundTextTexture>
+        <Text></Text>
       </View>
     </LinearGradient>
   );

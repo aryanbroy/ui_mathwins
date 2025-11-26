@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, Dimensions  } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import Svg, { Path, G } from "react-native-svg";
+import Entypo from '@expo/vector-icons/Entypo';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import AntDesign from '@expo/vector-icons/AntDesign';
 
 export default function BackgroundTextTexture() {
     const { width } = Dimensions.get("window");
@@ -12,31 +13,21 @@ export default function BackgroundTextTexture() {
 
     return (
         <View style={styles.page}>
-            <View style={styles.box}>
-                <View style = {styles.outerCircle2}>
-                    <View style = {styles.outerCircle1}>
-                        <View style = {styles.centerCircle}>
-                            
-                        </View>
-                    </View>
-                </View>
+            <View style={styles.header}>
+                <MaterialCommunityIcons name="math-compass" size={70} color="black" style={styles.compass} />
+                <AntDesign name="code-sandbox" size={60} color="black" style={styles.sandbox}/>
+                <View style={styles.holoCicrcle1}></View>
+                <View style={styles.holoCicrcle2}></View>
+                <View style={styles.holoCicrcle3}></View>
+                <View style={styles.holoCicrcle4}></View>
+                <View style={styles.holoCicrcle5}></View>
+                <MaterialCommunityIcons name="brain" size={60} color="black" style={styles.brain}/>
+                <MaterialCommunityIcons name="vector-triangle" size={60} color="black" style={styles.triangle}/>
             </View>
-            <View style={styles.svgContainer}>
-                <Svg
-                width={width}
-                height={420}
-                viewBox="0 0 820 400"
-                preserveAspectRatio="xMidYMid slice"
-                >
-                {/* top/outer wavy line */}
-                <Path d={d} stroke="#FFFFFF" strokeWidth={4} fill="none" strokeLinecap="round" />
-
-                {/* second line drawn slightly shifted down to create parallel band */}
-                <G transform="translate(0, 48)">
-                    <Path d={d} stroke="#FFFFFF" strokeWidth={4} fill="none" strokeLinecap="round" />
-                </G>
-                </Svg>
+            <View style={styles.textBg}>
+                <Text style={styles.mainText}>MATHEMATICS</Text>
             </View>
+            <View></View>
         </View>
     );
 };
@@ -44,45 +35,93 @@ export default function BackgroundTextTexture() {
 const styles = StyleSheet.create({
     page: {
         flex:1,
+        width: "100%",
         position: "absolute",
-        opacity: 0.5,
+        paddingHorizontal: 10,
+        opacity: 0.1,
     },
-    box: {
-        width: 400,
-        height: 400,
-        left: -180,
-        top: 40,
+    header: {
+        marginBottom: 2,
+        height: 200,
+        position: "relative",
     },
-    centerCircle: {
-        width: 150,
-        height: 150,
-        backgroundColor: "#FFF",
-        borderRadius: "100%",
-        opacity: 0.5,
-        margin: 0,
+    compass: {
+        position: "absolute",
+        left: 150,
+        top: 15,
     },
-    outerCircle1: {
+    sandbox: {
+        position: "absolute",
+        top: 50,
+        left: 0,
+    },
+    holoCicrcle1: {
+        position: "absolute",
+        borderWidth: 2,
+        borderRadius: 100,
+        width: 30,
+        height: 30,
+        left: 95,
+        top: 10,
+    },
+    holoCicrcle2: {
+        position: "absolute",
+        borderWidth: 2,
+        borderRadius: 100,
+        width: 30,
+        height: 30,
+        left: 270,
+        top: 150,
+    },
+    holoCicrcle3: {
+        position: "absolute",
+        borderWidth: 2,
+        borderRadius: 100,
+        width: 15,
+        height: 15,
+        left: 250,
+        top: 50,
+    },
+    holoCicrcle4: {
+        position: "absolute",
+        borderWidth: 2,
+        borderRadius: 100,
+        width: 15,
+        height: 15,
+        left: 20,
+        top: 160,
+    },
+    holoCicrcle5: {
+        position: "absolute",
+        borderWidth: 2,
+        borderRadius: 100,
+        width: 15,
+        height: 15,
+        left: 370,
+        top: 20,
+    },
+    brain: {
+        position: "absolute",
+        left: 310,
+        top: 60,
+    },
+    triangle: {
+        position: "absolute",
+        left: 100,
+        top: 120,
+    },
+    textBg: {
+        width: "100%",
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        borderWidth: 1,
-        borderColor: "#FFF",
-        borderRadius: "100%",
-        margin: 50,
+        paddingBottom: 10,
+        backgroundColor: "#000"
     },
-    outerCircle2: {
-        flex:1,
-        borderWidth: 1,
-        borderColor: "#FFF",
-        borderRadius: "100%",
+    mainText: {
+        fontSize: 50,
+        fontWeight: 900,
+        color: "#FFF",
+        position: "relative",
     },
-    svgContainer: {
-    position: "absolute",
-    right: -40,
-    bottom: -20,
-    // keep container large enough to fit the wave
-    width: "120%",
-    height: 420,
-    overflow: "visible",
-  },
 });

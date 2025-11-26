@@ -12,7 +12,7 @@ export default function LeaderBoard() {
     >
       <View>
         <BackgroundTexture></BackgroundTexture>
-        <Text>LeaderBoard tab</Text>
+        <Text></Text>
       </View>
     </LinearGradient>
   );
