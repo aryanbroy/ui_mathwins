@@ -73,6 +73,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#6A5AE0',
   },
   contentContainer: {
+    backgroundColor: '#6A5AE0',
     padding: 0, 
     margin: 0,
   },
@@ -83,7 +84,8 @@ const styles = StyleSheet.create({
   },
   bottomGradient: {
     width: '100%',
-    borderRadius: 20,
+    borderTopRightRadius: 20,
+    borderTopLeftRadius: 20,
     overflow: 'hidden',
     paddingVertical: 20,
     paddingHorizontal: 16,

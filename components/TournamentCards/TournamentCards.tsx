@@ -29,8 +29,6 @@ export default function TournamentCards() {
   );
 }
 
-const CARD_RADIUS = 10;
-
 const styles = StyleSheet.create({
   container: {
     paddingBottom: 24,
@@ -42,7 +40,7 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
   },
   lifelineCard: {
-    borderRadius: CARD_RADIUS,
+    borderRadius: 10,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,

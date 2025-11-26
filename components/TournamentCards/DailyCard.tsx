@@ -1,9 +1,10 @@
 import { View, Text, StyleSheet } from 'react-native';
+import EvilIcons from '@expo/vector-icons/EvilIcons';
 
 export default function DailyCard() {
   return (
     <View style={styles.dailyCard}>
-      <View style={styles.dailyIconPlaceholder} />
+      <EvilIcons name="calendar" size={70} color="#FFF" style={styles.smallIconPlaceholder}/>
 
       {/* Right text block */}
       <View style={styles.dailyTextWrapper}>
@@ -34,6 +35,9 @@ const styles = StyleSheet.create({
     borderColor: '#F46E8A',
     marginRight: 16,
     // TODO: replace with your SVG or Image
+  },
+  smallIconPlaceholder: {
+    marginRight: 20,
   },
   dailyTextWrapper: {
     flex: 1,
