@@ -1,3 +1,4 @@
+import BackgroundTexture from '@/components/BackgroundTexture';
 import Header from '@/components/Header';
 import { View, Text, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -5,6 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 export default function Index() {
   return (
     <SafeAreaView style={styles.safe}>
+      <BackgroundTexture></BackgroundTexture>
       <Header />
     </SafeAreaView>
   );
