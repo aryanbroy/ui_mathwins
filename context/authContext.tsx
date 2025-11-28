@@ -10,6 +10,7 @@ type AuthContextType = {
   user: UserData | null ;
   login: (user: UserData) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (profile: UserData) => Promise<void>;
   loading: boolean;
 };
 
@@ -56,8 +57,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const updateProfile = async (profile: UserData) => {
+    try {
+      await AsyncStorage.setItem("@profile", JSON.stringify(profile));
+      setUser(profile);
+    } catch (e) {
+      console.log("[Auth] profile update error", e);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );
