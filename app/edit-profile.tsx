@@ -61,7 +61,6 @@ export default function AvatarSelectionScreen() {
 
             {/* White Content Area */}
             <ScrollView
-                style={styles.scroll}
                 bounces={false}
                 alwaysBounceVertical={false}
                 showsVerticalScrollIndicator={false}
@@ -144,7 +143,7 @@ export default function AvatarSelectionScreen() {
                 onPress={() => setIsConfirmed(!isConfirmed)}
                 >
                 <View style={[styles.checkbox, isConfirmed && styles.checkboxChecked]}>
-                    {isConfirmed && <Ionicons name="checkmark" size={18} color="#8B5CF6" />}
+                    {isConfirmed && <Ionicons name="checkmark" size={20} color="#FFF" />}
                 </View>
                 <Text style={styles.checkboxLabel}>Confirm Submission</Text>
                 </TouchableOpacity>
@@ -173,8 +172,6 @@ const makeStyles = (colors: ColorScheme) =>
         header1: {
             flex: 1,
             width: "100%",
-        },
-        scroll: {
             borderRadius: 30,
         },
         safe: {
@@ -185,7 +182,6 @@ const makeStyles = (colors: ColorScheme) =>
             alignItems: "center",
             justifyContent: "space-between",
             paddingTop: 0,
-            paddingBottom: 40,
         },
         themeToggleContainer: {
             width: "100%",
@@ -321,7 +317,7 @@ const makeStyles = (colors: ColorScheme) =>
             marginBottom: 25,
         },
         inputLabel: {
-            color: colors.text      ,
+            color: colors.text,
             fontSize: 14,
             marginBottom: 8,
         },
@@ -338,7 +334,7 @@ const makeStyles = (colors: ColorScheme) =>
         checkboxContainer: {
             flexDirection: 'row',
             alignItems: 'center',
-            marginBottom: 25,
+            marginBottom: 20,
         },
         checkbox: {
             width: 24,
@@ -352,7 +348,7 @@ const makeStyles = (colors: ColorScheme) =>
             backgroundColor: 'white',
         },
         checkboxChecked: {
-            backgroundColor: 'white',
+            backgroundColor: colors.primary,
         },
         checkboxLabel: {
             color: colors.text,
@@ -364,7 +360,6 @@ const makeStyles = (colors: ColorScheme) =>
             paddingVertical: 16,
             paddingHorizontal: 100,
             borderRadius: 12,
-            marginVertical: 10,
         },
         playButtonText: {
             color: 'white',
