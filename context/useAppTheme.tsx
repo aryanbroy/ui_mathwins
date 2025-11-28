@@ -83,7 +83,7 @@ const lightColors: ColorScheme = {
   divider: "#E5E7EB",
   shadow: "rgba(15,23,42,0.12)",
   
-  primary: "#6A4DFB",
+  primary: "#6315FF",
   success: "#16A34A",
   warning: "#F59E0B",
   danger: "#EF4444",
@@ -148,7 +148,7 @@ const darkColors: ColorScheme = {
   divider: "#111827",
   shadow: "rgba(0,0,0,0.6)",
 
-  primary: "#6A4DFB",
+  primary: "#6315FF",
   success: "#22C55E",
   warning: "#FBBF24",
   danger: "#F97373",

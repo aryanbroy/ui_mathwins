@@ -43,10 +43,8 @@ export default function Index() {
       contentContainerStyle={styles.contentContainer}
     >
       <SafeAreaView style={styles.safe}>
-        {/* Top section on purple background + texture */}
         <View style={styles.topSection}>
           <BackgroundTexture />
-
           <Header />
           <Text style={styles.progressText}>Progress bar</Text>
           <TournamentCards />
