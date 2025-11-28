@@ -7,14 +7,14 @@ import useAppTheme from '../../context/useAppTheme';
 import { isDynamicPart } from 'expo-router/build/fork/getPathFromState-forks';
 
 export default function TabLayout() {
-  const {isDarkMode} = useAppTheme();
+  const {isDarkMode, colors} = useAppTheme();
   return (
     <ThemeProvider>
       <Tabs screenOptions={{ 
         headerShown: false, 
         tabBarActiveTintColor: "#6A5AE0",
         tabBarStyle: {
-          backgroundColor: "white",
+          backgroundColor: colors.bg,
         },
       }}>
         <Tabs.Screen

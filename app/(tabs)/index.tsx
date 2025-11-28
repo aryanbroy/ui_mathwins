@@ -1,3 +1,4 @@
+import React from 'react';
 import BackgroundTexture from '@/components/Texture/BackgroundTexture';
 import Header from '@/components/Header';
 import HomeBtn from '@/components/Home/HomeBtn';
@@ -6,6 +7,7 @@ import TournamentCards from '@/components/TournamentCards/TournamentCards';
 import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 
 export const dummyUsers = [
   {
@@ -29,24 +31,30 @@ export const dummyUsers = [
 ];
 
 export default function Index() {
+  const { colors } = useAppTheme();
+  const styles = React.useMemo(() => makeStyles(colors), [colors]);
+
   return (
     <ScrollView
+      style={styles.scroll}
       bounces={false}
       alwaysBounceVertical={false}
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.contentContainer}
     >
       <SafeAreaView style={styles.safe}>
-        <View style={styles.topGradient}>
+        {/* Top section on purple background + texture */}
+        <View style={styles.topSection}>
           <BackgroundTexture />
 
           <Header />
-          <Text style={{ paddingBottom: 20 }}>Progress bar</Text>
+          <Text style={styles.progressText}>Progress bar</Text>
           <TournamentCards />
         </View>
 
+        {/* Bottom rounded gradient panel */}
         <LinearGradient
-          colors={['#FEE1F3', '#DAB7FF', '#A88BFF']}
+          colors={colors.gradients.surface}
           start={{ x: 0, y: 0 }}
           end={{ x: 0, y: 1 }}
           style={styles.bottomGradient}
@@ -60,34 +68,45 @@ export default function Index() {
               points={points}
             />
           ))}
-          <HomeBtn onPress={() => console.log('btn pressed')} />
+          <HomeBtn onPress={() => console.log("btn pressed")} />
         </LinearGradient>
       </SafeAreaView>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: '#6A5AE0',
-  },
-  contentContainer: {
-    backgroundColor: '#6A5AE0',
-    padding: 0, 
-    margin: 0,
-  },
-  topGradient: {
-    width: '100%',
-    // backgroundColor: "#6A5AE0",
-    paddingHorizontal: 20,
-  },
-  bottomGradient: {
-    width: '100%',
-    borderTopRightRadius: 20,
-    borderTopLeftRadius: 20,
-    overflow: 'hidden',
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-  },
-});
+const makeStyles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    scroll: {
+      flex: 1,
+      backgroundColor: colors.bgPrimary,
+    },
+    safe: {
+      flex: 1,
+      backgroundColor: colors.bgPrimary,
+    },
+    contentContainer: {
+      backgroundColor: colors.bg,
+      padding: 0,
+      margin: 0,
+    },
+    topSection: {
+      width: "100%",
+      paddingHorizontal: 20,
+      paddingBottom: 20,
+    },
+    progressText: {
+      paddingBottom: 20,
+      color: colors.textOnPrimary,
+      fontSize: 14,
+      fontWeight: "500",
+    },
+    bottomGradient: {
+      width: "100%",
+      borderTopRightRadius: 20,
+      borderTopLeftRadius: 20,
+      overflow: "hidden",
+      paddingVertical: 20,
+      paddingHorizontal: 16,
+    },
+  });

@@ -2,88 +2,200 @@ import React, { createContext, ReactNode, useContext, useEffect, useState } from
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export interface ColorScheme {
-  bg: string;
-  surface: string;
+  // base surfaces
+  bg: string;              // screen background
+  bgPrimary: string;
+  surface: string;         // generic surface (modals, blocks)
+  card: string;            // cards like Profile settings rows
+
+  // text
   text: string;
+  textSecondary: string;
+  textHighlight: string;
   textMuted: string;
+  textOnPrimary: string;   // e.g. "Send OTP" on purple button
+
+  // borders & decor
   border: string;
+  divider: string;
+  shadow: string;
+
+  // brand / semantic
   primary: string;
   success: string;
   warning: string;
   danger: string;
-  shadow: string;
+
   gradients: {
-    background: [string, string];
-    surface: [string, string];
-    primary: [string, string];
+    background: [string, string]; // big screen background (login/profile top)
+    surface: [string, string];    // pink panel behind cards
+    primary: [string, string];    // primary CTA (Send OTP)
     success: [string, string];
     warning: [string, string];
     danger: [string, string];
     muted: [string, string];
     empty: [string, string];
   };
+
   backgrounds: {
-    input: string;
-    editInput: string;
+    input: string;     // normal input
+    editInput: string; // focused / editing input
   };
+
+  cardTexture: {
+    bg1: string;
+    bg2: string;
+    bg3: string;
+  }
+
+  tabBar: {
+    background: string;
+    borderTop: string;
+    iconActive: string;
+    iconInactive: string;
+  };
+
+  controls: {
+    switchTrackOn: string;
+    switchThumbOn: string;
+    switchTrackOff: string;
+    switchThumbOff: string;
+    checkboxBorder: string;
+    checkboxFill: string;
+  };
+
   statusBarStyle: "light-content" | "dark-content";
 }
 
 const lightColors: ColorScheme = {
-  bg: "#f3f3f3ff",
-  surface: "#ffffffff",
-  text: "#1e293b",
-  textMuted: "#64748b",
-  border: "#ff4d00",
-  primary: "#ff4d00",
-  success: "#10b981",
-  warning: "#f59e0b",
-  danger: "#ef4444",
-  shadow: "#000000",
+  bg: "#F5F4FF",              // very light lavender backing
+  bgPrimary: "#6A4DFB",
+  surface: "#FFFFFF",         // plain white surface
+  card: "#FFFFFF",            // profile cards
+
+  text: "#111827",
+  textSecondary: "#FFFFFF",
+  textHighlight: "#660012",
+  textMuted: "#6B7280",
+  textOnPrimary: "#000",
+  
+  border: "#838383",
+  divider: "#E5E7EB",
+  shadow: "rgba(15,23,42,0.12)",
+  
+  primary: "#6A4DFB",
+  success: "#16A34A",
+  warning: "#F59E0B",
+  danger: "#EF4444",
+  
   gradients: {
-    background: ["#f8fafc", "#e2e8f0"],
-    surface: ["#ffffff", "#f8fafc"],
-    primary: ["#3b82f6", "#1d4ed8"],
-    success: ["#10b981", "#059669"],
-    warning: ["#f59e0b", "#d97706"],
-    danger: ["#ef4444", "#dc2626"],
-    muted: ["#9ca3af", "#6b7280"],
-    empty: ["#f3f4f6", "#e5e7eb"],
+    // big purple → pink gradient (login & profile header)
+    background: ["#6315FF", "#FFCCD7"],
+    // panel behind the cards on profile screen
+    surface: ["#FFCCD5", "#9087E5"],
+    // CTA buttons like "Send OTP"
+    primary: ["#6A4DFB", "#4C2FE0"],
+    success: ["#4ADE80", "#16A34A"],
+    warning: ["#FBBF24", "#D97706"],
+    danger: ["#F87171", "#DC2626"],
+    muted: ["#FFB9DC", "#FFD6DD"],
+    empty: ["#F9FAFB", "#E5E7EB"],
   },
+  
   backgrounds: {
-    input: "#ffffff",
-    editInput: "#ffffff",
+    input: "#FFFFFF",
+    editInput: "#FFFFFF",
   },
-  statusBarStyle: "dark-content" as const,
+  
+  cardTexture: {
+    bg1: "#ffb3b3",
+    bg2: "#FFD6DD",
+    bg3: "#FFFFFF",
+  },
+
+  tabBar: {
+    background: "#FFFFFF",
+    borderTop: "rgba(148,163,184,0.25)",
+    iconActive: "#6A4DFB",
+    iconInactive: "#9CA3AF",
+  },
+  
+  controls: {
+    switchTrackOn: "#6A4DFB",
+    switchThumbOn: "#FFFFFF",
+    switchTrackOff: "#E5E7EB",
+    switchThumbOff: "#FFFFFF",
+    checkboxBorder: "#111827",
+    checkboxFill: "#6A4DFB",
+  },
+  
+  statusBarStyle: "light-content",
 };
 
 const darkColors: ColorScheme = {
-  bg: "#000",
-  surface: "#353535ff",
-  text: "#f1f5f9",
-  textMuted: "#94a3b8",
-  border: "#ff4d00",
-  primary: "#ff4d00",
-  success: "#34d399",
-  warning: "#fbbf24",
-  danger: "#f87171",
-  shadow: "#000000",
+  bg: "#020617",         // near-black blue
+  bgPrimary: "#000",
+  surface: "#020617",
+  card: "#1F2933",       // cards in profile/settings
+  
+  text: "#F9FAFB",
+  textSecondary: "#FFFFFF",
+  textHighlight: "#FF627D",
+  textMuted: "#9CA3AF",
+  textOnPrimary: "#FFD6DF",
+
+  border: "#1F2933",
+  divider: "#111827",
+  shadow: "rgba(0,0,0,0.6)",
+
+  primary: "#6A4DFB",
+  success: "#22C55E",
+  warning: "#FBBF24",
+  danger: "#F97373",
+
   gradients: {
-    background: ["#0f172a", "#1e293b"],
-    surface: ["#1e293b", "#334155"],
-    primary: ["#3b82f6", "#1d4ed8"],
-    success: ["#10b981", "#059669"],
-    warning: ["#f59e0b", "#d97706"],
-    danger: ["#ef4444", "#dc2626"],
-    muted: ["#374151", "#4b5563"],
-    empty: ["#374151", "#4b5563"],
+    // dark header / login background (can still be slightly purple)
+    background: ["#6315FF", "#FFCCD7"],
+    // dark subtle panel behind cards (you can tint with purple if you want)
+    surface: ["#242424", "#000000"],
+    primary: ["#6A4DFB", "#4C2FE0"],
+    success: ["#22C55E", "#15803D"],
+    warning: ["#FBBF24", "#D97706"],
+    danger: ["#F97373", "#DC2626"],
+    muted: ["#000000", "#242424"],
+    empty: ["#111827", "#020617"],
   },
+
   backgrounds: {
-    input: "#1e293b",
-    editInput: "#0f172a",
+    input: "#020617",
+    editInput: "#020617",
   },
-  statusBarStyle: "light-content" as const,
+
+  cardTexture: {
+    bg1: "#8a8a8a",
+    bg2: "#5c5c5c",
+    bg3: "#393939",
+  },
+
+  tabBar: {
+    background: "#020617",
+    borderTop: "rgba(15,23,42,0.9)",
+    iconActive: "#F97316", // you’re using orange-ish/pink active icon
+    iconInactive: "#4B5563",
+  },
+
+  controls: {
+    switchTrackOn: "#2563EB",
+    switchThumbOn: "#FFFFFF",
+    switchTrackOff: "#4B5563",
+    switchThumbOff: "#9CA3AF",
+    checkboxBorder: "#E5E7EB",
+    checkboxFill: "#6A4DFB",
+  },
+
+  statusBarStyle: "light-content",
 };
+
 
 interface ThemeContextType { 
   isDarkMode: boolean;
