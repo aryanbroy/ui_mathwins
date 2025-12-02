@@ -7,7 +7,7 @@ type Props = {
   rank: number;
   name: string;
   points: number;
-  medalColor: string;
+  medalColor: string | null;
 };
 
 const medalBg: Record<string, string> = {
@@ -16,7 +16,12 @@ const medalBg: Record<string, string> = {
   bronze: '#c16700',
 };
 
-export default function LeaderboardCard({ rank, name, points, medalColor }: Props) {
+export default function LeaderboardCard({
+  rank,
+  name,
+  points,
+  medalColor,
+}: Props) {
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
 
@@ -39,7 +44,12 @@ export default function LeaderboardCard({ rank, name, points, medalColor }: Prop
       </View>
 
       {/* Medal */}
-      <View style={[styles.medalWrapper, { backgroundColor: medalBg[medalColor] }]}>
+      <View
+        style={[
+          styles.medalWrapper,
+          { backgroundColor: medalColor ? medalBg[medalColor] : '' },
+        ]}
+      >
         <MaterialCommunityIcons name="crown" size={32} color="#FFF" />
       </View>
     </View>
@@ -54,8 +64,8 @@ const makeStyles = (colors: ColorScheme) =>
       borderRadius: CARD_RADIUS,
       paddingHorizontal: 16,
       paddingVertical: 10,
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       marginBottom: 10,
       shadowColor: colors.shadow,
       shadowOpacity: 0.12,
@@ -70,13 +80,13 @@ const makeStyles = (colors: ColorScheme) =>
       borderRadius: 14,
       borderWidth: 2,
       borderColor: colors.border,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
       marginRight: 10,
     },
     rankText: {
       fontSize: 13,
-      fontWeight: "700",
+      fontWeight: '700',
       color: colors.textMuted,
     },
 
@@ -97,13 +107,13 @@ const makeStyles = (colors: ColorScheme) =>
     },
     name: {
       fontSize: 15,
-      fontWeight: "700",
+      fontWeight: '700',
       color: colors.text,
     },
     points: {
       marginTop: 4,
       fontSize: 11,
-      fontWeight: "500",
+      fontWeight: '500',
       color: colors.textMuted,
     },
 
@@ -111,7 +121,8 @@ const makeStyles = (colors: ColorScheme) =>
       width: 48,
       height: 48,
       borderRadius: 14,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
     },
   });
+

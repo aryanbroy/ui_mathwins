@@ -28,6 +28,48 @@ export const dummyUsers = [
     points: 1510,
     medalColor: 'bronze',
   },
+  {
+    rank: 4,
+    name: 'AdityaXMathwins',
+    points: 1450,
+    medalColor: null,
+  },
+  {
+    rank: 5,
+    name: 'SnehaXMathwins',
+    points: 1380,
+    medalColor: null,
+  },
+  {
+    rank: 6,
+    name: 'VikramXMathwins',
+    points: 1290,
+    medalColor: null,
+  },
+  {
+    rank: 7,
+    name: 'RiyaXMathwins',
+    points: 1150,
+    medalColor: null,
+  },
+  {
+    rank: 8,
+    name: 'KaranXMathwins',
+    points: 1020,
+    medalColor: null,
+  },
+  {
+    rank: 9,
+    name: 'AnjaliXMathwins',
+    points: 950,
+    medalColor: null,
+  },
+  {
+    rank: 10,
+    name: 'RohanXMathwins',
+    points: 880,
+    medalColor: null,
+  },
 ];
 
 export default function Index() {
@@ -57,7 +99,7 @@ export default function Index() {
           end={{ x: 0, y: 1 }}
           style={styles.bottomGradient}
         >
-          {dummyUsers.map(({ rank, name, medalColor, points }) => (
+          {dummyUsers.slice(0, 3).map(({ rank, name, medalColor, points }) => (
             <LeaderboardCard
               key={rank}
               rank={rank}
@@ -66,7 +108,7 @@ export default function Index() {
               points={points}
             />
           ))}
-          <HomeBtn onPress={() => console.log("btn pressed")} />
+          <HomeBtn onPress={() => console.log('btn pressed')} />
         </LinearGradient>
       </SafeAreaView>
     </ScrollView>
@@ -89,7 +131,7 @@ const makeStyles = (colors: ColorScheme) =>
       margin: 0,
     },
     topSection: {
-      width: "100%",
+      width: '100%',
       paddingHorizontal: 20,
       paddingBottom: 20,
     },
@@ -97,14 +139,15 @@ const makeStyles = (colors: ColorScheme) =>
       paddingBottom: 20,
       color: colors.textOnPrimary,
       fontSize: 14,
-      fontWeight: "500",
+      fontWeight: '500',
     },
     bottomGradient: {
-      width: "100%",
+      width: '100%',
       borderTopRightRadius: 20,
       borderTopLeftRadius: 20,
-      overflow: "hidden",
+      overflow: 'hidden',
       paddingVertical: 20,
       paddingHorizontal: 16,
     },
   });
+
