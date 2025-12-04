@@ -1,54 +1,70 @@
-import { Tabs } from 'expo-router';
 import { Gift, Home, Trophy, User } from 'lucide-react-native';
-import { ThemeProvider } from '../../context/useAppTheme';
-import { BlurView } from 'expo-blur';
-import { Platform, StyleSheet } from 'react-native';
-import useAppTheme from '../../context/useAppTheme';
-import { isDynamicPart } from 'expo-router/build/fork/getPathFromState-forks';
+import useAppTheme, { ThemeProvider } from '../../context/useAppTheme';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import LeaderBoard from './leaderBoard';
+import Rewards from './rewards';
+import UserProfileScreen from './user';
+import HomeTabLayout from './(hometab)/_layout';
+
+const Tab = createBottomTabNavigator();
 
 export default function TabLayout() {
-  const {isDarkMode, colors} = useAppTheme();
   return (
     <ThemeProvider>
-      <Tabs screenOptions={{ 
-        headerShown: false, 
-        tabBarActiveTintColor: "#6A5AE0",
+      <TabNavigator />
+    </ThemeProvider>
+  );
+}
+
+function TabNavigator() {
+  const { colors } = useAppTheme();
+  return (
+    <Tab.Navigator
+      initialRouteName="Home"
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: '#6A5AE0',
         tabBarStyle: {
           backgroundColor: colors.bg,
         },
-      }}>
-        <Tabs.Screen
-          name="index"
-          options={{
-            title: 'Home',
-            tabBarIcon: ({ color }) => <Home color={color} />,
-          }}
-        />
+      }}
+    >
+      <Tab.Screen
+        name="Home"
+        component={HomeTabLayout}
+        options={{
+          headerTitle: 'hometab',
+          title: 'Home',
+          tabBarIcon: ({ color }) => <Home color={color} />,
+        }}
+      />
 
-        <Tabs.Screen
-          name="leaderBoard"
-          options={{
-            title: 'LeaderBoard',
-            tabBarIcon: ({ color }) => <Trophy color={color} />,
-          }}
-        />
+      <Tab.Screen
+        name="leaderBoard"
+        component={LeaderBoard}
+        options={{
+          title: 'LeaderBoard',
+          tabBarIcon: ({ color }) => <Trophy color={color} />,
+        }}
+      />
 
-        <Tabs.Screen
-          name="rewards"
-          options={{
-            title: 'Rewards',
-            tabBarIcon: ({ color }) => <Gift color={color} />,
-          }}
-        />
+      <Tab.Screen
+        name="rewards"
+        component={Rewards}
+        options={{
+          title: 'Rewards',
+          tabBarIcon: ({ color }) => <Gift color={color} />,
+        }}
+      />
 
-        <Tabs.Screen
-          name="user"
-          options={{
-            title: 'User',
-            tabBarIcon: ({ color }) => <User color={color} />,
-          }}
-        />
-      </Tabs>
-    </ThemeProvider>
+      <Tab.Screen
+        name="user"
+        component={UserProfileScreen}
+        options={{
+          title: 'User',
+          tabBarIcon: ({ color }) => <User color={color} />,
+        }}
+      />
+    </Tab.Navigator>
   );
 }
