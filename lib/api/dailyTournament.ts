@@ -1,3 +1,4 @@
+import { createDailySessionResponse } from '@/types/api/daily';
 import { api } from './client';
 import { parseApiError } from './parseApiError';
 
@@ -22,8 +23,14 @@ export const getDailyTournamentDetails = async () => {
   }
 };
 
-export const createDailySession = async () => {
-  const res = await api.post('api/daily/session/create');
-  const data = res.data;
-  return data;
-};
+export const createDailySession =
+  async (): Promise<createDailySessionResponse> => {
+    try {
+      const res = await api.post('api/daily/session/create');
+      const resData: createDailySessionResponse = res.data;
+      return resData;
+    } catch (err) {
+      const msg = parseApiError(err);
+      throw new Error(msg);
+    }
+  };
