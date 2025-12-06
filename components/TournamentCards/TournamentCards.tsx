@@ -6,13 +6,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { HomeTabStackParamList } from '@/types/tabTypes';
-
-export type HomeScreenNavigationProp = NativeStackNavigationProp<
-  HomeTabStackParamList,
-  'HomeMain'
->;
+import { HomeScreenNavigationProp } from '@/types/tabTypes';
 
 export default function TournamentCards() {
   const { colors } = useAppTheme();
