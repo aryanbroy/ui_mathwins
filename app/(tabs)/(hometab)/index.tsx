@@ -92,7 +92,6 @@ export default function Index() {
           <TournamentCards />
         </View>
 
-        {/* Bottom rounded gradient panel */}
         <LinearGradient
           colors={colors.gradients.surface}
           start={{ x: 0, y: 0 }}
@@ -150,4 +149,3 @@ const makeStyles = (colors: ColorScheme) =>
       paddingHorizontal: 16,
     },
   });
-

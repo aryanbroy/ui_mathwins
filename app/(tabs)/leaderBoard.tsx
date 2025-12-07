@@ -2,7 +2,7 @@ import Tab from '@/components/Leaderboard/StatusbarTabs';
 import { LinearGradient } from 'expo-linear-gradient';
 import { View, StyleSheet, StatusBar, ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { dummyUsers } from '.';
+import { dummyUsers } from './(hometab)';
 import LeaderboardCard from '@/components/Home/LeaderboardCard';
 import { useState } from 'react';
 
@@ -17,7 +17,6 @@ export default function LeaderBoard() {
       case 'allTime':
         return (
           <>
-            {/* replace with your all-time data */}
             {dummyUsers.map((u) => (
               <LeaderboardCard key={`all-${u.rank}`} {...u} />
             ))}

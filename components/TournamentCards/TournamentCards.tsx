@@ -5,11 +5,14 @@ import InstantCard from './InstantCard';
 import { LinearGradient } from 'expo-linear-gradient';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import React from 'react';
+import { useNavigation } from '@react-navigation/native';
+import { HomeScreenNavigationProp } from '@/types/tabTypes';
 
 export default function TournamentCards() {
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
-  
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+
   return (
     <View style={styles.container}>
       <View style={styles.lifelineCard}>
@@ -25,7 +28,7 @@ export default function TournamentCards() {
           </Text>
         </LinearGradient>
       </View>
-      <DailyCard />
+      <DailyCard onPress={() => navigation.navigate('Daily')} />
       <View style={styles.bottomRow}>
         <SoloCard />
         <InstantCard />
@@ -55,7 +58,7 @@ const makeStyles = (colors: ColorScheme) =>
     },
     lifelineLabel: {
       flex: 1,
-      alignItems: "center",
+      alignItems: 'center',
       fontSize: 16,
       fontWeight: '600',
       color: colors.textHighlight,
