@@ -3,6 +3,7 @@ import Index from '.';
 import DailyScreen from './dailyScreen';
 import { HomeTabStackParamList } from '@/types/tabTypes';
 import TournamentScreen from './TournamentScreen';
+import InstantLobby from './instantLobby';
 
 const Stack = createNativeStackNavigator<HomeTabStackParamList>();
 
@@ -23,6 +24,11 @@ export default function HomeTabLayout() {
         name="GameScreen"
         component={TournamentScreen}
         options={{ title: 'Game screen' }}
+      />
+      <Stack.Screen
+        name="Instant"
+        component={InstantLobby}
+        options={{ title: 'Lobby' }}
       />
     </Stack.Navigator>
   );
