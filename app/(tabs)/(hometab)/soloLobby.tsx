@@ -1,6 +1,14 @@
+import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
+import { useNavigation } from '@react-navigation/native';
+import { HomeScreenNavigationProp } from '@/types/tabTypes';
 
 export default function SoloScreen() {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+  const { colors } = useAppTheme();
+  const styles = React.useMemo(() => makeStyles(colors), [colors]);
+
   const attempLeft = 3;
   return (
     <View style={styles.container}>
@@ -9,8 +17,13 @@ export default function SoloScreen() {
           {/* Daily tournament attempts left: {maxAttempts - attemptsLeft} */}
           Solo tournament attempts left : {attempLeft}
         </Text>
-
-        <TouchableOpacity style={styles.startBtn}>
+        <View>
+          {/* Keypad */}
+        </View>
+        <TouchableOpacity 
+        style={styles.startBtn} 
+        onPress={() => navigation.navigate('SoloQuestion')}
+        >
           <Text style={styles.startBtnText}>Start game</Text>
         </TouchableOpacity>
       </>
@@ -18,66 +31,26 @@ export default function SoloScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-  },
-  attemptsText: {
-    fontSize: 16,
-    fontWeight: '500',
-    marginBottom: 12,
-  },
-  startBtn: {
-    backgroundColor: '#6A5AE0',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  startBtnText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#fff',
-  },
-  infoTitle: { fontWeight: '600', marginBottom: 8 },
-  infoText: { marginBottom: 12 },
-  retryBtn: {
-    backgroundColor: '#333',
-    paddingVertical: 10,
-    paddingHorizontal: 14,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  retryBtnText: { color: '#fff', fontWeight: '600' },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  submitBtnDisabled: {
-    backgroundColor: 'grey',
-    opacity: 0.6,
-    marginTop: 20,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '70%',
-    alignSelf: 'center',
-  },
-
-  submitBtn: {
-    marginTop: 20,
-    backgroundColor: '#6A5AE0',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '70%',
-    alignSelf: 'center',
-  },
-
-  submitBtnText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-});
+const makeStyles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    container: {
+      padding: 16,
+    },
+    attemptsText: {
+      fontSize: 16,
+      fontWeight: '500',
+      marginBottom: 12,
+    },
+    startBtn: {
+      backgroundColor: colors.primary,
+      paddingVertical: 12,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    startBtnText: {
+      color: colors.text,
+      fontSize: 20,
+      fontWeight: 700,
+    }
+  });
