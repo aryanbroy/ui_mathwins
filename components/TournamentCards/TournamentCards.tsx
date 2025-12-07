@@ -30,7 +30,7 @@ export default function TournamentCards() {
       </View>
       <DailyCard onPress={() => navigation.navigate('Daily')} />
       <View style={styles.bottomRow}>
-        <SoloCard />
+        <SoloCard onPress={() => navigation.navigate('Solo')}/>
         <InstantCard onPress={() => navigation.navigate('Instant')} />
       </View>
     </View>

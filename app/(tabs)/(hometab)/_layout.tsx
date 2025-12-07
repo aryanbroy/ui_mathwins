@@ -1,6 +1,7 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Index from '.';
-import DailyScreen from './dailyScreen';
+import DailyScreen from './dailyLobby';
+import SoloScreen from './soloLobby';
 import { HomeTabStackParamList } from '@/types/tabTypes';
 import InstantLobby from './instantLobby';
 
@@ -18,6 +19,11 @@ export default function HomeTabLayout() {
         name="Daily"
         component={DailyScreen}
         options={{ title: 'Daily' }}
+      />
+      <Stack.Screen
+        name="Solo"
+        component={SoloScreen}
+        options={{ title: 'Solo' }}
       />
       {/* <Stack.Screen */}
       {/*   name="GameScreen" */}
