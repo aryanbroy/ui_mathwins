@@ -26,8 +26,8 @@ function RootNavigator() {
           )} */}
 
         {/* <Stack.Screen name="login" /> */}
-        {/* <Stack.Screen name="(tabs)" /> */}
-        <Stack.Screen name="edit-profile" />
+        <Stack.Screen name="(tabs)" />
+        {/* <Stack.Screen name="edit-profile" /> */}
       </Stack>
     </ThemeProvider>
   );
