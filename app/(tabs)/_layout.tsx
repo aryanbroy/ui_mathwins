@@ -16,6 +16,7 @@ export default function TabLayout() {
   );
 }
 
+// fix
 function TabNavigator() {
   const { colors } = useAppTheme();
   return (
