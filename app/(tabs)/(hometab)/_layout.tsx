@@ -9,7 +9,10 @@ const Stack = createNativeStackNavigator<HomeTabStackParamList>();
 
 export default function HomeTabLayout() {
   return (
-    <Stack.Navigator>
+    <Stack.Navigator 
+      screenOptions={{
+        headerShown: false,
+      }}>
       <Stack.Screen
         name="HomeMain"
         component={Index}

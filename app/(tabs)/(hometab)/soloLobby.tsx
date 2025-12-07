@@ -1,12 +1,13 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 export default function SoloScreen() {
+  const attempLeft = 3;
   return (
     <View style={styles.container}>
       <>
         <Text style={styles.attemptsText}>
           {/* Daily tournament attempts left: {maxAttempts - attemptsLeft} */}
-          Solo tournament attempts left : 1
+          Solo tournament attempts left : {attempLeft}
         </Text>
 
         <TouchableOpacity style={styles.startBtn}>
