@@ -3,12 +3,9 @@ import EvilIcons from '@expo/vector-icons/EvilIcons';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import React from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import { CardProps } from '@/types/cardProps.types';
 
-type Props = {
-  onPress: () => void;
-};
-
-export default function DailyCard({ onPress }: Props) {
+export default function DailyCard({ onPress }: CardProps) {
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
 

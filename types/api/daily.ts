@@ -26,3 +26,14 @@ export type createDailySessionResponse = {
   message: string;
   data: dailySessionData;
 };
+
+export enum TournamentState {
+  LOBBY = 'lobby',
+  LOADING = 'loading',
+  PLAYING = 'playing',
+  FINISHED = 'finished',
+}
+
+// export type TournamentState = {
+//   state: TournamentState
+// }

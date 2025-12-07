@@ -1,12 +1,7 @@
-import { HomeScreenNavigationProp } from '@/types/tabTypes';
-import { useNavigation } from '@react-navigation/native';
-import { useEffect, useState } from 'react';
+import { generateQuestion, Question } from '@/lib/generateQuestion';
+import { TournamentState } from '@/types/api/daily';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
-type Question = {
-  id: number;
-  expression: string;
-};
 
 type Options = {
   id: number;
@@ -26,14 +21,6 @@ const options: Options[] = [
   { id: 9, value: 9 },
 ];
 
-const questions: Question[] = [
-  { id: 1, expression: '78 + 33' },
-  { id: 2, expression: '125 + 47' },
-  { id: 3, expression: '56 + 89' },
-  { id: 4, expression: '999 + 1' },
-  { id: 5, expression: '300 + 45' },
-];
-
 const keypadLayout = [
   [0, 1, 2],
   [3, 4, 5],
@@ -41,13 +28,23 @@ const keypadLayout = [
   [null, null, 9, null, null],
 ];
 
-export default function TournamentScreen() {
-  const [currentIndex, setCurrentIndex] = useState<number>(0);
-  const currentQuestion = questions[currentIndex];
-  const [isSubmittingSession, setIsSubmittingSession] =
-    useState<boolean>(false);
-  const [timer, setTimer] = useState(3);
-  const navigation = useNavigation<HomeScreenNavigationProp>();
+type TournamentScreenProps = {
+  question: Question;
+  sessionId: string;
+  sessionDuration: number;
+  setTourState: Dispatch<SetStateAction<TournamentState>>;
+};
+
+export default function TournamentScreen({
+  question,
+  sessionId,
+  sessionDuration,
+  setTourState,
+}: TournamentScreenProps) {
+  const [timer, setTimer] = useState<number>(sessionDuration);
+  const [displayQuestion, setDisplayQuestion] = useState<Question>(question);
+
+  // const navigation = useNavigation<HomeScreenNavigationProp>();
   // const [isLoading, setIsLoading] = useState<boolean>(false);
   // const [err, setErr] = useState(null);
   // const [errMsg, setErrMsg] = useState<string | null>(null);
@@ -104,11 +101,6 @@ export default function TournamentScreen() {
     let timerInterval = setInterval(() => {
       setTimer((prevTime) => {
         if (prevTime === 0) {
-          clearInterval(timerInterval);
-          console.log('timer ended');
-          console.log(
-            'make db request now to mark the session status as complete'
-          );
           return 0;
         } else {
           return prevTime - 1;
@@ -120,37 +112,20 @@ export default function TournamentScreen() {
     };
   }, []);
 
+  useEffect(() => {
+    if (timer === 0) {
+      console.log('timer ended');
+      console.log(
+        'make db request now to submit all questions and mark the session status as complete'
+      );
+      setTourState(TournamentState.FINISHED);
+    }
+  }, [timer, setTourState]);
+
   const handleSelect = (value: number) => {
-    console.log(
-      `question: ${currentQuestion.expression}, value selected: ${value}`
-    );
-
-    setCurrentIndex((prev) => (prev < questions.length ? prev + 1 : prev));
+    const question = generateQuestion();
+    setDisplayQuestion(question);
   };
-
-  const handleSubmit = () => {
-    setIsSubmittingSession(true);
-    setTimeout(() => {
-      setIsSubmittingSession(false);
-      console.log('session submitted');
-      navigation.navigate('HomeMain');
-    }, 2000);
-  };
-
-  if (currentIndex === questions.length) {
-    return (
-      <TouchableOpacity
-        disabled={isSubmittingSession}
-        // disabled
-        style={
-          isSubmittingSession ? styles.submitBtnDisabled : styles.submitBtn
-        }
-        onPress={handleSubmit}
-      >
-        <Text style={styles.submitBtnText}>Submit</Text>
-      </TouchableOpacity>
-    );
-  }
 
   return (
     <View style={styles.container}>
@@ -163,7 +138,7 @@ export default function TournamentScreen() {
             Find the 3rd digit from left after calculating:
           </Text>
           <Text style={styles.questionText}>
-            {currentQuestion.expression} = __
+            {displayQuestion.expression} = __
           </Text>
         </View>
 

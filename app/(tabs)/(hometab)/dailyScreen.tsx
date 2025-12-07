@@ -1,6 +1,10 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from 'expo-router';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
+import { useNavigation } from '@react-navigation/native';
+import { useState } from 'react';
+import { TournamentState } from '@/types/api/daily';
+import { generateQuestion, Question } from '@/lib/generateQuestion';
+import TournamentScreen from './TournamentScreen';
 
 // const maxAttempts = 200;
 
@@ -12,6 +16,12 @@ export default function DailyScreen() {
   // const [tournamentMsg, setTournamentMsg] = useState<string | null>(null);
   //
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const [tourState, setTourState] = useState<TournamentState>(
+    TournamentState.LOBBY
+  );
+  const [initialQuestion, setInitialQuestion] = useState<Question | null>(null);
+  const [isSubmittingSession, setIsSubmittingSession] =
+    useState<boolean>(false);
 
   // const load = useCallback(async () => {
   //   setIsLoading(true);
@@ -92,6 +102,46 @@ export default function DailyScreen() {
   //
   //
 
+  const handleStartGame = () => {
+    const question = generateQuestion();
+    setInitialQuestion(question);
+    setTourState(TournamentState.PLAYING);
+  };
+
+  const handleSubmit = () => {
+    setIsSubmittingSession(true);
+    console.log('submitting session');
+    setTimeout(() => {
+      navigation.navigate('HomeMain');
+    }, 2000);
+  };
+
+  if (tourState === TournamentState.PLAYING && initialQuestion != null) {
+    return (
+      <TournamentScreen
+        question={initialQuestion}
+        sessionId="sessionId"
+        sessionDuration={300}
+        setTourState={setTourState}
+      />
+    );
+  }
+
+  if (tourState === TournamentState.FINISHED) {
+    return (
+      <TouchableOpacity
+        disabled={isSubmittingSession}
+        // disabled
+        style={
+          isSubmittingSession ? styles.submitBtnDisabled : styles.submitBtn
+        }
+        onPress={handleSubmit}
+      >
+        <Text style={styles.submitBtnText}>Submit</Text>
+      </TouchableOpacity>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <>
@@ -100,10 +150,7 @@ export default function DailyScreen() {
           Daily tournament attempts left : 1
         </Text>
 
-        <TouchableOpacity
-          style={styles.startBtn}
-          onPress={() => navigation.navigate('GameScreen')}
-        >
+        <TouchableOpacity style={styles.startBtn} onPress={handleStartGame}>
           <Text style={styles.startBtnText}>Start game</Text>
         </TouchableOpacity>
       </>
@@ -143,4 +190,34 @@ const styles = StyleSheet.create({
   },
   retryBtnText: { color: '#fff', fontWeight: '600' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  submitBtnDisabled: {
+    backgroundColor: 'grey',
+    opacity: 0.6,
+    marginTop: 20,
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '70%',
+    alignSelf: 'center',
+  },
+
+  submitBtn: {
+    marginTop: 20,
+    backgroundColor: '#6A5AE0',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '70%',
+    alignSelf: 'center',
+  },
+
+  submitBtnText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '700',
+  },
 });
