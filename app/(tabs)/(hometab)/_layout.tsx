@@ -20,11 +20,11 @@ export default function HomeTabLayout() {
         component={DailyScreen}
         options={{ title: 'Daily' }}
       />
-      <Stack.Screen
+      {/* <Stack.Screen
         name="GameScreen"
         component={TournamentScreen}
         options={{ title: 'Game screen' }}
-      />
+      /> */}
       <Stack.Screen
         name="Instant"
         component={InstantLobby}
