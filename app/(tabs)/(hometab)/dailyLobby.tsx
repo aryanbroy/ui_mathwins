@@ -4,7 +4,8 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from 'react';
 import { TournamentState } from '@/types/api/daily';
 import { generateQuestion, Question } from '@/lib/generateQuestion';
-import TournamentScreen from './TournamentScreen';
+import TournamentScreen from '../../../components/QuestionScreen/DailyTournamentScreen';
+import ScoreSubmitScreen from '@/components/ScoreSubmitScreen';
 
 // const maxAttempts = 200;
 
@@ -112,6 +113,7 @@ export default function DailyScreen() {
     setIsSubmittingSession(true);
     console.log('submitting session');
     setTimeout(() => {
+      setIsSubmittingSession(false);
       navigation.navigate('HomeMain');
     }, 2000);
   };
@@ -121,7 +123,7 @@ export default function DailyScreen() {
       <TournamentScreen
         question={initialQuestion}
         sessionId="sessionId"
-        sessionDuration={300}
+        sessionDuration={3}
         setTourState={setTourState}
       />
     );
@@ -129,16 +131,10 @@ export default function DailyScreen() {
 
   if (tourState === TournamentState.FINISHED) {
     return (
-      <TouchableOpacity
-        disabled={isSubmittingSession}
-        // disabled
-        style={
-          isSubmittingSession ? styles.submitBtnDisabled : styles.submitBtn
-        }
-        onPress={handleSubmit}
-      >
-        <Text style={styles.submitBtnText}>Submit</Text>
-      </TouchableOpacity>
+      <ScoreSubmitScreen
+        isSubmittingSession={isSubmittingSession}
+        handleSubmit={handleSubmit}
+      />
     );
   }
 

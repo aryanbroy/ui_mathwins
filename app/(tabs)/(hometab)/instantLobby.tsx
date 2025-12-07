@@ -9,8 +9,11 @@ import {
   StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import TournamentScreen from './TournamentScreen';
 import { generateQuestion, Question } from '@/lib/generateQuestion';
+import ScoreSubmitScreen from '@/components/ScoreSubmitScreen';
+import { HomeScreenNavigationProp } from '@/types/tabTypes';
+import { useNavigation } from '@react-navigation/native';
+import InstantTournamentScreen from '@/components/QuestionScreen/InstantTournamentScreen';
 
 type Player = {
   id: string;
@@ -19,6 +22,8 @@ type Player = {
 };
 
 export default function InstantTournamentLobby() {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
+
   const roomId = 'R-12345';
   const roomCapacity = 100;
   const [players] = useState<Player[]>([
@@ -32,6 +37,8 @@ export default function InstantTournamentLobby() {
     TournamentState.LOBBY
   );
   const [initialQuestion, setInitialQuestion] = useState<Question | null>(null);
+  const [isSubmittingSession, setIsSubmittingSession] =
+    useState<boolean>(false);
 
   const isCreator = true;
   const expiresAt = useMemo(() => Date.now() + 20 * 60 * 1000, []);
@@ -56,12 +63,22 @@ export default function InstantTournamentLobby() {
   const joinedCount = players.length;
 
   const onStartGame = () => {
+    console.log('starting game now');
     const question = generateQuestion();
     setInitialQuestion(question);
-    console.log('starting game now');
+    setTourState(TournamentState.PLAYING);
   };
   const onLeave = () => alert('Leave (dummy)');
   const onInvite = () => alert('Invite (dummy)');
+
+  const handleSubmit = () => {
+    setIsSubmittingSession(true);
+    console.log('submitting session');
+    setTimeout(() => {
+      navigation.navigate('HomeMain');
+      setIsSubmittingSession(false);
+    }, 1000);
+  };
 
   const renderPlayer = ({ item, index }: { item: Player; index: number }) => (
     <View style={styles.playerRow}>
@@ -78,12 +95,21 @@ export default function InstantTournamentLobby() {
     </View>
   );
 
+  if (tourState === TournamentState.FINISHED) {
+    return (
+      <ScoreSubmitScreen
+        isSubmittingSession={isSubmittingSession}
+        handleSubmit={handleSubmit}
+      />
+    );
+  }
+
   if (tourState === TournamentState.PLAYING && initialQuestion != null) {
     return (
-      <TournamentScreen
+      <InstantTournamentScreen
         question={initialQuestion}
         sessionId="sessionId"
-        sessionDuration={300}
+        sessionDuration={180}
         setTourState={setTourState}
       />
     );
