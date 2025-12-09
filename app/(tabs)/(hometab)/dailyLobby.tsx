@@ -1,157 +1,238 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import { useNavigation } from '@react-navigation/native';
-import { useState } from 'react';
-import { TournamentState } from '@/types/api/daily';
-import { generateQuestion, Question } from '@/lib/generateQuestion';
-import TournamentScreen from '../../../components/QuestionScreen/DailyTournamentScreen';
+import { useCallback, useEffect, useState } from 'react';
+import { DailyQuestion, TournamentState } from '@/types/api/daily';
 import ScoreSubmitScreen from '@/components/ScoreSubmitScreen';
+import {
+  createDailySession,
+  finalSubmission,
+  getDailyAttempts,
+  getDailyTournamentDetails,
+} from '@/lib/api/dailyTournament';
+import TournamentScreen from '@/components/QuestionScreen/DailyTournamentScreen';
 
-// const maxAttempts = 200;
+const maxAttempts = 300;
 
 export default function DailyScreen() {
-  // const [attemptsLeft, setAttemptsLeft] = useState<number>(0);
-  // const [isLoading, setIsLoading] = useState<boolean>(true);
-  // const [err, setErr] = useState<string | null>(null);
-  // const [errMsg, setErrMsg] = useState<string | null>(null);
-  // const [tournamentMsg, setTournamentMsg] = useState<string | null>(null);
-  //
+  const [attemptsLeft, setAttemptsLeft] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [disableStartBtn, setDisableStartBtn] = useState<boolean>(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [errMsg, setErrMsg] = useState<string | null>(null);
+  const [tournamentMsg, setTournamentMsg] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  // const [finalScore, setFinalScore] = useState<number>(0);
+  const [currentScore, setCurrentScore] = useState<number>(0);
+
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const [tourState, setTourState] = useState<TournamentState>(
     TournamentState.LOBBY
   );
-  const [initialQuestion, setInitialQuestion] = useState<Question | null>(null);
+  const [initialQuestion, setInitialQuestion] = useState<DailyQuestion | null>(
+    null
+  );
   const [isSubmittingSession, setIsSubmittingSession] =
     useState<boolean>(false);
 
-  // const load = useCallback(async () => {
-  //   setIsLoading(true);
-  //   setErr(null);
-  //   setErrMsg(null);
-  //   setTournamentMsg(null);
-  //
-  //   try {
-  //     const attemptsData = await getDailyAttempts();
-  //     const attempts = attemptsData.data.dailyAttemptCount;
-  //     console.log('Attempts: ', attemptsData.data.dailyAttemptCount);
-  //     setAttemptsLeft(attempts);
-  //     try {
-  //       const dailyTournamentDetails = await getDailyTournamentDetails();
-  //       console.log('Tournament details: ', dailyTournamentDetails);
-  //     } catch (tErr: any) {
-  //       setTournamentMsg(tErr?.message ?? 'Tournament not available yet');
-  //     }
-  //   } catch (err: any) {
-  //     setErrMsg(err?.message ?? 'Failed to load daily attempts');
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }, []);
-  //
-  // useEffect(() => {
-  //   load();
-  // }, [load]);
-  //
-  // const handleRetry = () => load();
-  //
-  // if (attemptsLeft >= maxAttempts) {
-  //   return (
-  //     <View style={styles.container}>
-  //       <Text style={styles.attemptsText}>Watch ad to unlock attempt</Text>
-  //       <TouchableOpacity style={styles.startBtn}>
-  //         <Text style={styles.startBtnText}>Watch ad</Text>
-  //       </TouchableOpacity>
-  //     </View>
-  //   );
-  // }
-  //
-  // if (isLoading) {
-  //   return (
-  //     <View style={styles.center}>
-  //       <ActivityIndicator />
-  //       <Text style={{ marginTop: 8 }}>Loading...</Text>
-  //     </View>
-  //   );
-  // }
-  //
-  // if (err != null) {
-  //   return (
-  //     <View>
-  //       <Text>Error fetching attempts: {errMsg}</Text>
-  //     </View>
-  //   );
-  // }
-  //
-  // if (tournamentMsg) {
-  //   return (
-  //     <View style={styles.container}>
-  //       <Text style={styles.attemptsText}>
-  //         Daily tournament attempts left: {maxAttempts - (attemptsLeft ?? 0)}
-  //       </Text>
-  //
-  //       <View style={{ marginTop: 16 }}>
-  //         <Text style={styles.infoTitle}>Tournament unavailable</Text>
-  //         <Text style={styles.infoText}>{tournamentMsg}</Text>
-  //
-  //         <TouchableOpacity style={styles.retryBtn} onPress={handleRetry}>
-  //           <Text style={styles.retryBtnText}>Check again</Text>
-  //         </TouchableOpacity>
-  //       </View>
-  //     </View>
-  //   );
-  // }
-  //
-  //
+  const load = useCallback(async () => {
+    setIsLoading(true);
+    setErr(null);
+    setErrMsg(null);
+    setTournamentMsg(null);
 
-  const handleStartGame = () => {
-    const question = generateQuestion();
-    setInitialQuestion(question);
-    setTourState(TournamentState.PLAYING);
+    try {
+      const attemptsData = await getDailyAttempts();
+      const attempts = attemptsData.data.dailyAttemptCount;
+      console.log('Attempts: ', attemptsData.data.dailyAttemptCount);
+      setAttemptsLeft(attempts);
+      try {
+        const dailyTournamentDetails = await getDailyTournamentDetails();
+        console.log('Tournament details: ', dailyTournamentDetails);
+      } catch (tErr: any) {
+        setTournamentMsg(tErr?.message ?? 'Tournament not available yet');
+      }
+    } catch (err: any) {
+      setErrMsg(err?.message ?? 'Failed to load daily attempts');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  const handleRetry = () => load();
+
+  const handleStartGame = async () => {
+    setDisableStartBtn(true);
+    setErr(null);
+    setErrMsg(null);
+    setTournamentMsg(null);
+
+    try {
+      const res = await createDailySession();
+      console.log('Create daily session res: ', res);
+      const data = res.data;
+      const { firstQuestion, session } = data;
+      setInitialQuestion(firstQuestion);
+      setSessionId(session.id);
+      setTourState(TournamentState.PLAYING);
+    } catch (err: any) {
+      setErr(err);
+      setErrMsg(err?.message ?? 'Failed to load start game');
+    } finally {
+      setDisableStartBtn(false);
+    }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsSubmittingSession(true);
+    setErr(null);
+    setErrMsg(null);
+    setTournamentMsg(null);
     console.log('submitting session');
-    setTimeout(() => {
-      setIsSubmittingSession(false);
+    try {
+      if (!sessionId) {
+        setErr('invalid session not available');
+        setErrMsg('invalid session not available');
+        setIsSubmittingSession(false);
+        return;
+      }
+      const res = await finalSubmission({ sessionId });
+      const data = res.data;
       navigation.navigate('HomeMain');
-    }, 2000);
+      console.log(data);
+    } catch (err: any) {
+      setErr(err);
+      setErrMsg(err?.message ?? 'Failed to load start game');
+    } finally {
+      setIsSubmittingSession(false);
+    }
+
+    // setTimeout(() => {
+    //   setIsSubmittingSession(false);
+    //   navigation.navigate('HomeMain');
+    // }, 2000);
   };
 
-  if (tourState === TournamentState.PLAYING && initialQuestion != null) {
+  const getScreenState = () => {
+    if (attemptsLeft >= maxAttempts) return 'watchAd';
+    if (isLoading) return 'loading';
+    if (err != null) return 'err';
+    if (tournamentMsg) return 'unavailable';
+    if (tourState === TournamentState.PLAYING) return 'playing';
+    if (tourState === TournamentState.FINISHED) return 'finished';
+    return 'ready';
+  };
+
+  const DisplayAttempts = () => {
     return (
-      <TournamentScreen
-        question={initialQuestion}
-        sessionId="sessionId"
-        sessionDuration={3}
-        setTourState={setTourState}
-      />
+      <Text style={styles.attemptsText}>
+        Daily tournament attempts left: {maxAttempts - (attemptsLeft ?? 0)}
+      </Text>
     );
-  }
+  };
 
-  if (tourState === TournamentState.FINISHED) {
-    return (
-      <ScoreSubmitScreen
-        isSubmittingSession={isSubmittingSession}
-        handleSubmit={handleSubmit}
-      />
-    );
-  }
+  const renderContent = () => {
+    const screenState = getScreenState();
 
-  return (
-    <View style={styles.container}>
-      <>
-        <Text style={styles.attemptsText}>
-          {/* Daily tournament attempts left: {maxAttempts - attemptsLeft} */}
-          Daily tournament attempts left : 1
-        </Text>
+    switch (screenState) {
+      case 'loading':
+        return (
+          <View style={styles.center}>
+            <ActivityIndicator />
+            <Text style={{ marginTop: 8 }}>Loading...</Text>
+          </View>
+        );
+      case 'watchAd':
+        return (
+          <View style={styles.container}>
+            <Text style={styles.attemptsText}>Watch ad to unlock attempt</Text>
+            <TouchableOpacity style={styles.startBtn}>
+              <Text style={styles.startBtnText}>Watch ad</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      case 'err':
+        return (
+          <View>
+            <Text>Error fetching attempts: {errMsg}</Text>
+          </View>
+        );
+      case 'unavailable':
+        return (
+          <View style={styles.container}>
+            <Text style={styles.attemptsText}>
+              Daily tournament attempts left:{' '}
+              {maxAttempts - (attemptsLeft ?? 0)}
+            </Text>
 
-        <TouchableOpacity style={styles.startBtn} onPress={handleStartGame}>
-          <Text style={styles.startBtnText}>Start game</Text>
-        </TouchableOpacity>
-      </>
-    </View>
-  );
+            <View style={{ marginTop: 16 }}>
+              <Text style={styles.infoTitle}>Tournament unavailable</Text>
+              <Text style={styles.infoText}>{tournamentMsg}</Text>
+
+              <TouchableOpacity style={styles.retryBtn} onPress={handleRetry}>
+                <Text style={styles.retryBtnText}>Check again</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        );
+      case 'playing':
+        if (!initialQuestion || !sessionId) {
+          console.log('empty values: initialQuestion, sessionid');
+          return (
+            <View>
+              <Text>Loading session...</Text>
+            </View>
+          );
+        }
+        return (
+          <TournamentScreen
+            question={initialQuestion}
+            sessionId={sessionId}
+            sessionDuration={10}
+            setTourState={setTourState}
+            setCurrentScore={setCurrentScore}
+          />
+        );
+      case 'ready':
+      default:
+        return (
+          <View style={styles.container}>
+            <DisplayAttempts />
+            <TouchableOpacity
+              style={
+                disableStartBtn ? styles.startBtnDisabled : styles.startBtn
+              }
+              onPress={handleStartGame}
+              disabled={disableStartBtn}
+            >
+              <Text style={styles.startBtnText}>Start game</Text>
+            </TouchableOpacity>
+          </View>
+        );
+      case 'finished':
+        return (
+          <>
+            <Text>Final score: {currentScore}</Text>
+            <ScoreSubmitScreen
+              isSubmittingSession={isSubmittingSession}
+              handleSubmit={handleSubmit}
+            />
+          </>
+        );
+    }
+  };
+
+  return renderContent();
 }
 
 const styles = StyleSheet.create({
@@ -186,7 +267,7 @@ const styles = StyleSheet.create({
   },
   retryBtnText: { color: '#fff', fontWeight: '600' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  submitBtnDisabled: {
+  startBtnDisabled: {
     backgroundColor: 'grey',
     opacity: 0.6,
     marginTop: 20,
@@ -197,23 +278,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '70%',
     alignSelf: 'center',
-  },
-
-  submitBtn: {
-    marginTop: 20,
-    backgroundColor: '#6A5AE0',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '70%',
-    alignSelf: 'center',
-  },
-
-  submitBtnText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
   },
 });

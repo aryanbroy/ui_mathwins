@@ -1,7 +1,13 @@
-import { generateQuestion, Question } from '@/lib/generateQuestion';
-import { TournamentState } from '@/types/api/daily';
+import { submitQuestion } from '@/lib/api/dailyTournament';
+import { DailyQuestion, TournamentState } from '@/types/api/daily';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
 
 type Options = {
   id: number;
@@ -29,10 +35,11 @@ const keypadLayout = [
 ];
 
 type TournamentScreenProps = {
-  question: Question;
+  question: DailyQuestion;
   sessionId: string;
   sessionDuration: number;
   setTourState: Dispatch<SetStateAction<TournamentState>>;
+  setCurrentScore: Dispatch<SetStateAction<number>>;
 };
 
 export default function TournamentScreen({
@@ -40,14 +47,17 @@ export default function TournamentScreen({
   sessionId,
   sessionDuration,
   setTourState,
+  setCurrentScore,
 }: TournamentScreenProps) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [err, setErr] = useState(null);
+  const [errMsg, setErrMsg] = useState<string | null>(null);
   const [timer, setTimer] = useState<number>(sessionDuration);
-  const [displayQuestion, setDisplayQuestion] = useState<Question>(question);
+  const [displayQuestion, setDisplayQuestion] =
+    useState<DailyQuestion>(question);
 
+  const [timeTaken, setTimeTaken] = useState<number>(0);
   // const navigation = useNavigation<HomeScreenNavigationProp>();
-  // const [isLoading, setIsLoading] = useState<boolean>(false);
-  // const [err, setErr] = useState(null);
-  // const [errMsg, setErrMsg] = useState<string | null>(null);
   // const [questionExpression, setQuestionExpression] = useState<string | null>(
   //   null
   // );
@@ -102,15 +112,18 @@ export default function TournamentScreen({
       setTimer((prevTime) => {
         if (prevTime === 0) {
           return 0;
+        } else if (isLoading) {
+          return prevTime;
         } else {
           return prevTime - 1;
         }
       });
+      setTimeTaken((prevTime) => prevTime + 1);
     }, 1000);
     return () => {
       clearInterval(timerInterval);
     };
-  }, []);
+  }, [isLoading]);
 
   useEffect(() => {
     if (timer === 0) {
@@ -122,52 +135,85 @@ export default function TournamentScreen({
     }
   }, [timer, setTourState]);
 
-  const handleSelect = (value: number) => {
-    const question = generateQuestion();
-    setDisplayQuestion(question);
+  const handleSelect = async (value: number) => {
+    setIsLoading(true);
+    try {
+      const res = await submitQuestion({
+        dailyTournamentSessionId: sessionId,
+        questionId: question.id,
+        answer: value,
+        timeTaken,
+      });
+      const data = res.data;
+      setDisplayQuestion(data.newQuestion);
+      setCurrentScore(data.currentScore);
+    } catch (err: any) {
+      setErr(err);
+      setErrMsg(err?.message ?? 'Failed to load next question');
+    } finally {
+      setIsLoading(false);
+    }
   };
+
+  if (err) {
+    return (
+      <View>
+        <Text>{errMsg}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <View style={styles.questionWrapper}>
-          <View style={styles.timerCircle}>
-            <Text style={styles.timerText}>{timer}</Text>
-          </View>
-          <Text style={styles.label}>
-            Find the 3rd digit from left after calculating:
-          </Text>
-          <Text style={styles.questionText}>
-            {displayQuestion.expression} = __
-          </Text>
-        </View>
-
-        <View style={styles.optionsContainer}>
-          {keypadLayout.map((row, rowIndex) => (
-            <View key={rowIndex} style={styles.row}>
-              {row.map((value, colIndex) => {
-                if (value === null) {
-                  return (
-                    <View key={colIndex} style={styles.optionPlaceholder} />
-                  );
-                }
-
-                const option = options.find((o) => o.value === value);
-                if (!option) return null;
-
-                return (
-                  <TouchableOpacity
-                    key={option.id}
-                    style={styles.optionBtn}
-                    onPress={() => handleSelect(option.value)}
-                  >
-                    <Text style={styles.optionText}>{option.value}</Text>
-                  </TouchableOpacity>
-                );
-              })}
+        {isLoading ? (
+          <>
+            <ActivityIndicator />
+            <Text>Loading...</Text>
+          </>
+        ) : (
+          <>
+            <View style={styles.questionWrapper}>
+              <View style={styles.timerCircle}>
+                <Text style={styles.timerText}>{timer}</Text>
+              </View>
+              <Text style={styles.label}>
+                Find the {question.kthDigit} digit from {question.side} after
+                calculating:
+              </Text>
+              <Text style={styles.questionText}>
+                {displayQuestion.expression} = __
+              </Text>
             </View>
-          ))}
-        </View>
+
+            <View style={styles.optionsContainer}>
+              {keypadLayout.map((row, rowIndex) => (
+                <View key={rowIndex} style={styles.row}>
+                  {row.map((value, colIndex) => {
+                    if (value === null) {
+                      return (
+                        <View key={colIndex} style={styles.optionPlaceholder} />
+                      );
+                    }
+
+                    const option = options.find((o) => o.value === value);
+                    if (!option) return null;
+
+                    return (
+                      <TouchableOpacity
+                        key={option.id}
+                        style={styles.optionBtn}
+                        onPress={() => handleSelect(option.value)}
+                      >
+                        <Text style={styles.optionText}>{option.value}</Text>
+                      </TouchableOpacity>
+                    );
+                  })}
+                </View>
+              ))}
+            </View>
+          </>
+        )}
       </View>
     </View>
   );

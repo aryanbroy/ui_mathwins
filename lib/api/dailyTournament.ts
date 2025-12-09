@@ -1,4 +1,9 @@
-import { createDailySessionResponse } from '@/types/api/daily';
+import {
+  createDailySessionResponse,
+  FinalSubmissionResponse,
+  SubmitQuestionProp,
+  submitQuestionSessionResponse,
+} from '@/types/api/daily';
 import { api } from './client';
 import { parseApiError } from './parseApiError';
 
@@ -34,3 +39,48 @@ export const createDailySession =
       throw new Error(msg);
     }
   };
+
+export const submitQuestion = async ({
+  dailyTournamentSessionId,
+  questionId,
+  answer,
+  timeTaken,
+}: SubmitQuestionProp) => {
+  try {
+    const res = await api({
+      method: 'patch',
+      url: 'api/daily/session/submit_question',
+      data: {
+        dailyTournamentSessionId,
+        questionId,
+        answer,
+        timeTaken,
+      },
+    });
+    const resData: submitQuestionSessionResponse = res.data;
+    return resData;
+  } catch (err) {
+    console.log('error submitting question: ', err);
+    const msg = parseApiError(err);
+    throw new Error(msg);
+  }
+};
+
+export const finalSubmission = async ({ sessionId }: { sessionId: string }) => {
+  try {
+    const res = await api({
+      method: 'post',
+      url: 'api/daily/session/submit_final',
+      data: {
+        sessionId,
+      },
+    });
+    const resData: FinalSubmissionResponse = res.data;
+    console.log('Final score: ', resData.data.finalScore);
+    return resData;
+  } catch (err) {
+    console.log('error in final submission: ', err);
+    const msg = parseApiError(err);
+    throw new Error(msg);
+  }
+};
