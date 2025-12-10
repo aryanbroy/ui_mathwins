@@ -4,20 +4,22 @@ enum SessionStatus {
   COMPLETED = 'COMPLETED',
 }
 
+export type DailyQuestion = {
+  id: string;
+  expression: string;
+  kthDigit: number;
+  level: number;
+  questionIndex: number;
+  result: string;
+  side: string;
+};
+
 type dailySessionData = {
   session: {
     id: string;
     status: SessionStatus;
   };
-  question: {
-    id: string;
-    expression: string;
-    kthDigit: number;
-    level: number;
-    questionIndex: number;
-    result: string;
-    side: string;
-  };
+  firstQuestion: DailyQuestion;
 };
 
 export type createDailySessionResponse = {
@@ -27,12 +29,39 @@ export type createDailySessionResponse = {
   data: dailySessionData;
 };
 
+export type submitQuestionSessionResponse = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    questionId: string;
+    newQuestion: DailyQuestion;
+    currentScore: number;
+  };
+};
+
 export enum TournamentState {
   LOBBY = 'lobby',
   LOADING = 'loading',
   PLAYING = 'playing',
   FINISHED = 'finished',
 }
+
+export type SubmitQuestionProp = {
+  dailyTournamentSessionId: string;
+  questionId: string;
+  answer: number;
+  timeTaken: number;
+};
+
+export type FinalSubmissionResponse = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    finalScore: number;
+  };
+};
 
 // export type TournamentState = {
 //   state: TournamentState
