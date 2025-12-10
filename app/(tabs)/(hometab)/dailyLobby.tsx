@@ -123,7 +123,7 @@ export default function DailyScreen() {
       <TournamentScreen
         question={initialQuestion}
         sessionId="sessionId"
-        sessionDuration={3}
+        sessionDuration={100}
         setTourState={setTourState}
       />
     );

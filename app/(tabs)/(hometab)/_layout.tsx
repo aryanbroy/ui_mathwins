@@ -6,6 +6,7 @@ import { HomeTabStackParamList } from '@/types/tabTypes';
 import InstantLobby from './instantLobby';
 import SoloQuestion from './soloQuestion';
 import adScreen from './adScreen';
+import roundOverview from './roundOverview';
 
 const Stack = createNativeStackNavigator<HomeTabStackParamList>();
 
@@ -36,9 +37,14 @@ export default function HomeTabLayout() {
         options={{ title: 'SoloQuestion' }}
       />
       <Stack.Screen
-        name="Next"
+        name="ad"
         component={adScreen}
-        options={{ title: 'Next' }}
+        options={{ title: 'ad' }}
+      />
+      <Stack.Screen
+        name="roundOverview"
+        component={roundOverview}
+        options={{ title: 'soloScoreboard' }}
       />
       {/* <Stack.Screen */}
       {/*   name="GameScreen" */}
