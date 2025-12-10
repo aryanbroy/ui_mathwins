@@ -1,6 +1,7 @@
 import { submitQuestion } from '@/lib/api/dailyTournament';
 import { DailyQuestion, TournamentState } from '@/types/api/daily';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -8,6 +9,7 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type Options = {
   id: number;
@@ -57,73 +59,29 @@ export default function TournamentScreen({
     useState<DailyQuestion>(question);
 
   const [timeTaken, setTimeTaken] = useState<number>(0);
-  // const navigation = useNavigation<HomeScreenNavigationProp>();
-  // const [questionExpression, setQuestionExpression] = useState<string | null>(
-  //   null
-  // );
-  //
-  // useEffect(() => {
-  //   (async () => {
-  //     setIsLoading(true);
-  //     setErr(null);
-  //     setErrMsg(null);
-  //     try {
-  //       const createSession = await createDailySession();
-  //       console.log('Session created: ', createSession);
-  //       const data = createSession.data;
-  //       const { question } = data;
-  //       setQuestionExpression(question.expression);
-  //     } catch (err: any) {
-  //       if (err instanceof AxiosError) {
-  //         console.log('AxiosError: ', err);
-  //         setErrMsg(err.response?.data.message);
-  //       } else {
-  //         console.log('Error: ', err);
-  //       }
-  //       setErr(err);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   })();
-  // }, []);
-  //
-  // if (isLoading) {
-  //   return (
-  //     <View style={styles.center}>
-  //       <ActivityIndicator />
-  //
-  //       <Text style={{ marginTop: 8 }}>Loading...</Text>
-  //     </View>
-  //   );
-  // }
-  //
-  // if (err != null) {
-  //   return (
-  //     <View>
-  //       <Text>Error fetching attempts: {errMsg}</Text>
-  //     </View>
-  //   );
-  // }
-  //
+  const intervalRef = useRef<number | null>(null);
+  const isPausedRef = useRef<boolean>(false);
 
   useEffect(() => {
     console.log('timer started');
-    let timerInterval = setInterval(() => {
-      setTimer((prevTime) => {
-        if (prevTime === 0) {
-          return 0;
-        } else if (isLoading) {
-          return prevTime;
-        } else {
-          return prevTime - 1;
-        }
-      });
-      setTimeTaken((prevTime) => prevTime + 1);
+    intervalRef.current = setInterval(() => {
+      if (!isPausedRef.current) {
+        setTimer((prevTime) => {
+          if (prevTime === 0) {
+            return 0;
+          } else {
+            return prevTime - 1;
+          }
+        });
+        setTimeTaken((prevTime) => prevTime + 1);
+      }
     }, 1000);
     return () => {
-      clearInterval(timerInterval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
     };
-  }, [isLoading]);
+  }, []);
 
   useEffect(() => {
     if (timer === 0) {
@@ -136,6 +94,7 @@ export default function TournamentScreen({
   }, [timer, setTourState]);
 
   const handleSelect = async (value: number) => {
+    isPausedRef.current = true;
     setIsLoading(true);
     try {
       const res = await submitQuestion({
@@ -152,6 +111,7 @@ export default function TournamentScreen({
       setErrMsg(err?.message ?? 'Failed to load next question');
     } finally {
       setIsLoading(false);
+      isPausedRef.current = false;
     }
   };
 
@@ -164,98 +124,112 @@ export default function TournamentScreen({
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        {isLoading ? (
-          <>
-            <ActivityIndicator />
-            <Text>Loading...</Text>
-          </>
-        ) : (
-          <>
-            <View style={styles.questionWrapper}>
-              <View style={styles.timerCircle}>
-                <Text style={styles.timerText}>{timer}</Text>
-              </View>
-              <Text style={styles.label}>
-                Find the {question.kthDigit} digit from {question.side} after
-                calculating:
-              </Text>
-              <Text style={styles.questionText}>
-                {displayQuestion.expression} = __
-              </Text>
-            </View>
-
-            <View style={styles.optionsContainer}>
-              {keypadLayout.map((row, rowIndex) => (
-                <View key={rowIndex} style={styles.row}>
-                  {row.map((value, colIndex) => {
-                    if (value === null) {
-                      return (
-                        <View key={colIndex} style={styles.optionPlaceholder} />
-                      );
-                    }
-
-                    const option = options.find((o) => o.value === value);
-                    if (!option) return null;
-
-                    return (
-                      <TouchableOpacity
-                        key={option.id}
-                        style={styles.optionBtn}
-                        onPress={() => handleSelect(option.value)}
-                      >
-                        <Text style={styles.optionText}>{option.value}</Text>
-                      </TouchableOpacity>
-                    );
-                  })}
-                </View>
-              ))}
-            </View>
-          </>
-        )}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.header}>
+        <Ionicons name="chevron-back" size={24} />
+        <View style={styles.headerCenter}>
+          <View style={styles.timerBadge}>
+            <Text style={styles.timerText}>{timer}</Text>
+          </View>
+        </View>
+        <View style={{ width: 24 }} />
       </View>
-    </View>
+      {isLoading ? (
+        <View style={styles.loadingView}>
+          <ActivityIndicator />
+        </View>
+      ) : (
+        <>
+          <View style={styles.questionWrapper}>
+            <Text style={styles.questionLine1}>
+              What is the {question.kthDigit} digit from the {question.side} of
+              the
+            </Text>
+            <Text style={styles.questionLine1}>answer to:</Text>
+            <Text style={styles.questionExpression}>
+              {displayQuestion.expression}
+            </Text>
+          </View>
+
+          <View style={styles.optionsContainer}>
+            {keypadLayout.map((row, rowIndex) => (
+              <View key={rowIndex} style={styles.row}>
+                {row.map((value, colIndex) => {
+                  if (value === null) {
+                    return (
+                      <View key={colIndex} style={styles.optionPlaceholder} />
+                    );
+                  }
+
+                  const option = options.find((o) => o.value === value);
+                  if (!option) return null;
+
+                  return (
+                    <TouchableOpacity
+                      key={option.id}
+                      style={styles.optionBtn}
+                      onPress={() => handleSelect(option.value)}
+                    >
+                      <Text style={styles.optionText}>{option.value}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ))}
+          </View>
+        </>
+      )}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
-  },
-  card: {
-    width: '90%',
-    backgroundColor: '#fff',
-    paddingVertical: 32,
+    backgroundColor: '#F6F7FB',
     paddingHorizontal: 20,
-    borderRadius: 20,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
+  },
+  header: {
+    marginTop: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  headerCenter: {
+    flex: 1,
     alignItems: 'center',
   },
-
+  timerBadge: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#FF4B8C',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  timerText: {
+    color: '#FFFFFF',
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  progressText: {
+    marginTop: 16,
+    fontSize: 12,
+  },
   questionWrapper: {
+    marginTop: 24,
     alignItems: 'center',
     marginBottom: 20,
   },
-  label: {
+  questionLine1: {
     fontSize: 16,
-    marginBottom: 4,
-    fontWeight: '400',
-    color: '#111827',
     textAlign: 'center',
   },
-  questionText: {
-    textAlign: 'center',
-    fontSize: 24,
+  questionExpression: {
+    marginTop: 8,
+    fontSize: 20,
     fontWeight: '700',
-    color: '#111827',
   },
-
   optionsContainer: {
     gap: 12,
   },
@@ -264,7 +238,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 12,
   },
-
   optionBtn: {
     width: 60,
     height: 60,
@@ -282,52 +255,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
   },
-
-  submitBtnDisabled: {
-    backgroundColor: 'grey',
-    opacity: 0.6,
-    marginTop: 20,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '70%',
-    alignSelf: 'center',
-  },
-
-  submitBtn: {
-    marginTop: 20,
-    backgroundColor: '#6A5AE0',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '70%',
-    alignSelf: 'center',
-  },
-
-  submitBtnText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
-  },
-  timerCircle: {
-    width: 50,
-    height: 50,
-    borderRadius: 999,
-    borderWidth: 3,
-    borderColor: '#FFA500',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  timerText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#111827',
-    lineHeight: 50,
-    textAlign: 'center',
+  loadingView: {
+    marginTop: 24,
   },
 });
