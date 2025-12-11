@@ -1,9 +1,15 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import { soloStart } from '@/lib/api/soloTournament';
+
+import { Platform } from 'react-native';
+import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
+
+import mobileAds from 'react-native-google-mobile-ads';
+
 
 export default function SoloScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -11,6 +17,16 @@ export default function SoloScreen() {
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+  useEffect(() => {
+    // initialize the SDK once
+    mobileAds()
+      .initialize()
+      .then(adapterStatuses => {
+        console.log('AdMob initialized', adapterStatuses);
+      });
+  }, []);
 
   async function createSoloSession(){
     // loading = true
@@ -30,6 +46,12 @@ export default function SoloScreen() {
     ).catch();
   }
 
+  const bannerRef = useRef<BannerAd>(null);
+   useForeground(() => {
+    Platform.OS === 'ios' && bannerRef.current?.load();
+  });
+
+
   const attempLeft = 3;
   return (
     <View style={styles.container}>
@@ -38,15 +60,12 @@ export default function SoloScreen() {
           {/* Daily tournament attempts left: {maxAttempts - attemptsLeft} */}
           Solo tournament attempts left : {attempLeft}
         </Text>
-        <View>
-          {/* Keypad */}
+        <View style={styles.bannerAd}>
+          <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
         </View>
         <TouchableOpacity 
         style={styles.startBtn} 
         onPress={createSoloSession}
-        // onPress={async () => {
-        //   navigation.navigate('SoloQuestion');
-        // }}
         >
           <Text style={styles.startBtnText}>Start game</Text>
         </TouchableOpacity>
@@ -64,6 +83,10 @@ const makeStyles = (colors: ColorScheme) =>
       fontSize: 16,
       fontWeight: '500',
       marginBottom: 12,
+    },
+    bannerAd: {
+      marginVertical: 20,
+      backgroundColor: "black",
     },
     startBtn: {
       backgroundColor: colors.primary,
