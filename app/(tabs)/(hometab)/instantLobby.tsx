@@ -1,5 +1,5 @@
 import { TournamentState } from '@/types/api/daily';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -37,11 +37,7 @@ export default function InstantTournamentLobby() {
   const [joinedCount, setJoinedCount] = useState<number>(0);
   const [players, setPlayers] = useState<Player[] | null>(null);
 
-  const isCreator = true;
-  const expiresAt = useMemo(() => Date.now() + 20 * 60 * 1000, []);
-  const [remainingSeconds, setRemainingSeconds] = useState<number>(
-    Math.max(0, Math.floor((expiresAt - Date.now()) / 1000))
-  );
+  const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
 
   const load = useCallback(async () => {
     setIsLoading(false);
@@ -50,11 +46,16 @@ export default function InstantTournamentLobby() {
     try {
       const tournamentData = await joinOrCreateTournament();
       const tournamentId = tournamentData.id;
+
       console.log('Tournament id: ', tournamentId);
+
+      const expire = new Date(tournamentData.expiresAt);
+      const now = new Date();
+      const secondsLeft = (expire.getTime() - now.getTime()) / 1000;
+      setRemainingSeconds(Math.floor(secondsLeft));
+
       const { playersCount, firstFivePlayers } =
         await fetchTournamentPlayers(tournamentId);
-      console.log('Number of players: ', playersCount);
-      console.log('First five players: ', firstFivePlayers);
       setJoinedCount(playersCount.playersCount);
       setPlayers(firstFivePlayers);
     } catch (err: any) {
@@ -69,12 +70,19 @@ export default function InstantTournamentLobby() {
   }, [load]);
 
   useEffect(() => {
-    const t = setInterval(() => {
-      const secs = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
-      setRemainingSeconds(secs);
+    let interval = setInterval(() => {
+      setRemainingSeconds((prevTime) => {
+        if (prevTime === 0) {
+          return 0;
+        } else {
+          return prevTime - 1;
+        }
+      });
     }, 1000);
-    return () => clearInterval(t);
-  }, [expiresAt]);
+    return () => {
+      clearInterval(interval);
+    };
+  });
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -88,7 +96,6 @@ export default function InstantTournamentLobby() {
     setInitialQuestion(question);
     setTourState(TournamentState.PLAYING);
   };
-  const onLeave = () => alert('Leave (dummy)');
   const onInvite = () => alert('Invite (dummy)');
 
   const handleSubmit = () => {
@@ -207,21 +214,12 @@ export default function InstantTournamentLobby() {
                   <Text style={styles.ghostText}>Invite</Text>
                 </TouchableOpacity>
 
-                {isCreator ? (
-                  <TouchableOpacity
-                    style={styles.primaryButton}
-                    onPress={onStartGame}
-                  >
-                    <Text style={styles.primaryText}>Start</Text>
-                  </TouchableOpacity>
-                ) : (
-                  <TouchableOpacity
-                    style={styles.ghostButton}
-                    onPress={onLeave}
-                  >
-                    <Text style={styles.ghostText}>Leave</Text>
-                  </TouchableOpacity>
-                )}
+                <TouchableOpacity
+                  style={styles.primaryButton}
+                  onPress={onStartGame}
+                >
+                  <Text style={styles.primaryText}>Start</Text>
+                </TouchableOpacity>
               </View>
             </View>
 

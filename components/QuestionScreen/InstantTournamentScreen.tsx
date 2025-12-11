@@ -138,14 +138,12 @@ export default function InstantTournamentScreen({
   return (
     <View style={styles.screen}>
       <View style={styles.mainContent}>
-        {/* Timer */}
         <View style={styles.header}>
           <View style={styles.timerCircle}>
             <Text style={styles.timerText}>{timer}</Text>
           </View>
         </View>
 
-        {/* Question */}
         <View style={styles.questionBlock}>
           <Text style={styles.label}>
             Find the 3rd digit from left after calculating:
@@ -155,7 +153,6 @@ export default function InstantTournamentScreen({
           </Text>
         </View>
 
-        {/* Keypad */}
         <View style={styles.optionsContainer}>
           {keypadLayout.map((row, rowIndex) => (
             <View key={rowIndex} style={styles.row}>

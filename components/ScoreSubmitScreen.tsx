@@ -22,7 +22,7 @@ export default function ScoreSubmitScreen({
         disabled={isSubmittingSession}
         onPress={handleSubmit}
         style={
-          isSubmittingSession ? styles.submitBtn : styles.submitBtnDisabled
+          isSubmittingSession ? styles.submitBtnDisabled : styles.submitBtn
         }
       >
         <Text style={styles.submitText}>Submit</Text>
@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   submitBtnDisabled: {
+    opacity: 0.3,
     width: '80%',
     paddingVertical: 16,
     backgroundColor: 'grey',
