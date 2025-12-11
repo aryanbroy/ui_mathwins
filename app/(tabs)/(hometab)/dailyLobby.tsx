@@ -116,11 +116,6 @@ export default function DailyScreen() {
     } finally {
       setIsSubmittingSession(false);
     }
-
-    // setTimeout(() => {
-    //   setIsSubmittingSession(false);
-    //   navigation.navigate('HomeMain');
-    // }, 2000);
   };
 
   const getScreenState = () => {
@@ -198,7 +193,7 @@ export default function DailyScreen() {
           <TournamentScreen
             question={initialQuestion}
             sessionId={sessionId}
-            sessionDuration={10}
+            sessionDuration={300}
             setTourState={setTourState}
             setCurrentScore={setCurrentScore}
           />
@@ -222,10 +217,10 @@ export default function DailyScreen() {
       case 'finished':
         return (
           <>
-            <Text>Final score: {currentScore}</Text>
             <ScoreSubmitScreen
               isSubmittingSession={isSubmittingSession}
               handleSubmit={handleSubmit}
+              finalScore={currentScore}
             />
           </>
         );

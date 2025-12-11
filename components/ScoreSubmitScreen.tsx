@@ -1,55 +1,88 @@
-import { Text, StyleSheet, TouchableOpacity } from 'react-native';
+// SubmissionScreen.tsx
+import React from 'react';
+import { Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type ScoreSubmitScreenProps = {
   isSubmittingSession: boolean;
   handleSubmit: () => void;
+  finalScore: number;
 };
 
 export default function ScoreSubmitScreen({
   isSubmittingSession,
   handleSubmit,
+  finalScore,
 }: ScoreSubmitScreenProps) {
   return (
-    <TouchableOpacity
-      disabled={isSubmittingSession}
-      // disabled
-      style={isSubmittingSession ? styles.submitBtnDisabled : styles.submitBtn}
-      onPress={handleSubmit}
-    >
-      <Text style={styles.submitBtnText}>Submit</Text>
-    </TouchableOpacity>
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>Final Score: {finalScore}</Text>
+
+      <TouchableOpacity
+        disabled={isSubmittingSession}
+        onPress={handleSubmit}
+        style={
+          isSubmittingSession ? styles.submitBtn : styles.submitBtnDisabled
+        }
+      >
+        <Text style={styles.submitText}>Submit</Text>
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  submitBtnDisabled: {
-    backgroundColor: 'grey',
-    opacity: 0.6,
-    marginTop: 20,
-    paddingVertical: 14,
-    paddingHorizontal: 32,
-    borderRadius: 12,
-    alignItems: 'center',
+  container: {
+    flex: 1,
+    backgroundColor: '#F6F7FB',
     justifyContent: 'center',
-    width: '70%',
-    alignSelf: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+
+  scoreBubble: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    backgroundColor: '#FF4B8C',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 60,
+  },
+
+  scoreText: {
+    fontSize: 48,
+    fontWeight: '800',
+    color: '#FFF',
   },
 
   submitBtn: {
-    marginTop: 20,
-    backgroundColor: '#6A5AE0',
-    paddingVertical: 14,
-    paddingHorizontal: 32,
+    width: '80%',
+    paddingVertical: 16,
+    backgroundColor: '#6C63FF',
     borderRadius: 12,
-    alignItems: 'center',
     justifyContent: 'center',
-    width: '70%',
-    alignSelf: 'center',
+    alignItems: 'center',
   },
 
-  submitBtnText: {
-    color: '#fff',
-    fontSize: 18,
+  submitText: {
+    color: '#FFF',
+    fontSize: 20,
     fontWeight: '700',
+  },
+  submitBtnDisabled: {
+    width: '80%',
+    paddingVertical: 16,
+    backgroundColor: 'grey',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
