@@ -87,7 +87,7 @@ export default function DailyScreen() {
       setTourState(TournamentState.PLAYING);
     } catch (err: any) {
       setErr(err);
-      setErrMsg(err?.message ?? 'Failed to load start game');
+      setErrMsg(err?.message ?? 'Failed to start game');
     } finally {
       setDisableStartBtn(false);
     }

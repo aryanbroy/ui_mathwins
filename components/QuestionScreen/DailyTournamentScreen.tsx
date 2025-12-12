@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import QuestionScreen from './QuestionScreen';
 
 type Options = {
   id: number;
@@ -110,6 +111,7 @@ export default function TournamentScreen({
       setErr(err);
       setErrMsg(err?.message ?? 'Failed to load next question');
     } finally {
+      setTimeTaken(0);
       setIsLoading(false);
       isPausedRef.current = false;
     }
@@ -124,138 +126,12 @@ export default function TournamentScreen({
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Ionicons name="chevron-back" size={24} />
-        <View style={styles.headerCenter}>
-          <View style={styles.timerBadge}>
-            <Text style={styles.timerText}>{timer}</Text>
-          </View>
-        </View>
-        <View style={{ width: 24 }} />
-      </View>
-      {isLoading ? (
-        <View style={styles.loadingView}>
-          <ActivityIndicator />
-        </View>
-      ) : (
-        <>
-          <View style={styles.questionWrapper}>
-            <Text style={styles.questionLine1}>
-              What is the {question.kthDigit} digit from the {question.side} of
-              the
-            </Text>
-            <Text style={styles.questionLine1}>answer to:</Text>
-            <Text style={styles.questionExpression}>
-              {displayQuestion.expression}
-            </Text>
-          </View>
-
-          <View style={styles.optionsContainer}>
-            {keypadLayout.map((row, rowIndex) => (
-              <View key={rowIndex} style={styles.row}>
-                {row.map((value, colIndex) => {
-                  if (value === null) {
-                    return (
-                      <View key={colIndex} style={styles.optionPlaceholder} />
-                    );
-                  }
-
-                  const option = options.find((o) => o.value === value);
-                  if (!option) return null;
-
-                  return (
-                    <TouchableOpacity
-                      key={option.id}
-                      style={styles.optionBtn}
-                      onPress={() => handleSelect(option.value)}
-                    >
-                      <Text style={styles.optionText}>{option.value}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            ))}
-          </View>
-        </>
-      )}
-    </SafeAreaView>
+    <QuestionScreen
+      question={question}
+      displayQuestion={displayQuestion}
+      handleSelect={handleSelect}
+      isLoading={isLoading}
+      timer={timer}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F6F7FB',
-    paddingHorizontal: 20,
-  },
-  header: {
-    marginTop: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  headerCenter: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  timerBadge: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#FF4B8C',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  timerText: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-    fontSize: 16,
-  },
-  progressText: {
-    marginTop: 16,
-    fontSize: 12,
-  },
-  questionWrapper: {
-    marginTop: 24,
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  questionLine1: {
-    fontSize: 16,
-    textAlign: 'center',
-  },
-  questionExpression: {
-    marginTop: 8,
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  optionsContainer: {
-    gap: 12,
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 12,
-  },
-  optionBtn: {
-    width: 60,
-    height: 60,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#000',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  optionPlaceholder: {
-    width: 60,
-    height: 60,
-  },
-  optionText: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  loadingView: {
-    marginTop: 24,
-  },
-});
