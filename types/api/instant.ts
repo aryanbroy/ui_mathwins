@@ -22,6 +22,12 @@ enum tournamentStatus {
   CANCELLED = 'CANCELLED',
 }
 
+enum InstantTournamentSessionStatus {
+  ACTIVE = 'ACTIVE',
+  SUBMITTED = 'SUBMITTED',
+  EXPIRED = 'EXPIRED',
+}
+
 export type fetchPlayersResponse = {
   success: boolean;
   statusCode: number;
@@ -41,5 +47,54 @@ export type Player = {
   sessionStarted: boolean;
   user: {
     username: string;
+  };
+};
+
+export type startSessionResponse = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    question: InstantQuestion;
+    session: InstantSession;
+  };
+};
+
+export type submitQuestionResponse = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    question: InstantQuestion;
+    session: InstantSession;
+  };
+};
+
+type InstantSession = {
+  id: string;
+  score: number;
+  startedAt: Date;
+  endsAt: Date;
+  status: InstantTournamentSessionStatus;
+  finalScore: number | null;
+};
+
+export type InstantQuestion = {
+  id: string;
+  expression: string;
+  kthDigit: number;
+  level: number;
+  questionIndex: number;
+  result: string;
+  side: string;
+};
+
+export type finalSubmissionResponse = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    alreadySubmitted: boolean;
+    session: InstantSession;
   };
 };

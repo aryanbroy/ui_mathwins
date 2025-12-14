@@ -10,34 +10,38 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { generateQuestion, Question } from '@/lib/generateQuestion';
 import ScoreSubmitScreen from '@/components/ScoreSubmitScreen';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import { useNavigation } from '@react-navigation/native';
 import InstantTournamentScreen from '@/components/QuestionScreen/InstantTournamentScreen';
 import {
   fetchTournamentPlayers,
+  finalSubmission,
   joinOrCreateTournament,
+  startInstantSession,
 } from '@/lib/api/instantTournament';
-import { Player } from '@/types/api/instant';
+import { InstantQuestion, Player } from '@/types/api/instant';
 
 export default function InstantTournamentLobby() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
-  const roomId = 'R-12345';
   const roomCapacity = 100;
   const [tourState, setTourState] = useState<TournamentState>(
     TournamentState.LOBBY
   );
-  const [initialQuestion, setInitialQuestion] = useState<Question | null>(null);
+  const [initialQuestion, setInitialQuestion] =
+    useState<InstantQuestion | null>(null);
   const [isSubmittingSession, setIsSubmittingSession] =
     useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const [joinedCount, setJoinedCount] = useState<number>(0);
   const [players, setPlayers] = useState<Player[] | null>(null);
-
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
+  const [disableStartBtn, setDisableStartBtn] = useState<boolean>(false);
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [currentScore, setCurrentScore] = useState<number>(0);
 
   const load = useCallback(async () => {
     setIsLoading(false);
@@ -48,6 +52,7 @@ export default function InstantTournamentLobby() {
       const tournamentId = tournamentData.id;
 
       console.log('Tournament id: ', tournamentId);
+      setRoomId(tournamentId);
 
       const expire = new Date(tournamentData.expiresAt);
       const now = new Date();
@@ -90,22 +95,50 @@ export default function InstantTournamentLobby() {
     return `${m}:${sec.toString().padStart(2, '0')}`;
   };
 
-  const onStartGame = () => {
+  const onStartGame = async () => {
+    setDisableStartBtn(true);
+    setErrMsg(null);
+    if (!roomId) {
+      return;
+    }
+
+    try {
+      const { question, session } = await startInstantSession(roomId);
+      console.log('FirstQuestion: ', question);
+      setInitialQuestion(question);
+      console.log('Session info: ', session);
+      setSessionId(session.id);
+      setTourState(TournamentState.PLAYING);
+    } catch (err: any) {
+      setErrMsg(err?.message ?? 'Failed to start game');
+    } finally {
+      setDisableStartBtn(false);
+    }
     console.log('starting game now');
-    const question = generateQuestion();
-    setInitialQuestion(question);
-    setTourState(TournamentState.PLAYING);
   };
   const onInvite = () => alert('Invite (dummy)');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsSubmittingSession(true);
     console.log('submitting session');
-    setTimeout(() => {
+    try {
+      if (!sessionId) {
+        setErrMsg('invalid session: not available');
+        return;
+      }
+      const submissionRes = await finalSubmission(sessionId);
+      console.log('Final score: ', submissionRes.finalScore);
+      console.log('Status: ', submissionRes.status);
+
       navigation.navigate('HomeMain');
+    } catch (err: any) {
+      setErrMsg(err?.message ?? 'Failed to load start game');
+    } finally {
       setIsSubmittingSession(false);
-    }, 1000);
+    }
   };
+
+  const handleRetry = () => load();
 
   const renderPlayer = ({ item, index }: { item: Player; index: number }) => (
     <View style={styles.playerRow}>
@@ -153,24 +186,25 @@ export default function InstantTournamentLobby() {
           <ScoreSubmitScreen
             isSubmittingSession={isSubmittingSession}
             handleSubmit={handleSubmit}
-            finalScore={20}
+            finalScore={currentScore}
           />
         );
       case 'playing':
-        if (!initialQuestion) {
+        if (!initialQuestion || !sessionId) {
           return (
             <>
               <Text>Failed to generate question</Text>
-              <TouchableOpacity>Retry</TouchableOpacity>
+              <TouchableOpacity onPress={handleRetry}>Retry</TouchableOpacity>
             </>
           );
         }
         return (
           <InstantTournamentScreen
             question={initialQuestion}
-            sessionId="sessionId"
-            sessionDuration={3}
+            sessionId={sessionId}
+            sessionDuration={15}
             setTourState={setTourState}
+            setCurrentScore={setCurrentScore}
           />
         );
       case 'ready':
@@ -214,12 +248,21 @@ export default function InstantTournamentLobby() {
                   <Text style={styles.ghostText}>Invite</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                  style={styles.primaryButton}
-                  onPress={onStartGame}
-                >
-                  <Text style={styles.primaryText}>Start</Text>
-                </TouchableOpacity>
+                {!roomId ? (
+                  <TouchableOpacity style={styles.loadingBtn} disabled>
+                    <Text style={styles.primaryText}>Loading</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={
+                      disableStartBtn ? styles.loadingBtn : styles.primaryButton
+                    }
+                    disabled={disableStartBtn}
+                    onPress={onStartGame}
+                  >
+                    <Text style={styles.primaryText}>Start</Text>
+                  </TouchableOpacity>
+                )}
               </View>
             </View>
 
@@ -308,7 +351,14 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   primaryText: { color: '#fff', fontWeight: '700' },
-
+  loadingBtn: {
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: 'grey',
+    opacity: 0.6,
+    marginLeft: 10,
+  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
