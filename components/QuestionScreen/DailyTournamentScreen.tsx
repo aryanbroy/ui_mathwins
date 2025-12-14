@@ -1,41 +1,8 @@
 import { submitQuestion } from '@/lib/api/dailyTournament';
 import { DailyQuestion, TournamentState } from '@/types/api/daily';
-import { Ionicons } from '@expo/vector-icons';
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ActivityIndicator,
-} from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { View, Text } from 'react-native';
 import QuestionScreen from './QuestionScreen';
-
-type Options = {
-  id: number;
-  value: number;
-};
-
-const options: Options[] = [
-  { id: 0, value: 0 },
-  { id: 1, value: 1 },
-  { id: 2, value: 2 },
-  { id: 3, value: 3 },
-  { id: 4, value: 4 },
-  { id: 5, value: 5 },
-  { id: 6, value: 6 },
-  { id: 7, value: 7 },
-  { id: 8, value: 8 },
-  { id: 9, value: 9 },
-];
-
-const keypadLayout = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [null, null, 9, null, null],
-];
 
 type TournamentScreenProps = {
   question: DailyQuestion;
@@ -87,9 +54,6 @@ export default function TournamentScreen({
   useEffect(() => {
     if (timer === 0) {
       console.log('timer ended');
-      console.log(
-        'make db request now to submit all questions and mark the session status as complete'
-      );
       setTourState(TournamentState.FINISHED);
     }
   }, [timer, setTourState]);

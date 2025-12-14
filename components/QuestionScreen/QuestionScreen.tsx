@@ -40,6 +40,8 @@ type QuestionScreenProps = {
   timer: number;
   question: DailyQuestion | InstantQuestion;
   displayQuestion: DailyQuestion | InstantQuestion;
+  tournament?: string;
+  bannerTimer?: number;
   handleSelect: (value: number) => void;
 };
 
@@ -48,65 +50,72 @@ export default function QuestionScreen({
   timer,
   question,
   displayQuestion,
+  tournament,
+  bannerTimer,
   handleSelect,
 }: QuestionScreenProps) {
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Ionicons name="chevron-back" size={24} />
-        <View style={styles.headerCenter}>
-          <View style={styles.timerBadge}>
-            <Text style={styles.timerText}>{timer}</Text>
+      <View style={styles.content}>
+        <View style={styles.header}>
+          <Ionicons name="chevron-back" size={24} />
+          <View style={styles.headerCenter}>
+            <View style={styles.timerBadge}>
+              <Text style={styles.timerText}>{timer}</Text>
+            </View>
           </View>
+          <View style={{ width: 24 }} />
         </View>
-        <View style={{ width: 24 }} />
-      </View>
-      {isLoading ? (
-        <View style={styles.loadingView}>
-          <ActivityIndicator />
-        </View>
-      ) : (
-        <>
-          <View style={styles.questionWrapper}>
-            <Text style={styles.questionLine1}>
-              What is the{' '}
-              {displayQuestion ? displayQuestion.kthDigit : question.kthDigit}{' '}
-              digit from the{' '}
-              {displayQuestion ? displayQuestion.side : question.side} of the
-            </Text>
-            <Text style={styles.questionLine1}>answer to:</Text>
-            <Text style={styles.questionExpression}>
-              {displayQuestion.expression}
-            </Text>
+        {isLoading ? (
+          <View style={styles.loadingView}>
+            <ActivityIndicator />
           </View>
+        ) : (
+          <>
+            <View style={styles.questionWrapper}>
+              <Text style={styles.questionLine1}>
+                What is the{' '}
+                {displayQuestion ? displayQuestion.kthDigit : question.kthDigit}{' '}
+                digit from the{' '}
+                {displayQuestion ? displayQuestion.side : question.side} of the
+              </Text>
+              <Text style={styles.questionLine1}>answer to:</Text>
+              <Text style={styles.questionExpression}>
+                {displayQuestion.expression}
+              </Text>
+            </View>
 
-          <View style={styles.optionsContainer}>
-            {keypadLayout.map((row, rowIndex) => (
-              <View key={rowIndex} style={styles.row}>
-                {row.map((value, colIndex) => {
-                  if (value === null) {
+            <View style={styles.optionsContainer}>
+              {keypadLayout.map((row, rowIndex) => (
+                <View key={rowIndex} style={styles.row}>
+                  {row.map((value, colIndex) => {
+                    if (value === null) {
+                      return (
+                        <View key={colIndex} style={styles.optionPlaceholder} />
+                      );
+                    }
+
+                    const option = options.find((o) => o.value === value);
+                    if (!option) return null;
+
                     return (
-                      <View key={colIndex} style={styles.optionPlaceholder} />
+                      <TouchableOpacity
+                        key={option.id}
+                        style={styles.optionBtn}
+                        onPress={() => handleSelect(option.value)}
+                      >
+                        <Text style={styles.optionText}>{option.value}</Text>
+                      </TouchableOpacity>
                     );
-                  }
-
-                  const option = options.find((o) => o.value === value);
-                  if (!option) return null;
-
-                  return (
-                    <TouchableOpacity
-                      key={option.id}
-                      style={styles.optionBtn}
-                      onPress={() => handleSelect(option.value)}
-                    >
-                      <Text style={styles.optionText}>{option.value}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-            ))}
-          </View>
-        </>
+                  })}
+                </View>
+              ))}
+            </View>
+          </>
+        )}
+      </View>
+      {tournament === 'instant' && bannerTimer === 0 && (
+        <View style={styles.bannerSlot}>{/* Banner Ad goes here later */}</View>
       )}
     </SafeAreaView>
   );
@@ -186,5 +195,14 @@ const styles = StyleSheet.create({
   },
   loadingView: {
     marginTop: 24,
+  },
+  content: {
+    flex: 1,
+  },
+  bannerSlot: {
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#EDEEF3',
   },
 });
