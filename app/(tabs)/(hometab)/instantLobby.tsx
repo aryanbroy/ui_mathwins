@@ -1,5 +1,5 @@
 import { TournamentState } from '@/types/api/daily';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,52 +7,87 @@ import {
   TouchableOpacity,
   FlatList,
   StatusBar,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { generateQuestion, Question } from '@/lib/generateQuestion';
 import ScoreSubmitScreen from '@/components/ScoreSubmitScreen';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import { useNavigation } from '@react-navigation/native';
 import InstantTournamentScreen from '@/components/QuestionScreen/InstantTournamentScreen';
-
-type Player = {
-  id: string;
-  name: string;
-  score?: number;
-};
+import {
+  fetchTournamentPlayers,
+  finalSubmission,
+  joinOrCreateTournament,
+  startInstantSession,
+} from '@/lib/api/instantTournament';
+import { InstantQuestion, Player } from '@/types/api/instant';
 
 export default function InstantTournamentLobby() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
 
-  const roomId = 'R-12345';
   const roomCapacity = 100;
-  const [players] = useState<Player[]>([
-    { id: 'u1', name: 'Aryan', score: 220 },
-    { id: 'u2', name: 'Sam', score: 180 },
-    { id: 'u3', name: 'Priya', score: 150 },
-    { id: 'u4', name: 'Nina', score: 120 },
-    { id: 'u5', name: 'Raj', score: 90 },
-  ]);
   const [tourState, setTourState] = useState<TournamentState>(
     TournamentState.LOBBY
   );
-  const [initialQuestion, setInitialQuestion] = useState<Question | null>(null);
+  const [initialQuestion, setInitialQuestion] =
+    useState<InstantQuestion | null>(null);
   const [isSubmittingSession, setIsSubmittingSession] =
     useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errMsg, setErrMsg] = useState<string | null>(null);
+  const [joinedCount, setJoinedCount] = useState<number>(0);
+  const [players, setPlayers] = useState<Player[] | null>(null);
+  const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
+  const [disableStartBtn, setDisableStartBtn] = useState<boolean>(false);
+  const [roomId, setRoomId] = useState<string | null>(null);
+  const [sessionId, setSessionId] = useState<string | null>(null);
+  const [currentScore, setCurrentScore] = useState<number>(0);
 
-  const isCreator = true;
-  const expiresAt = useMemo(() => Date.now() + 20 * 60 * 1000, []);
-  const [remainingSeconds, setRemainingSeconds] = useState<number>(
-    Math.max(0, Math.floor((expiresAt - Date.now()) / 1000))
-  );
+  const load = useCallback(async () => {
+    setIsLoading(false);
+    setErrMsg(null);
+
+    try {
+      const tournamentData = await joinOrCreateTournament();
+      const tournamentId = tournamentData.id;
+
+      console.log('Tournament id: ', tournamentId);
+      setRoomId(tournamentId);
+
+      const expire = new Date(tournamentData.expiresAt);
+      const now = new Date();
+      const secondsLeft = (expire.getTime() - now.getTime()) / 1000;
+      setRemainingSeconds(Math.floor(secondsLeft));
+
+      const { playersCount, firstFivePlayers } =
+        await fetchTournamentPlayers(tournamentId);
+      setJoinedCount(playersCount.playersCount);
+      setPlayers(firstFivePlayers);
+    } catch (err: any) {
+      setErrMsg(err?.message ?? 'Failed to load daily attempts');
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const t = setInterval(() => {
-      const secs = Math.max(0, Math.floor((expiresAt - Date.now()) / 1000));
-      setRemainingSeconds(secs);
+    load();
+  }, [load]);
+
+  useEffect(() => {
+    let interval = setInterval(() => {
+      setRemainingSeconds((prevTime) => {
+        if (prevTime === 0) {
+          return 0;
+        } else {
+          return prevTime - 1;
+        }
+      });
     }, 1000);
-    return () => clearInterval(t);
-  }, [expiresAt]);
+    return () => {
+      clearInterval(interval);
+    };
+  });
 
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60);
@@ -60,147 +95,210 @@ export default function InstantTournamentLobby() {
     return `${m}:${sec.toString().padStart(2, '0')}`;
   };
 
-  const joinedCount = players.length;
+  const onStartGame = async () => {
+    setDisableStartBtn(true);
+    setErrMsg(null);
+    if (!roomId) {
+      return;
+    }
 
-  const onStartGame = () => {
+    try {
+      const { question, session } = await startInstantSession(roomId);
+      console.log('FirstQuestion: ', question);
+      setInitialQuestion(question);
+      console.log('Session info: ', session);
+      setSessionId(session.id);
+      setTourState(TournamentState.PLAYING);
+    } catch (err: any) {
+      setErrMsg(err?.message ?? 'Failed to start game');
+    } finally {
+      setDisableStartBtn(false);
+    }
     console.log('starting game now');
-    const question = generateQuestion();
-    setInitialQuestion(question);
-    setTourState(TournamentState.PLAYING);
   };
-  const onLeave = () => alert('Leave (dummy)');
   const onInvite = () => alert('Invite (dummy)');
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     setIsSubmittingSession(true);
     console.log('submitting session');
-    setTimeout(() => {
+    try {
+      if (!sessionId) {
+        setErrMsg('invalid session: not available');
+        return;
+      }
+      const submissionRes = await finalSubmission(sessionId);
+      console.log('Final score: ', submissionRes.finalScore);
+      console.log('Status: ', submissionRes.status);
+
       navigation.navigate('HomeMain');
+    } catch (err: any) {
+      setErrMsg(err?.message ?? 'Failed to load start game');
+    } finally {
       setIsSubmittingSession(false);
-    }, 1000);
+    }
   };
+
+  const handleRetry = () => load();
 
   const renderPlayer = ({ item, index }: { item: Player; index: number }) => (
     <View style={styles.playerRow}>
       <View style={styles.avatarCircle}>
-        <Text style={styles.avatarText}>{item.name.charAt(0)}</Text>
+        <Text style={styles.avatarText}>{item.user.username.charAt(0)}</Text>
       </View>
 
       <View style={styles.playerInfo}>
-        <Text style={styles.playerName}>{item.name}</Text>
-        <Text style={styles.playerScore}>{item.score ?? 0} pts</Text>
+        <Text style={styles.playerName}>{item.user.username}</Text>
+        {/* <Text style={styles.playerScore}>{item.score ?? 0} pts</Text> */}
       </View>
 
       <Text style={styles.rankBubble}>{index + 1}</Text>
     </View>
   );
 
-  if (tourState === TournamentState.FINISHED) {
-    return (
-      <ScoreSubmitScreen
-        isSubmittingSession={isSubmittingSession}
-        handleSubmit={handleSubmit}
-      />
-    );
-  }
+  const getScreenState = () => {
+    if (tourState === TournamentState.FINISHED) return 'finished';
+    if (tourState === TournamentState.PLAYING) return 'playing';
+    if (isLoading) return 'loading';
+    if (errMsg != null) return 'err';
+    return 'ready';
+  };
 
-  if (tourState === TournamentState.PLAYING && initialQuestion != null) {
-    return (
-      <InstantTournamentScreen
-        question={initialQuestion}
-        sessionId="sessionId"
-        sessionDuration={180}
-        setTourState={setTourState}
-      />
-    );
-  }
+  const renderContent = () => {
+    const screenState = getScreenState();
 
-  if (tourState === TournamentState.LOBBY) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar barStyle="dark-content" />
-
-        <View style={styles.topRow}>
-          <Text style={styles.title}>Instant Tournament</Text>
-          <Text style={styles.roomTag}>Room • {roomId}</Text>
-        </View>
-
-        <View style={styles.summaryCard}>
-          <View style={styles.summaryRow}>
-            <View>
-              <Text style={styles.summaryLabel}>Players</Text>
-              <Text style={styles.summaryValue}>
-                {joinedCount}/{roomCapacity}
-              </Text>
-            </View>
-
-            <View style={{ alignItems: 'flex-end' }}>
-              <Text style={styles.summaryLabel}>Closes in</Text>
-              <Text style={styles.summaryValue}>
-                {formatTime(remainingSeconds)}
-              </Text>
-            </View>
+    switch (screenState) {
+      case 'loading':
+        return (
+          <View style={styles.center}>
+            <ActivityIndicator />
+            <Text style={{ marginTop: 8 }}>Loading...</Text>
           </View>
+        );
+      case 'err':
+        return (
+          <View>
+            <Text>Error fetching tournament details: {errMsg}</Text>
+          </View>
+        );
 
-          <View style={styles.progressBarContainer}>
-            <View
-              style={[
-                styles.progressBarFill,
-                { width: `${(joinedCount / roomCapacity) * 100}%` },
-              ]}
+      case 'finished':
+        return (
+          <ScoreSubmitScreen
+            isSubmittingSession={isSubmittingSession}
+            handleSubmit={handleSubmit}
+            finalScore={currentScore}
+          />
+        );
+      case 'playing':
+        if (!initialQuestion || !sessionId) {
+          return (
+            <>
+              <Text>Failed to generate question</Text>
+              <TouchableOpacity onPress={handleRetry}>Retry</TouchableOpacity>
+            </>
+          );
+        }
+        return (
+          <InstantTournamentScreen
+            question={initialQuestion}
+            sessionId={sessionId}
+            sessionDuration={15}
+            setTourState={setTourState}
+            setCurrentScore={setCurrentScore}
+          />
+        );
+      case 'ready':
+        return (
+          <SafeAreaView style={styles.container}>
+            <StatusBar barStyle="dark-content" />
+
+            <View style={styles.topRow}>
+              <Text style={styles.title}>Instant Tournament</Text>
+              <Text style={styles.roomTag}>Room • {roomId}</Text>
+            </View>
+
+            <View style={styles.summaryCard}>
+              <View style={styles.summaryRow}>
+                <View>
+                  <Text style={styles.summaryLabel}>Players</Text>
+                  <Text style={styles.summaryValue}>
+                    {joinedCount}/{roomCapacity}
+                  </Text>
+                </View>
+
+                <View style={{ alignItems: 'flex-end' }}>
+                  <Text style={styles.summaryLabel}>Closes in</Text>
+                  <Text style={styles.summaryValue}>
+                    {formatTime(remainingSeconds)}
+                  </Text>
+                </View>
+              </View>
+
+              <View style={styles.progressBarContainer}>
+                <View
+                  style={[
+                    styles.progressBarFill,
+                    { width: `${(joinedCount / roomCapacity) * 100}%` },
+                  ]}
+                />
+              </View>
+
+              <View style={styles.actionsRow}>
+                <TouchableOpacity style={styles.ghostButton} onPress={onInvite}>
+                  <Text style={styles.ghostText}>Invite</Text>
+                </TouchableOpacity>
+
+                {!roomId ? (
+                  <TouchableOpacity style={styles.loadingBtn} disabled>
+                    <Text style={styles.primaryText}>Loading</Text>
+                  </TouchableOpacity>
+                ) : (
+                  <TouchableOpacity
+                    style={
+                      disableStartBtn ? styles.loadingBtn : styles.primaryButton
+                    }
+                    disabled={disableStartBtn}
+                    onPress={onStartGame}
+                  >
+                    <Text style={styles.primaryText}>Start</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            </View>
+
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Players</Text>
+              <Text style={styles.sectionSub}>Live</Text>
+            </View>
+
+            <FlatList
+              data={players}
+              keyExtractor={(i) => i.userId}
+              renderItem={renderPlayer}
+              style={styles.list}
+              contentContainerStyle={{ paddingBottom: 24 }}
             />
-          </View>
 
-          <View style={styles.actionsRow}>
-            <TouchableOpacity style={styles.ghostButton} onPress={onInvite}>
-              <Text style={styles.ghostText}>Invite</Text>
-            </TouchableOpacity>
-
-            {isCreator ? (
-              <TouchableOpacity
-                style={styles.primaryButton}
-                onPress={onStartGame}
-              >
-                <Text style={styles.primaryText}>Start</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity style={styles.ghostButton} onPress={onLeave}>
-                <Text style={styles.ghostText}>Leave</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Players</Text>
-          <Text style={styles.sectionSub}>Live</Text>
-        </View>
-
-        <FlatList
-          data={players}
-          keyExtractor={(i) => i.id}
-          renderItem={renderPlayer}
-          style={styles.list}
-          contentContainerStyle={{ paddingBottom: 24 }}
-        />
-
-        {/* <View style={styles.footer}> */}
-        {/*   <Text style={styles.footerText}> */}
-        {/*     3 min per player · Early submit allowed (ad-gated) */}
-        {/*   </Text> */}
-        {/*   <TouchableOpacity */}
-        {/*     style={styles.linkBtn} */}
-        {/*     onPress={() => alert('Leaderboard (dummy)')} */}
-        {/*   > */}
-        {/*     <Text style={styles.linkText}>Leaderboard</Text> */}
-        {/*   </TouchableOpacity> */}
-        {/* </View> */}
-      </SafeAreaView>
-    );
-  }
+            {/* <View style={styles.footer}> */}
+            {/*   <Text style={styles.footerText}> */}
+            {/*     3 min per player · Early submit allowed (ad-gated) */}
+            {/*   </Text> */}
+            {/*   <TouchableOpacity */}
+            {/*     style={styles.linkBtn} */}
+            {/*     onPress={() => alert('Leaderboard (dummy)')} */}
+            {/*   > */}
+            {/*     <Text style={styles.linkText}>Leaderboard</Text> */}
+            {/*   </TouchableOpacity> */}
+            {/* </View> */}
+          </SafeAreaView>
+        );
+    }
+  };
+  return renderContent();
 }
 
 const styles = StyleSheet.create({
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   container: { flex: 1, backgroundColor: '#FAFAFB', padding: 16 },
   topRow: { marginBottom: 12 },
   title: { fontSize: 20, fontWeight: '700', color: '#111' },
@@ -253,7 +351,14 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   primaryText: { color: '#fff', fontWeight: '700' },
-
+  loadingBtn: {
+    paddingVertical: 9,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    backgroundColor: 'grey',
+    opacity: 0.6,
+    marginLeft: 10,
+  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',

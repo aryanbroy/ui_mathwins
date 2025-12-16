@@ -14,9 +14,9 @@ export default function SoloScreen() {
 
   async function createSoloSession(){
     setLoading(true);
-    await soloStart({userId: "cmiuilr020006fj3zecq1hhal"}).then(
-      (res)=>{
-        console.log("soloStart : ",res);
+    await soloStart({ userId: 'cmiuilr020006fj3zecq1hhal' })
+      .then((res) => {
+        console.log('soloStart : ', res);
         const sanitizedAttemp = {
           userId: res.sanitizedAttemp.userId,
           soloSessionId: res.sanitizedAttemp.id,
@@ -78,5 +78,5 @@ const makeStyles = (colors: ColorScheme) =>
       color: colors.text,
       fontSize: 20,
       fontWeight: 700,
-    }
+    },
   });

@@ -1,38 +1,16 @@
-import { generateQuestion, Question } from '@/lib/generateQuestion';
+import { submitQuestion } from '@/lib/api/instantTournament';
 import { TournamentState } from '@/types/api/daily';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
-type Options = {
-  id: number;
-  value: number;
-};
-
-const options: Options[] = [
-  { id: 0, value: 0 },
-  { id: 1, value: 1 },
-  { id: 2, value: 2 },
-  { id: 3, value: 3 },
-  { id: 4, value: 4 },
-  { id: 5, value: 5 },
-  { id: 6, value: 6 },
-  { id: 7, value: 7 },
-  { id: 8, value: 8 },
-  { id: 9, value: 9 },
-];
-
-const keypadLayout = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [null, null, 9, null, null],
-];
+import { InstantQuestion } from '@/types/api/instant';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
+import { View, Text } from 'react-native';
+import QuestionScreen from './QuestionScreen';
 
 type TournamentScreenProps = {
-  question: Question;
+  question: InstantQuestion;
   sessionId: string;
   sessionDuration: number;
   setTourState: Dispatch<SetStateAction<TournamentState>>;
+  setCurrentScore: Dispatch<SetStateAction<number>>;
 };
 
 export default function InstantTournamentScreen({
@@ -40,73 +18,32 @@ export default function InstantTournamentScreen({
   sessionId,
   sessionDuration,
   setTourState,
+  setCurrentScore,
 }: TournamentScreenProps) {
   const [timer, setTimer] = useState<number>(sessionDuration);
-  const [displayQuestion, setDisplayQuestion] = useState<Question>(question);
+  const [displayQuestion, setDisplayQuestion] =
+    useState<InstantQuestion>(question);
   const [bannerTimer, setBannerTimer] = useState<number>(10);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [errMsg, setErrMsg] = useState<string | null>(null);
+  const [timeTaken, setTimeTaken] = useState<number>(0);
 
-  // const navigation = useNavigation<HomeScreenNavigationProp>();
-  // const [isLoading, setIsLoading] = useState<boolean>(false);
-  // const [err, setErr] = useState(null);
-  // const [errMsg, setErrMsg] = useState<string | null>(null);
-  // const [questionExpression, setQuestionExpression] = useState<string | null>(
-  //   null
-  // );
-  //
-  // useEffect(() => {
-  //   (async () => {
-  //     setIsLoading(true);
-  //     setErr(null);
-  //     setErrMsg(null);
-  //     try {
-  //       const createSession = await createDailySession();
-  //       console.log('Session created: ', createSession);
-  //       const data = createSession.data;
-  //       const { question } = data;
-  //       setQuestionExpression(question.expression);
-  //     } catch (err: any) {
-  //       if (err instanceof AxiosError) {
-  //         console.log('AxiosError: ', err);
-  //         setErrMsg(err.response?.data.message);
-  //       } else {
-  //         console.log('Error: ', err);
-  //       }
-  //       setErr(err);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   })();
-  // }, []);
-  //
-  // if (isLoading) {
-  //   return (
-  //     <View style={styles.center}>
-  //       <ActivityIndicator />
-  //
-  //       <Text style={{ marginTop: 8 }}>Loading...</Text>
-  //     </View>
-  //   );
-  // }
-  //
-  // if (err != null) {
-  //   return (
-  //     <View>
-  //       <Text>Error fetching attempts: {errMsg}</Text>
-  //     </View>
-  //   );
-  // }
-  //
+  const intervalRef = useRef<number | null>(null);
+  const isPausedRef = useRef<boolean>(false);
+  const timeTakenRef = useRef<number | null>(null);
 
   useEffect(() => {
     console.log('timer started');
-    let timerInterval = setInterval(() => {
-      setTimer((prevTime) => {
-        if (prevTime === 0) {
-          return 0;
-        } else {
-          return prevTime - 1;
-        }
-      });
+    intervalRef.current = setInterval(() => {
+      if (!isPausedRef.current) {
+        setTimer((prevTime) => {
+          if (prevTime === 0) {
+            return 0;
+          } else {
+            return prevTime - 1;
+          }
+        });
+      }
       setBannerTimer((prevTime) => {
         if (prevTime === 0) {
           return 0;
@@ -115,179 +52,69 @@ export default function InstantTournamentScreen({
         }
       });
     }, 1000);
+    timeTakenRef.current = setInterval(() => {
+      if (!isPausedRef.current) {
+        setTimeTaken((prevtime) => prevtime + 1);
+      }
+    }, 100);
     return () => {
-      clearInterval(timerInterval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+      if (timeTakenRef.current) {
+        clearInterval(timeTakenRef.current);
+      }
     };
   }, []);
 
   useEffect(() => {
     if (timer === 0) {
       console.log('timer ended');
-      console.log(
-        'make db request now to submit all questions and mark the session status as complete'
-      );
       setTourState(TournamentState.FINISHED);
     }
   }, [timer, setTourState]);
 
-  const handleSelect = (value: number) => {
-    const question = generateQuestion();
-    setDisplayQuestion(question);
+  const handleSelect = async (value: number) => {
+    console.log(timeTaken);
+    isPausedRef.current = true;
+    setIsLoading(true);
+    setErrMsg(null);
+
+    try {
+      const { question: newQuestion, session } = await submitQuestion(
+        sessionId,
+        question.id,
+        value,
+        30
+      );
+      setDisplayQuestion(newQuestion);
+      setCurrentScore(session.score);
+    } catch (err: any) {
+      setErrMsg(err?.message ?? 'Failed to load next question');
+    } finally {
+      setIsLoading(false);
+      isPausedRef.current = false;
+      setTimeTaken(0);
+    }
   };
 
+  if (errMsg != null) {
+    return (
+      <View>
+        <Text>{errMsg}</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.screen}>
-      <View style={styles.mainContent}>
-        {/* Timer */}
-        <View style={styles.header}>
-          <View style={styles.timerCircle}>
-            <Text style={styles.timerText}>{timer}</Text>
-          </View>
-        </View>
-
-        {/* Question */}
-        <View style={styles.questionBlock}>
-          <Text style={styles.label}>
-            Find the 3rd digit from left after calculating:
-          </Text>
-          <Text style={styles.questionText}>
-            {displayQuestion.expression} = __
-          </Text>
-        </View>
-
-        {/* Keypad */}
-        <View style={styles.optionsContainer}>
-          {keypadLayout.map((row, rowIndex) => (
-            <View key={rowIndex} style={styles.row}>
-              {row.map((value, colIndex) => {
-                if (value === null) {
-                  return (
-                    <View key={colIndex} style={styles.optionPlaceholder} />
-                  );
-                }
-
-                const option = options.find((o) => o.value === value);
-                if (!option) {
-                  return (
-                    <View key={colIndex} style={styles.optionPlaceholder} />
-                  );
-                }
-
-                return (
-                  <TouchableOpacity
-                    key={option.id}
-                    style={styles.optionBtn}
-                    onPress={() => handleSelect(option.value)}
-                    activeOpacity={0.8}
-                  >
-                    <Text style={styles.optionText}>{option.value}</Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
-          ))}
-        </View>
-      </View>
-
-      {/* Bottom banner space */}
-
-      <View style={styles.bannerContainer}>
-        {bannerTimer === 0 && <Text>Banner ad here</Text>}
-      </View>
-    </View>
+    <QuestionScreen
+      question={question}
+      displayQuestion={displayQuestion}
+      handleSelect={handleSelect}
+      isLoading={isLoading}
+      timer={timer}
+      tournament="instant"
+      bannerTimer={bannerTimer}
+    />
   );
 }
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 16,
-    paddingTop: 24,
-  },
-
-  mainContent: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  header: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-
-  questionBlock: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-    fontWeight: '400',
-    color: '#111827',
-    textAlign: 'center',
-  },
-
-  questionText: {
-    textAlign: 'center',
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#111827',
-  },
-
-  optionsContainer: {
-    gap: 12,
-  },
-
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 12,
-  },
-
-  optionBtn: {
-    width: 60,
-    height: 60,
-    borderRadius: 999,
-    borderWidth: 1,
-    borderColor: '#000',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  optionPlaceholder: {
-    width: 60,
-    height: 60,
-  },
-
-  optionText: {
-    fontSize: 18,
-    fontWeight: '600',
-  },
-
-  timerCircle: {
-    width: 56,
-    height: 56,
-    borderRadius: 999,
-    borderWidth: 3,
-    borderColor: '#FFA500',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  timerText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#111827',
-  },
-
-  bannerContainer: {
-    height: 70, // space reserved for banner ad
-    borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});

@@ -20,14 +20,15 @@ function RootNavigator() {
   return (
     <ThemeProvider>
       <Stack screenOptions={{ headerShown: false }}>
-        {user ? (
-            <Stack.Screen name="(tabs)" />   // protected tab routes
-          ) : (
-            <Stack.Screen name="login" />    // public
-          )}
-
+        {/* {user ? ( */}
+        {/*     <Stack.Screen name="(tabs)" />   // protected tab routes */}
+        {/*     // <Stack.Screen name="edit-profile" /> */}
+        {/*   ) : ( */}
+        {/*     <Stack.Screen name="login" />    // public */}
+        {/*   )} */}
+        {/**/}
         {/* <Stack.Screen name="login" /> */}
-        {/* <Stack.Screen name="(tabs)" /> */}
+        <Stack.Screen name="(tabs)" />
         {/* <Stack.Screen name="edit-profile" /> */}
         {/* <Stack.Screen name="adScreen" /> */}
         {/* <Stack.Screen name="soloScoreboard" /> */}
