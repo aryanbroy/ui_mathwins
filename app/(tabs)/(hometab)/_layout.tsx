@@ -7,6 +7,7 @@ import InstantLobby from './instantLobby';
 import SoloQuestion from './soloQuestion';
 import adScreen from './adScreen';
 import roundOverview from './roundOverview';
+import LoginScreen from '@/app/login';
 
 const Stack = createNativeStackNavigator<HomeTabStackParamList>();
 
@@ -45,6 +46,11 @@ export default function HomeTabLayout() {
         name="roundOverview"
         component={roundOverview}
         options={{ title: 'soloScoreboard' }}
+      />
+      <Stack.Screen
+        name="login"
+        component={LoginScreen}
+        options={{ title: 'login' }}
       />
       {/* <Stack.Screen */}
       {/*   name="GameScreen" */}

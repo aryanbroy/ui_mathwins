@@ -32,7 +32,7 @@ export default function roundOverview() {
     quitSolo(payload)
       .then((response)=>{
         console.log("response continue : ",response);
-        navigation.navigate('HomeMain')
+        navigation.navigate('HomeMain');
       }).catch((err)=>{
         console.log(err);
       });

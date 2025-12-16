@@ -1,4 +1,4 @@
-import { View, Text, Image, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useAuth } from '@/context/authContext';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 
@@ -6,6 +6,9 @@ export default function Header() {
   const { user } = useAuth();
   const { colors } = useAppTheme();
   const styles = makeStyles(colors);
+  function profileClick() {
+    console.log("Clicked Profile");
+  }
 
   return (
     <View style={styles.content}>
@@ -19,18 +22,20 @@ export default function Header() {
 
         <View style={styles.coinContainer}>
           <Text style={styles.coinEmoji}>🪙</Text>
-          <Text style={styles.coinText}>2,000 / 2,000 coins</Text>
+          <Text style={styles.coinText}>0 / 2,000 coins</Text>
         </View>
       </View>
 
-      <View style={styles.avatarContainer}>
+      <TouchableOpacity
+      onPress={profileClick} 
+      style={styles.avatarContainer}>
         <View style={styles.avatarBorder}>
           <Image
             source={{ uri: user?.picture }}
             style={styles.avatar}
           />
         </View>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 }

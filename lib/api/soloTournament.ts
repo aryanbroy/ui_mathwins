@@ -1,6 +1,7 @@
 import { createSoloSessionResponse } from '@/types/api/solo';
 import { api } from './client';
 import { parseApiError } from './parseApiError';
+import LeaderBoard from '@/app/(tabs)/leaderBoard';
 
 export const soloStart = async ({userId}: any) => {
   try {
@@ -27,6 +28,11 @@ type continueParams = {
 type quitParams = {
   userId: string;
   soloSessionId: string;
+};
+type loaderBoradParam = {
+  todayDate: string;
+  start: number;
+  end: number;
 };
 export const nextQuestion = async (params: NextQuestionParams) => {
   try {
@@ -60,6 +66,16 @@ export const quitSolo = async (params: quitParams) => {
 export const finalsubmission = async (params: quitParams) => {
   try {
     const res = await api.post('api/solo/finalsubmission', params);
+    return res.data;
+  } catch (err) {
+    const msg = parseApiError(err);
+    throw new Error(msg);
+  }
+};
+export const soloLeaderboard = async (params: loaderBoradParam) => {
+  try {
+    const res = await api.post('api/solo/leaderboard', params);
+    // console.log(res);
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);

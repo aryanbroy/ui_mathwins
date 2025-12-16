@@ -9,6 +9,8 @@ import { useAuth } from "../context/authContext";
 import useAppTheme from "@/context/useAppTheme";
 import BackgroundTexture from "@/components/Texture/BackgroundTexture";
 import type { ColorScheme } from "@/context/useAppTheme";
+import { useNavigation } from "expo-router";
+import { HomeScreenNavigationProp } from "@/types/tabTypes";
 
 type UserData = {
     name?: string;
@@ -18,6 +20,7 @@ type UserData = {
 WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
   const [selectedTab, setSelectedTab] = useState<"login" | "signup">("login");
   const [phone, setPhone] = useState("");
   const { login } = useAuth();
@@ -64,9 +67,10 @@ export default function LoginScreen() {
       const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
         headers: { Authorization: `Bearer ${token}` },
       });
-
+      
       const user = await res.json();
       // console.log("user :", user);
+      navigation.navigate('HomeMain');
       return user; // return to handleSignInWithGoogle
     } catch (error) {
       console.log("Error fetching user info", error);

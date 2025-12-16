@@ -2,6 +2,8 @@ import { Stack } from 'expo-router';
 import { useAuth, AuthProvider } from '../context/authContext';
 import { ActivityIndicator, View } from 'react-native';
 import { ThemeProvider } from '@/context/useAppTheme';
+import { useEffect } from 'react';
+// import mobileAds, { MaxAdContentRating } from 'react-native-google-mobile-ads';
 
 function RootNavigator() {
   const { user, loading } = useAuth();
@@ -20,7 +22,6 @@ function RootNavigator() {
       <Stack screenOptions={{ headerShown: false }}>
         {user ? (
             <Stack.Screen name="(tabs)" />   // protected tab routes
-            // <Stack.Screen name="edit-profile" />
           ) : (
             <Stack.Screen name="login" />    // public
           )}
@@ -36,6 +37,25 @@ function RootNavigator() {
 }
 
 export default function RootLayout() {
+  // useEffect(()=>{
+  //   mobileAds()
+  //     .setRequestConfiguration({
+  //       maxAdContentRating: MaxAdContentRating.PG,
+  //       tagForChildDirectedTreatment: true,
+  //       tagForUnderAgeOfConsent: true,
+  //       testDeviceIdentifiers: ['EMULATOR'],
+  //     })
+  //     .then(() => {
+  //       return mobileAds().initialize();
+  //     })
+  //     .then(() => {
+  //       console.log("AdMod Initialized");
+  //     })
+  //     .catch((error) => {
+  //       console.error("AdMod Error : ", error);
+  //     });
+
+  // },[])
   return (
     <AuthProvider>
       <RootNavigator />

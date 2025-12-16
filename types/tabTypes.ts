@@ -20,6 +20,7 @@ export type HomeTabStackParamList = {
   ad: continueParams;
   GameScreen: undefined;
   Instant: undefined;
+  login: undefined;
 };
 
 export type HomeScreenNavigationProp =

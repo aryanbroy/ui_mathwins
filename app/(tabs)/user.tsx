@@ -5,9 +5,12 @@ import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather, Ionicons, MaterialIcons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
+import { useNavigation } from '@react-navigation/native';
+import { HomeScreenNavigationProp } from '@/types/tabTypes';
 
 
 export default function UserProfileScreen() {
+  const navigation = useNavigation<HomeScreenNavigationProp>();
   const { user } = useAuth();
   console.log("user : ",user);
   
@@ -16,6 +19,11 @@ export default function UserProfileScreen() {
   const { isDarkMode, toggleDarkMode, colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
 
+  function loginHandle(){
+    console.log("login");
+    navigation.navigate('login');
+    
+  }
   return (
     <ScrollView
       style={styles.scroll}
@@ -35,9 +43,22 @@ export default function UserProfileScreen() {
             <View style={styles.avatarWrapper}>
               <Image source={{ uri: user?.picture }} style={styles.avatarImage} />
             </View>
+            {
+              user ?
+              <View style={styles.screenContainer}>
+                <Text style={styles.nameText}>{user?.name || "User"}</Text>
+                <Text style={styles.emailText}>{user?.email}</Text>
+              </View> : 
+              <View style={styles.screenContainer}>
+                <TouchableOpacity
+                onPress={loginHandle}
+                style={styles.startBtn} 
+                >
+                  <Text style={styles.btnText} >Login</Text>
+                </TouchableOpacity>
+              </View>
+            }
 
-            <Text style={styles.nameText}>{user?.name || "User"}</Text>
-            <Text style={styles.emailText}>{user?.email}</Text>
 
             <TouchableOpacity style={styles.editProfileButton}>
               <View style={styles.editIconWrapper}>
@@ -210,7 +231,28 @@ const makeStyles = (colors: ColorScheme) =>
       opacity: 0.9,
       marginBottom: 20,
     },
-
+    screenContainer: {
+      width: "100%",
+      paddingHorizontal: 20,
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
+    startBtn: {
+      width: "100%",
+      backgroundColor: colors.bg,
+      marginVertical: 20,
+      paddingVertical: 12,
+      borderRadius: 8,
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderWidth: 2,
+      borderColor: colors.primary,
+    },
+    btnText: {
+      fontSize: 20,
+      fontWeight: 700,
+      color: colors.primary,
+    },
     editProfileButton: {
       flexDirection: "row",
       alignItems: "center",
