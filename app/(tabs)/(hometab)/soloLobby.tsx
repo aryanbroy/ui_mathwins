@@ -6,6 +6,8 @@ import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import { getSoloAtempts, soloStart } from '@/lib/api/soloTournament';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '@/context/authContext';
+import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SoloScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -15,24 +17,30 @@ export default function SoloScreen() {
   const [remainingAttempt, setRemainingAttempt] = useState(0);
   const [loading, setLoading] = useState(false);
   const { user } = useAuth();
+
+  const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+  const bannerRef = useRef<BannerAd>(null);
+  useForeground(() => {
+    Platform.OS === 'ios' && bannerRef.current?.load();
+  });
   
-  useEffect(()=>{
-    async function getRemainingAttemp(): Promise<any> {
-      //get Remaining Attempts
-      await getSoloAtempts()
-      .then((res)=>{
-        console.log(res);
-        setTotalAttempt(res?.data?.totalDailyAttempts);
-        setRemainingAttempt(res?.data.remainingAttempts);
-      })
-    }
-    getRemainingAttemp();
-  },[])
+  // useEffect(()=>{
+  //   async function getRemainingAttemp(): Promise<any> {
+  //     //get Remaining Attempts
+  //     await getSoloAtempts()
+  //     .then((res)=>{
+  //       console.log(res);
+  //       setTotalAttempt(res?.data?.totalDailyAttempts);
+  //       setRemainingAttempt(res?.data.remainingAttempts);
+  //     })
+  //   }
+  //   getRemainingAttemp();
+  // },[])
 
   async function createSoloSession(){
     setLoading(true);
     // await soloStart({ userId: user.userId }
-    console.log(user);
+    console.log("user :- ",user);
     await soloStart()
       .then((res) => {
         console.log('soloStart : ', res);
@@ -47,39 +55,40 @@ export default function SoloScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <>
-        <Text style={styles.attemptsText}>
-          {/* Daily tournament attempts left: {maxAttempts - attemptsLeft} */}
-          Solo tournament attempts left : {remainingAttempt} / {totalAttempt}
-        </Text>
-        <View style={styles.bannerAd}>
-          <Text>Ad here</Text>
-        </View>
+    <SafeAreaView style={styles.safe}>
+      <View style={styles.container}>
+      <Text style={styles.attemptsText}>
+        Solo tournament attempts left : {remainingAttempt} / {totalAttempt}
+      </Text>
+      <View style={styles.bannerAd}>
+        <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
+
+      </View>
+        <TouchableOpacity
+        disabled={loading}
+        style={styles.startBtn} 
+        onPress={createSoloSession}
+        >
         {
-          remainingAttempt < totalAttempt ? 
-          <TouchableOpacity
-          disabled={loading}
-          style={styles.startBtn} 
-          onPress={createSoloSession}
-          >
-          {
-            loading ? 
-            <Text style={styles.startBtnText}>. . .</Text> :
-            <Text style={styles.startBtnText}>Start game</Text>
-          }
-          </TouchableOpacity> :
-          <View>ad</View>
+          loading ? 
+          <Text style={styles.startBtnText}>. . .</Text> :
+          <Text style={styles.startBtnText}>Start game</Text>
         }
-      </>
-    </View>
+        </TouchableOpacity>
+      </View>
+    </SafeAreaView>
   );
 }
 
 const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
+    safe: {
+      // padding: 10,
+      width: "100%",
+      height: "100%",
+    },
     container: {
-      padding: 16,
+      // padding: 16,
     },
     attemptsText: {
       fontSize: 16,
