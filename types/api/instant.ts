@@ -9,12 +9,12 @@ type tournamentInfo = {
   id: string;
   maxPlayers: number;
   playersCount: number;
-  status: tournamentStatus;
+  status: TournamentStatus;
   createdAt: Date;
   expiresAt: Date;
 };
 
-enum tournamentStatus {
+export enum TournamentStatus {
   NOT_OPENED = 'NOT_OPENED',
   OPEN = 'OPEN',
   CLOSED = 'CLOSED',
@@ -97,4 +97,19 @@ export type finalSubmissionResponse = {
     alreadySubmitted: boolean;
     session: InstantSession;
   };
+};
+
+export type PastTournaments = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: InstantParticipant[];
+};
+
+export type InstantParticipant = {
+  tournamentId: string;
+  userId: string;
+  finalScore: string;
+  // finalRank: number | null;
+  tournament: tournamentInfo;
 };

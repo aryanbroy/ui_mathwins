@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
@@ -7,7 +7,6 @@ type Props = {
   rank: number;
   name: string;
   points: number;
-  medalColor: string | null;
 };
 
 const medalBg: Record<string, string> = {
@@ -16,14 +15,21 @@ const medalBg: Record<string, string> = {
   bronze: '#c16700',
 };
 
-export default function LeaderboardCard({
-  rank,
-  name,
-  points,
-  medalColor,
-}: Props) {
+export default function LeaderboardCard({ rank, name, points }: Props) {
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
+
+  const medalColor: string | null = useMemo(() => {
+    if (rank === 1) {
+      return 'gold';
+    } else if (rank === 2) {
+      return 'silver';
+    } else if (rank === 3) {
+      return 'bronze';
+    } else {
+      return null;
+    }
+  }, [rank]);
 
   return (
     <View style={styles.card}>
@@ -31,18 +37,15 @@ export default function LeaderboardCard({
       <View style={styles.rankCircle}>
         <Text style={styles.rankText}>{rank}</Text>
       </View>
-
       {/* Avatar */}
       <View style={styles.avatarWrapper}>
         <View style={styles.avatar} />
       </View>
-
       {/* Name + Points */}
       <View style={styles.textWrapper}>
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.points}>{points} OVERALL POINTS</Text>
       </View>
-
       {/* Medal */}
       <View
         style={[
@@ -125,4 +128,3 @@ const makeStyles = (colors: ColorScheme) =>
       justifyContent: 'center',
     },
   });
-

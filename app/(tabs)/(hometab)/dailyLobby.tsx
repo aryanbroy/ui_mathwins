@@ -193,7 +193,7 @@ export default function DailyScreen() {
           <TournamentScreen
             question={initialQuestion}
             sessionId={sessionId}
-            sessionDuration={300}
+            sessionDuration={5}
             setTourState={setTourState}
             setCurrentScore={setCurrentScore}
           />

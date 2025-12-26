@@ -63,6 +63,18 @@ export type FinalSubmissionResponse = {
   };
 };
 
-// export type TournamentState = {
-//   state: TournamentState
-// }
+export type LeaderboardRes = {
+  success: boolean;
+  statusCode: number;
+  message: string;
+  data: {
+    leaderboard: LeaderboardUser[];
+    rank: number;
+  };
+};
+
+export type LeaderboardUser = {
+  userId: string;
+  bestScore: number;
+  user: { username: string };
+};

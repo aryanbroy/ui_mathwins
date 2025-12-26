@@ -2,6 +2,7 @@ import {
   fetchPlayersResponse,
   finalSubmissionResponse,
   joinOrCreateResponse,
+  PastTournaments,
   startSessionResponse,
   submitQuestionResponse,
 } from '@/types/api/instant';
@@ -98,6 +99,21 @@ export const finalSubmission = async (sessionId: string) => {
     const resData: finalSubmissionResponse = res.data;
     const sessionData = resData.data.session;
     return sessionData;
+  } catch (err: any) {
+    const msg = parseApiError(err);
+    throw new Error(msg);
+  }
+};
+
+export const fetchPastTournaments = async () => {
+  try {
+    const res = await api({
+      method: 'get',
+      url: 'api/instant/participated_tournaments',
+    });
+    const resData: PastTournaments = res.data;
+    const data = resData.data;
+    return data;
   } catch (err: any) {
     const msg = parseApiError(err);
     throw new Error(msg);

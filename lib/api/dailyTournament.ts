@@ -1,6 +1,7 @@
 import {
   createDailySessionResponse,
   FinalSubmissionResponse,
+  LeaderboardRes,
   SubmitQuestionProp,
   submitQuestionSessionResponse,
 } from '@/types/api/daily';
@@ -80,6 +81,25 @@ export const finalSubmission = async ({ sessionId }: { sessionId: string }) => {
     return resData;
   } catch (err) {
     console.log('error in final submission: ', err);
+    const msg = parseApiError(err);
+    throw new Error(msg);
+  }
+};
+
+export const fetchDailyLeaderboard = async (page: number) => {
+  try {
+    const res = await api({
+      method: 'get',
+      url: 'api/daily/leaderboard',
+      params: {
+        page: page,
+      },
+    });
+    const resData: LeaderboardRes = res.data;
+    const { leaderboard } = resData.data;
+    return leaderboard;
+  } catch (err: any) {
+    console.log('Error fetching leaderboard: ', err);
     const msg = parseApiError(err);
     throw new Error(msg);
   }

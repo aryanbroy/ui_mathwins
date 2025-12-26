@@ -4,12 +4,66 @@ import { View, StyleSheet, StatusBar, ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { dummyUsers } from './(hometab)';
 import LeaderboardCard from '@/components/Home/LeaderboardCard';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { fetchDailyLeaderboard } from '@/lib/api/dailyTournament';
+import { InstantTournamentCard } from '@/components/Home/InstantTournamentCard';
+import { fetchPastTournaments } from '@/lib/api/instantTournament';
+import { InstantParticipant } from '@/types/api/instant';
+import TopThreePodium from '@/components/Leaderboard/TopThreePodium';
 
 type TabKey = 'allTime' | 'daily' | 'instant' | 'solo';
+type RankedLeaderboard = {
+  userId: string;
+  bestScore: number;
+  user: { username: string };
+  rank: number;
+};
 
 export default function LeaderBoard() {
   const [activeTab, setActiveTab] = useState<TabKey>('daily');
+  const [page, setPage] = useState<number>(1);
+  const [dailyLeaderBoard, setDailyLeaderboard] = useState<RankedLeaderboard[]>(
+    []
+  );
+  const [errMsg, setErrMsg] = useState<string | null>(null);
+  const [instantTournamentsPlayed, setInstantTournamentsPlayed] = useState<
+    InstantParticipant[] | null
+  >(null);
+
+  const getDailyLeaderboard = useCallback(async () => {
+    console.log('fetching daily leaderboard');
+    const leaderboard = await fetchDailyLeaderboard(page);
+    const rankedLeaderboard: RankedLeaderboard[] = leaderboard.map(
+      (entry, index) => ({
+        ...entry,
+        rank: index + 1,
+      })
+    );
+    setDailyLeaderboard(rankedLeaderboard);
+  }, [page]);
+
+  const getInstantTournaments = useCallback(async () => {
+    setErrMsg(null);
+    console.log('fetching instant tournaments');
+    try {
+      const tournaments: InstantParticipant[] = await fetchPastTournaments();
+      setInstantTournamentsPlayed(tournaments);
+    } catch (err: any) {
+      setErrMsg(err?.message ?? 'Failed to load daily attempts');
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === 'daily') {
+      getDailyLeaderboard();
+    } else if (activeTab === 'instant') {
+      getInstantTournaments();
+    }
+  }, [getDailyLeaderboard, activeTab, getInstantTournaments]);
+
+  const onClick = (value: number) => {
+    setPage(value);
+  };
 
   const renderContent = () => {
     console.log('active tab: ', activeTab);
@@ -17,7 +71,8 @@ export default function LeaderBoard() {
       case 'allTime':
         return (
           <>
-            {dummyUsers.map((u) => (
+            <TopThreePodium />
+            {dummyUsers.slice(3).map((u) => (
               <LeaderboardCard key={`all-${u.rank}`} {...u} />
             ))}
           </>
@@ -25,17 +80,36 @@ export default function LeaderBoard() {
       case 'daily':
         return (
           <>
-            {dummyUsers.map((u) => (
-              <LeaderboardCard key={`daily-${u.rank}`} {...u} />
+            {dailyLeaderBoard.map((user) => (
+              <LeaderboardCard
+                rank={user.rank}
+                key={user.userId}
+                name={user.user.username}
+                points={user.bestScore}
+              />
             ))}
           </>
         );
       case 'instant':
-        return <Text style={styles.placeholder}>No instant games yet</Text>;
+        return (
+          <>
+            {instantTournamentsPlayed?.map((tournament) => (
+              <InstantTournamentCard
+                key={tournament.tournamentId}
+                joinedCount={tournament.tournament.playersCount}
+                maxPlayers={tournament.tournament.maxPlayers}
+                expiresAt={tournament.tournament.expiresAt}
+                status={tournament.tournament.status}
+                onPress={() => console.log('display leaderboard')}
+              />
+            ))}
+          </>
+        );
       case 'solo':
         return <Text style={styles.placeholder}>Play a solo match!</Text>;
     }
   };
+
   return (
     <LinearGradient
       colors={['#6315FF', '#FFCCD7']}
@@ -68,23 +142,24 @@ export default function LeaderBoard() {
           />
         </View>
 
-        <ScrollView>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1 }}
+        >
           <LinearGradient
             colors={['#FEE1F3', '#DAB7FF', '#A88BFF']}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
             style={styles.bottomGradient}
           >
-            {renderContent()}
-            {/* {dummyUsers.map(({ rank, name, medalColor, points }) => ( */}
-            {/*   <LeaderboardCard */}
-            {/*     key={rank} */}
-            {/*     rank={rank} */}
-            {/*     name={name} */}
-            {/*     medalColor={medalColor as any} */}
-            {/*     points={points} */}
-            {/*   /> */}
-            {/* ))} */}
+            {errMsg != null ? (
+              <Text style={styles.placeholder}>
+                Error fetching leaderboard! Try again later
+              </Text>
+            ) : (
+              renderContent()
+            )}
           </LinearGradient>
         </ScrollView>
       </SafeAreaView>
@@ -94,9 +169,6 @@ export default function LeaderBoard() {
 
 const styles = StyleSheet.create({
   gradient: {
-    flex: 1,
-  },
-  container: {
     flex: 1,
   },
   safeArea: {
@@ -110,15 +182,17 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
   },
-
+  scrollContent: {
+    flexGrow: 1,
+  },
   bottomGradient: {
     width: '100%',
-    height: '100%',
     borderTopRightRadius: 20,
     borderTopLeftRadius: 20,
     overflow: 'hidden',
     paddingVertical: 20,
     paddingHorizontal: 16,
+    minHeight: '100%',
   },
   placeholder: {
     textAlign: 'center',

@@ -14,61 +14,51 @@ export const dummyUsers = [
     rank: 1,
     name: 'UjwalXMathwins',
     points: 1850,
-    medalColor: 'gold',
   },
   {
     rank: 2,
     name: 'AbhilashXMathwins',
     points: 1620,
-    medalColor: 'silver',
   },
   {
     rank: 3,
     name: 'RahulXMathwins',
     points: 1510,
-    medalColor: 'bronze',
   },
   {
     rank: 4,
     name: 'AdityaXMathwins',
     points: 1450,
-    medalColor: null,
   },
   {
     rank: 5,
     name: 'SnehaXMathwins',
     points: 1380,
-    medalColor: null,
   },
   {
     rank: 6,
     name: 'VikramXMathwins',
     points: 1290,
-    medalColor: null,
   },
   {
     rank: 7,
     name: 'RiyaXMathwins',
     points: 1150,
-    medalColor: null,
   },
   {
     rank: 8,
     name: 'KaranXMathwins',
     points: 1020,
-    medalColor: null,
   },
   {
     rank: 9,
     name: 'AnjaliXMathwins',
     points: 950,
-    medalColor: null,
   },
   {
     rank: 10,
     name: 'RohanXMathwins',
     points: 880,
-    medalColor: null,
   },
 ];
 
@@ -98,12 +88,11 @@ export default function Index() {
           end={{ x: 0, y: 1 }}
           style={styles.bottomGradient}
         >
-          {dummyUsers.slice(0, 3).map(({ rank, name, medalColor, points }) => (
+          {dummyUsers.slice(0, 3).map(({ rank, name, points }) => (
             <LeaderboardCard
               key={rank}
               rank={rank}
               name={name}
-              medalColor={medalColor as any}
               points={points}
             />
           ))}
