@@ -1,6 +1,7 @@
 {
   "name": "ui_mathwins",
   "main": "expo-router/entry",
+  "type": "module",
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
@@ -36,6 +37,7 @@
     "expo-symbols": "~1.0.7",
     "expo-system-ui": "~6.0.8",
     "expo-web-browser": "~15.0.9",
+    "jsonwebtoken": "^9.0.3",
     "lucide-react-native": "^0.552.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -48,10 +50,25 @@
     "react-native-worklets": "0.5.1"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "typescript": "~5.9.2"
   },
-  "private": true
+  "private": true,
+  "description": "This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).",
+  "directories": {
+    "lib": "lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aryanbroy/ui_mathwins.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aryanbroy/ui_mathwins/issues"
+  },
+  "homepage": "https://github.com/aryanbroy/ui_mathwins#readme"
 }

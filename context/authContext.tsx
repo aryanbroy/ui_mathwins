@@ -1,13 +1,20 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getUser, loginUser } from "@/lib/api/user";
 
 type UserData = {
     name?: string;
     email?: string;
     picture?: string;
 };
+type ClientUserData = {
+    username?: string;
+    email?: string;
+    picture?: string;
+};
 type AuthContextType = {
-  user: UserData | null ;
+  user: ClientUserData | null;
+  userToken: string;
   login: (user: UserData) => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (profile: UserData) => Promise<void>;
@@ -17,16 +24,29 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [user, setUser] = useState<UserData | null>(null);
+  const [user, setUser] = useState<ClientUserData | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [ userToken, setUserToken ] = useState("");
   useEffect(() => {
     const restoreUser = async () => {
       try {
+        // console.log("authCOntext called");
+        
         const token = await AsyncStorage.getItem("token");
         // console.log("token : ",token);
         if (token) {
-          setUser(JSON.parse(token));
+          setUserToken(JSON.parse(token));
+          // console.log("token : ",token);
+          
+          const payload = {
+            token: JSON.parse(token),
+          }
+          await getUser(payload).then((response)=>{
+            console.log("response :- ",response);
+            setUser(response);
+            console.log("after setUser ", user);
+            
+          });
         }
       } catch (e) {
         console.log("Error loading token from AsyncStorage:", e);
@@ -35,14 +55,25 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     };
     restoreUser();
-  }, []);
+  }, [userToken]);
 
   const login = async (user: UserData) => {
-    console.log("authContext : user = ",user);
+    // console.log("authContext : user = ",user);
     
     try {
-      await AsyncStorage.setItem("token", JSON.stringify(user));
-      setUser(user);
+      if (!user.name || !user.email) {
+        throw new Error("User name or email missing");
+      }
+      const payload = {
+        username: user.name,
+        email: user.email,
+      }
+      await loginUser(payload).then((response)=>{
+        console.log("response :- ",response);
+        // const newUser = {...user, userId: .id}
+        AsyncStorage.setItem("token", JSON.stringify(response.data));
+        setUserToken(response.data);
+      });
     } catch (e) {
       console.log("Error saving token to AsyncStorage:", e);
     }
@@ -67,7 +98,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading, updateProfile }}>
+    <AuthContext.Provider value={{ user, userToken, login, logout, loading, updateProfile }}>
       {children}
     </AuthContext.Provider>
   );

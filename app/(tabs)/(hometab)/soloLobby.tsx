@@ -1,77 +1,76 @@
 import React, { useEffect, useRef, useState } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  Platform,
-} from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
-import { soloStart } from '@/lib/api/soloTournament';
-
-// import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
-
-// import mobileAds from 'react-native-google-mobile-ads';
+import { getSoloAtempts, soloStart } from '@/lib/api/soloTournament';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '@/context/authContext';
 
 export default function SoloScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
-  const [data, setData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [totalAttempt, setTotalAttempt] = useState(0);
+  const [remainingAttempt, setRemainingAttempt] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  
+  useEffect(()=>{
+    async function getRemainingAttemp(): Promise<any> {
+      //get Remaining Attempts
+      await getSoloAtempts()
+      .then((res)=>{
+        console.log(res);
+        setTotalAttempt(res?.data?.totalDailyAttempts);
+        setRemainingAttempt(res?.data.remainingAttempts);
+      })
+    }
+    getRemainingAttemp();
+  },[])
 
-  // const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
-  // useEffect(() => {
-  //   // initialize the SDK once
-  //   mobileAds()
-  //     .initialize()
-  //     .then(adapterStatuses => {
-  //       console.log('AdMob initialized', adapterStatuses);
-  //     });
-  // }, []);
-
-  async function createSoloSession() {
-    // loading = true
-    // soloStart();
-    // on success : setData -> loading = false -> navigate to soloQuestion
-    // on fail : show 'try again'
+  async function createSoloSession(){
     setLoading(true);
-    await soloStart({ userId: 'cmiuilr020006fj3zecq1hhal' })
+    // await soloStart({ userId: user.userId }
+    console.log(user);
+    await soloStart()
       .then((res) => {
         console.log('soloStart : ', res);
         const sanitizedAttemp = {
           userId: res.sanitizedAttemp.userId,
           soloSessionId: res.sanitizedAttemp.id,
-        };
-        navigation.navigate('SoloQuestion', {
-          session: sanitizedAttemp,
-          sanitizedQuestion: res.sanitizedQuestion,
-        });
-      })
-      .catch();
+        }
+        setLoading(false);
+        navigation.navigate('Question', { session: sanitizedAttemp, sanitizedQuestion : res.sanitizedQuestion });
+      }
+    ).catch();
   }
 
-  // const bannerRef = useRef<BannerAd>(null);
-  //  useForeground(() => {
-  //   Platform.OS === 'ios' && bannerRef.current?.load();
-  // });
-
-  const attempLeft = 3;
   return (
     <View style={styles.container}>
       <>
         <Text style={styles.attemptsText}>
           {/* Daily tournament attempts left: {maxAttempts - attemptsLeft} */}
-          Solo tournament attempts left : {attempLeft}
+          Solo tournament attempts left : {remainingAttempt} / {totalAttempt}
         </Text>
         <View style={styles.bannerAd}>
-          {/* <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} /> */}
+          <Text>Ad here</Text>
         </View>
-        <TouchableOpacity style={styles.startBtn} onPress={createSoloSession}>
-          <Text style={styles.startBtnText}>Start game</Text>
-        </TouchableOpacity>
+        {
+          remainingAttempt < totalAttempt ? 
+          <TouchableOpacity
+          disabled={loading}
+          style={styles.startBtn} 
+          onPress={createSoloSession}
+          >
+          {
+            loading ? 
+            <Text style={styles.startBtnText}>. . .</Text> :
+            <Text style={styles.startBtnText}>Start game</Text>
+          }
+          </TouchableOpacity> :
+          <View>ad</View>
+        }
       </>
     </View>
   );
@@ -89,7 +88,6 @@ const makeStyles = (colors: ColorScheme) =>
     },
     bannerAd: {
       marginVertical: 20,
-      backgroundColor: 'black',
     },
     startBtn: {
       backgroundColor: colors.primary,

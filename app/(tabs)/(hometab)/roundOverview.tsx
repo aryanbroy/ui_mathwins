@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { continueSolo } from '@/lib/api/soloTournament';
 import { quitSolo } from '@/lib/api/soloTournament';
+import LeaderboardCard from '@/components/Home/LeaderboardCard';
 
 type continueParams = {
   userId: string;
@@ -17,22 +18,56 @@ export default function roundOverview() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
-  const [disableSkip, setDisableSkip] = useState(false);
+  const [ showScore, setShowScore ] = useState(false);
   const route = useRoute<any>();
+  const dummyUsers = [
+  {
+    rank: 1,
+    name: 'UjwalXMathwins',
+    points: 1850,
+    medalColor: 'gold',
+  },
+  {
+    rank: 2,
+    name: 'AbhilXMathwins',
+    points: 1620,
+    medalColor: 'silver',
+  },
+  {
+    rank: 3,
+    name: 'RahulXMathwins',
+    points: 1510,
+    medalColor: 'bronze',
+  },
+  {
+    rank: 4,
+    name: 'AdityaXMathwins',
+    points: 1450,
+    medalColor: null,
+  },
+  {
+    rank: 5,
+    name: 'SnehaXMathwins',
+    points: 1380,
+    medalColor: null,
+  }];
   const sessionDetails = route.params.sessionDetails as continueParams;
+  // const [ sessionDetails, setSessionDetails ] = useState({
+  //   userId: "787878787878",
+  //   soloSessionId: "4545454545",
+  // });
   console.log("roundOverview : ",sessionDetails);
 
   function handleQuit(){
     console.log("Quit Clicked");
     // navigation.navigate('HomeMain');
-      const payload = {
-      userId: sessionDetails.userId,
+    const payload = {
       soloSessionId: sessionDetails.soloSessionId,
     }
     quitSolo(payload)
       .then((response)=>{
         console.log("response continue : ",response);
-        navigation.navigate('HomeMain')
+        navigation.navigate('HomeMain');
       }).catch((err)=>{
         console.log(err);
       });
@@ -40,13 +75,12 @@ export default function roundOverview() {
   function handleContinue(){
     console.log("Continue Clicked");
     const payload = {
-      userId: sessionDetails.userId,
       soloSessionId: sessionDetails.soloSessionId,
     }
     continueSolo(payload)
       .then((response)=>{
         console.log("response continue : ",response);
-        navigation.navigate('SoloQuestion',{ session: sessionDetails, sanitizedQuestion : response.questions })
+        navigation.navigate('Question',{ session: sessionDetails, sanitizedQuestion : response.questions })
       }).catch((err)=>{
         console.log(err);
       });
@@ -59,36 +93,46 @@ export default function roundOverview() {
     end={{ x: 0, y: 1 }}
     style={styles.container}>
     <SafeAreaView style={styles.safe}>
+      <View style={styles.adArea1}>
+        ad here
+      </View>
       <View style={styles.box}>
-        <>
-          <View>
-            <Text style={styles.message}>
-              Your Score
-            </Text>
-            <Text style={styles.messageHighlight}>
-              7.9
-            </Text>
-            <Text style={styles.messageSecondary}>
-              This will be converted to coins when leaderboard gets generated.
-            </Text>
-          </View>
+        <View style={styles.leaderBoardBox}>
+          {dummyUsers.map((u) => (
+            <LeaderboardCard key={`all-${u.rank}`} {...u} />
+          ))}
+        </View>
 
-          <View style={styles.buttonBox}>
-            <TouchableOpacity
-            // disabled={disableSkip}
-            onPress={handleQuit}
-            style={styles.startBtn}
-            >
-                <Text style={styles.startBtnText}>Quit</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-            onPress={handleContinue}
-            style={styles.startBtn}
-            >
-                <Text style={styles.startBtnText}>Continue</Text>
-            </TouchableOpacity>
-          </View>
-        </>
+        <View>
+          {
+            showScore ? 
+            <View>
+
+            </View> :
+            <View style={styles.scoreBox}>
+              <Text style={styles.scoreMessage}>Your Current Score</Text>
+              <Text style={styles.score}>7.85</Text>
+            </View>
+          }
+        </View>
+        <View style={styles.buttonBox}>
+          <TouchableOpacity
+          // disabled={disableSkip}
+          onPress={handleQuit}
+          style={styles.btn}
+          >
+              <Text style={styles.btnText}>Quit</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+          onPress={handleContinue}
+          style={styles.btn}
+          >
+              <Text style={styles.btnText}>Continue</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={styles.adArea2}>
+        ad here
       </View>
     </SafeAreaView>
     </LinearGradient>
@@ -99,60 +143,73 @@ const makeStyles = (colors: ColorScheme) =>
     StyleSheet.create({
     container: {
       flex:1,
-      padding: 16,
     },
     safe: {
-      padding: 10,
+      paddingVertical: 20,
+      paddingHorizontal: 20,
       width: "100%",
       height: "100%",
       display: "flex",
       alignItems: "center",
-      justifyContent: "center",
     },
     box: {
       width: "100%",
       borderRadius: 10,
-      paddingVertical: 40,
-      paddingHorizontal: 40,
+      paddingVertical: 10,
+      paddingHorizontal: 10,
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: colors.bg,
     },
-    message: {
-      color:colors.text,
+    leaderBoardBox: {
+      paddingVertical: 20,
+    },
+    scoreBox: {
+      flex: 1,
+      alignItems: "center",
+    },
+    scoreMessage: {
       fontSize: 20,
-      textAlign: "center",
-    },
-    messageHighlight: {
-      textAlign: "center",
-      color:colors.warning,
-      fontSize: 40,
       fontWeight: 700,
+      color: colors.text,
     },
-    messageSecondary: {
-      fontSize: 10,
-      color:colors.textMuted,
-      textAlign: "center",
+    score: {
+      fontSize: 40,
+      fontWeight: 900,
+      color: colors.secondary,
     },
     buttonBox: {
       width: "100%",
-      marginTop: 40,
+      marginTop: 20,
       display: "flex",
       flexDirection: "row",
       justifyContent: "space-between",
       alignItems: "center",
+      gap: 20,
     },
-    startBtn: {
-      backgroundColor: colors.border,
+    btn: {
+      backgroundColor: colors.secondary,
       paddingVertical: 14,
       paddingHorizontal: 20 ,
       borderRadius: 12,
     },
-    startBtnText: {
-      color: colors.text,
+    btnText: {
+      color: colors.surface,
       fontSize: 20,
       fontWeight: 700,
+    },
+    adArea1: {
+      marginBottom: 10,
+      backgroundColor: "#a1a1a1",
+      width: "100%",
+      height: 50,
+    },
+    adArea2: {
+      marginTop: 10,
+      backgroundColor: "#a1a1a1",
+      width: "100%",
+      height: 200,
     }
     });

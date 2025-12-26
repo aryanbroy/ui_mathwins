@@ -15,11 +15,12 @@ export type HomeTabStackParamList = {
   HomeMain: undefined;
   Daily: undefined;
   Solo: undefined;
-  SoloQuestion: sanitizedQuestion;
+  Question: sanitizedQuestion;
   roundOverview: continueParams;
   ad: continueParams;
   GameScreen: undefined;
   Instant: undefined;
+  login: undefined;
 };
 
 export type HomeScreenNavigationProp =

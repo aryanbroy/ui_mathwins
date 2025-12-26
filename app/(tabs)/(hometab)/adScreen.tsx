@@ -19,7 +19,26 @@ export default function adscreen() {
   const route = useRoute<any>();
   const sessionDetails = route.params.sessionDetails as continueParams;
   console.log("ad : ",sessionDetails);
-  
+
+// ad implementation :-   
+// npm i react-native-google-mobile-ads
+// import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
+
+// const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+// const bannerRef = useRef<BannerAd>(null);
+// useForeground(() => {
+//   Platform.OS === 'ios' && bannerRef.current?.load();
+// });
+
+// add to app.json :-
+// [
+//   "react-native-google-mobile-ads",
+//   {
+//     "androidAppId": "ca-app-pub-xxxxxxxx~xxxxxxxx",
+//     "iosAppId": "ca-app-pub-xxxxxxxx~xxxxxxxx"
+//   }
+// ]
+
   
   function handleSkip(){
     navigation.navigate('roundOverview',{sessionDetails})
@@ -48,6 +67,7 @@ export default function adscreen() {
           >
             <Text style={styles.startBtnText}>Skip</Text>
           </TouchableOpacity>
+          {/* <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} /> */}
         </>
       </View>
     </SafeAreaView>
