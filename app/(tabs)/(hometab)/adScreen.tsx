@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+
+import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
 
 type continueParams = {
   userId: string;
@@ -22,13 +24,12 @@ export default function adscreen() {
 
 // ad implementation :-   
 // npm i react-native-google-mobile-ads
-// import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
 
-// const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
-// const bannerRef = useRef<BannerAd>(null);
-// useForeground(() => {
-//   Platform.OS === 'ios' && bannerRef.current?.load();
-// });
+const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+const bannerRef = useRef<BannerAd>(null);
+useForeground(() => {
+  Platform.OS === 'ios' && bannerRef.current?.load();
+});
 
 // add to app.json :-
 // [
