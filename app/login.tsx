@@ -52,8 +52,7 @@ export default function LoginScreen() {
         const user = await getUserInfo(token);
         if (user) {
           // Tell the authContext that we are logged in
-          console.log("login : ", token, " - - ", user);
-          
+          // console.log("login : ", token, " - - ", user);
           await login(user);
           // after this, app/_layout.tsx will see `user` and switch to (tabs)
         }

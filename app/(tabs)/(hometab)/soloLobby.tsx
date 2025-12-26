@@ -3,18 +3,37 @@ import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
-import { soloStart } from '@/lib/api/soloTournament';
+import { getSoloAtempts, soloStart } from '@/lib/api/soloTournament';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '@/context/authContext';
 
 export default function SoloScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
-  const [data, setData] = useState(null);
+  const [totalAttempt, setTotalAttempt] = useState(0);
+  const [remainingAttempt, setRemainingAttempt] = useState(0);
   const [loading, setLoading] = useState(false);
+  const { user } = useAuth();
+  
+  useEffect(()=>{
+    async function getRemainingAttemp(): Promise<any> {
+      //get Remaining Attempts
+      await getSoloAtempts()
+      .then((res)=>{
+        console.log(res);
+        setTotalAttempt(res?.data?.totalDailyAttempts);
+        setRemainingAttempt(res?.data.remainingAttempts);
+      })
+    }
+    getRemainingAttemp();
+  },[])
 
   async function createSoloSession(){
     setLoading(true);
-    await soloStart({ userId: 'cmiuilr020006fj3zecq1hhal' })
+    // await soloStart({ userId: user.userId }
+    console.log(user);
+    await soloStart()
       .then((res) => {
         console.log('soloStart : ', res);
         const sanitizedAttemp = {
@@ -22,33 +41,36 @@ export default function SoloScreen() {
           soloSessionId: res.sanitizedAttemp.id,
         }
         setLoading(false);
-        navigation.navigate('SoloQuestion', { session: sanitizedAttemp, sanitizedQuestion : res.sanitizedQuestion });
+        navigation.navigate('Question', { session: sanitizedAttemp, sanitizedQuestion : res.sanitizedQuestion });
       }
     ).catch();
   }
 
-  const attempLeft = 3;
   return (
     <View style={styles.container}>
       <>
         <Text style={styles.attemptsText}>
           {/* Daily tournament attempts left: {maxAttempts - attemptsLeft} */}
-          Solo tournament attempts left : {attempLeft}
+          Solo tournament attempts left : {remainingAttempt} / {totalAttempt}
         </Text>
         <View style={styles.bannerAd}>
           <Text>Ad here</Text>
         </View>
-        <TouchableOpacity
-        disabled={loading}
-        style={styles.startBtn} 
-        onPress={createSoloSession}
-        >
         {
-          loading ? 
-          <Text style={styles.startBtnText}>. . .</Text> :
-          <Text style={styles.startBtnText}>Start game</Text>
+          remainingAttempt < totalAttempt ? 
+          <TouchableOpacity
+          disabled={loading}
+          style={styles.startBtn} 
+          onPress={createSoloSession}
+          >
+          {
+            loading ? 
+            <Text style={styles.startBtnText}>. . .</Text> :
+            <Text style={styles.startBtnText}>Start game</Text>
+          }
+          </TouchableOpacity> :
+          <View>ad</View>
         }
-        </TouchableOpacity>
       </>
     </View>
   );

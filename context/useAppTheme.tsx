@@ -22,6 +22,7 @@ export interface ColorScheme {
 
   // brand / semantic
   primary: string;
+  secondary: string;
   success: string;
   warning: string;
   danger: string;
@@ -84,6 +85,7 @@ const lightColors: ColorScheme = {
   shadow: "rgba(15,23,42,0.12)",
   
   primary: "#6315FF",
+  secondary: "#FF627D",
   success: "#16A34A",
   warning: "#F59E0B",
   danger: "#EF4444",
@@ -149,6 +151,7 @@ const darkColors: ColorScheme = {
   shadow: "rgba(0,0,0,0.6)",
 
   primary: "#6315FF",
+  secondary: "#FF627D",
   success: "#22C55E",
   warning: "#FBBF24",
   danger: "#F97373",

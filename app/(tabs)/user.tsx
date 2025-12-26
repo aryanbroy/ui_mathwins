@@ -11,7 +11,9 @@ import { HomeScreenNavigationProp } from '@/types/tabTypes';
 
 export default function UserProfileScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const { user } = useAuth();
+  const { userToken, user } = useAuth();
+  // const decoded = Jwt.verify(userToken, 'super-secret-key-change-this');
+  console.log("userT : ",userToken);
   console.log("user : ",user);
   
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -46,7 +48,7 @@ export default function UserProfileScreen() {
             {
               user ?
               <View style={styles.screenContainer}>
-                <Text style={styles.nameText}>{user?.name || "User"}</Text>
+                <Text style={styles.nameText}>{user?.username || "User"}</Text>
                 <Text style={styles.emailText}>{user?.email}</Text>
               </View> : 
               <View style={styles.screenContainer}>
@@ -54,7 +56,7 @@ export default function UserProfileScreen() {
                 onPress={loginHandle}
                 style={styles.startBtn} 
                 >
-                  <Text style={styles.btnText} >Login</Text>
+                  <Text style={styles.btnText} >LOGIN</Text>
                 </TouchableOpacity>
               </View>
             }
@@ -239,19 +241,20 @@ const makeStyles = (colors: ColorScheme) =>
     },
     startBtn: {
       width: "100%",
-      backgroundColor: colors.bg,
+      backgroundColor: colors.secondary,
       marginVertical: 20,
       paddingVertical: 12,
       borderRadius: 8,
       alignItems: 'center',
       justifyContent: 'center',
       borderWidth: 2,
-      borderColor: colors.primary,
+      borderColor: colors.text,
     },
     btnText: {
       fontSize: 20,
-      fontWeight: 700,
-      color: colors.primary,
+      fontWeight: 900,
+      letterSpacing: 2,
+      color: colors.text,
     },
     editProfileButton: {
       flexDirection: "row",
