@@ -33,6 +33,7 @@ function RootNavigator() {
         {/* <Stack.Screen name="adScreen" /> */}
         {/* <Stack.Screen name="rewardHistory" /> */}
         <Stack.Screen name="question" />
+        <Stack.Screen name="rewardHistory" />
       </Stack>
     </ThemeProvider>
   );
