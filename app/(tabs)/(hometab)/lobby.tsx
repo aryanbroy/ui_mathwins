@@ -1,5 +1,12 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Platform, Image } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Platform,
+  Image,
+} from 'react-native';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
@@ -9,6 +16,12 @@ import { useAuth } from '@/context/authContext';
 // import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+
+export enum SessionType {
+  SOLO = 'solo',
+  DAILY = 'daily',
+  INSTANT = 'instant',
+}
 
 export default function SoloScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -24,71 +37,81 @@ export default function SoloScreen() {
   // useForeground(() => {
   //   Platform.OS === 'ios' && bannerRef.current?.load();
   // });
-  
-  useEffect(()=>{
+
+  useEffect(() => {
     async function getRemainingAttemp(): Promise<any> {
       //get Remaining Attempts
-      await getSoloAtempts()
-      .then((res)=>{
+      await getSoloAtempts().then((res) => {
         console.log(res);
         setTotalAttempt(res?.data?.totalDailyAttempts);
         setRemainingAttempt(res?.data.remainingAttempts);
-      })
+      });
     }
     getRemainingAttemp();
-  },[])
+  }, []);
 
-  async function createSoloSession(){
+  async function createSoloSession() {
     setLoading(true);
     // await soloStart({ userId: user.userId }
-    console.log("user :- ",user);
+    console.log('user :- ', user);
     await soloStart()
       .then((res) => {
         console.log('soloStart : ', res);
         const sanitizedAttemp = {
           userId: res.sanitizedAttemp.userId,
-          soloSessionId: res.sanitizedAttemp.id,
-        }
+          sessionId: res.sanitizedAttemp.id,
+          sessionType: SessionType.SOLO,
+          sessionDuration: 60000,
+        };
         setLoading(false);
-        navigation.navigate('Question', { session: sanitizedAttemp, sanitizedQuestion : res.sanitizedQuestion });
-      }
-    ).catch();
+        navigation.navigate('Question', {
+          session: sanitizedAttemp,
+          sanitizedQuestion: res.sanitizedQuestion,
+        });
+      })
+      .catch();
+  }
+
+  async function createDailySession() {
+    // await daily session join or create
+  }
+
+  async function createInstantSession() {
+    // await instant session join or create
   }
 
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.container}>
-        <LinearGradient 
-        colors={colors.gradients.background}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
-        style={styles.container}>
+        <LinearGradient
+          colors={colors.gradients.background}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.container}
+        >
           <View style={styles.box}>
-            <Image
-              source={{ uri: user?.picture }}
-              style={styles.avatar}
-            />
+            <Image source={{ uri: user?.picture }} style={styles.avatar} />
             <Text style={styles.attemptsText}>
-              Solo tournament attempts left : {remainingAttempt} / {totalAttempt}
+              Solo tournament attempts left : {remainingAttempt} /{' '}
+              {totalAttempt}
             </Text>
             <TouchableOpacity
               disabled={loading}
-              style={styles.startBtn} 
+              style={styles.startBtn}
               onPress={createSoloSession}
             >
-            {
-              loading ? 
-              <Text style={styles.startBtnText}>. . .</Text> :
-              <Text style={styles.startBtnText}>Start game</Text>
-            }
+              {loading ? (
+                <Text style={styles.startBtnText}>. . .</Text>
+              ) : (
+                <Text style={styles.startBtnText}>Start game</Text>
+              )}
             </TouchableOpacity>
           </View>
         </LinearGradient>
-      {/* <View style={styles.bannerAd}>
+        {/* <View style={styles.bannerAd}>
         <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
 
       </View> */}
-        
       </View>
     </SafeAreaView>
   );
@@ -97,8 +120,8 @@ export default function SoloScreen() {
 const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     safe: {
-      width: "100%",
-      height: "100%",
+      width: '100%',
+      height: '100%',
     },
     container: {
       borderRadius: 20,
@@ -106,7 +129,7 @@ const makeStyles = (colors: ColorScheme) =>
     box: {
       flex: 1,
       paddingHorizontal: 20,
-      alignItems: "center",
+      alignItems: 'center',
       paddingVertical: 30,
     },
     avatar: {
@@ -126,7 +149,7 @@ const makeStyles = (colors: ColorScheme) =>
       marginVertical: 20,
     },
     startBtn: {
-      width: "100%",
+      width: '100%',
       backgroundColor: colors.primary,
       paddingVertical: 12,
       borderRadius: 10,

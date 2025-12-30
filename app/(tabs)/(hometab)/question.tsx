@@ -1,35 +1,40 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Animated,
+} from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { applyFiftyfifty, LevelDown, nextQuestion } from '@/lib/api/soloTournament';
+import {
+  applyFiftyfifty,
+  LevelDown,
+  nextQuestion,
+} from '@/lib/api/soloTournament';
 
 type sanitizedQuestionType = {
-  id: string,
-  expression: string,
-  kthDigit: number,
-  level: number,
-  side: string
-}
+  id: string;
+  expression: string;
+  kthDigit: number;
+  level: number;
+  side: string;
+};
 
 type sanitizedSessionType = {
-  soloSessionId: string,
-  userId: string,
-}
+  soloSessionId: string;
+  userId: string;
+};
 
-const keypadLayout = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [9],
-];
+const keypadLayout = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]];
 
 function getOrdinalSuffix(n: number) {
-  const s = ["th", "st", "nd", "rd"];
+  const s = ['th', 'st', 'nd', 'rd'];
   const v = n % 100;
   return s[(v - 20) % 10] || s[v] || s[0];
 }
@@ -39,7 +44,7 @@ function formatTime(ms: number) {
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   const milliseconds = Math.floor((ms % 1000) / 10);
-  
+
   return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}:${String(milliseconds).padStart(2, '0')}`;
 }
 
@@ -48,38 +53,42 @@ export default function QuestionScreen() {
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   const route = useRoute<any>();
-  
+
   // Question and Session State
-  const [sanitizedQuestion, setSanitizedQuestion] = useState(route.params.sanitizedQuestion as sanitizedQuestionType);
-  const [session, setSession] = useState(route.params.session as sanitizedSessionType);
+  const [sanitizedQuestion, setSanitizedQuestion] = useState(
+    route.params.sanitizedQuestion as sanitizedQuestionType
+  );
+  const [session, setSession] = useState(
+    route.params.session as sanitizedSessionType
+  );
   const [answer, setAnswer] = useState<number | null>(null);
   const [round, setRound] = useState(1);
-  
+
   // UI State
   const [loading, setLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [correctAnswer, setCorrectAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
-  
+
   // Timer State
   const [elapsedTime, setElapsedTime] = useState(0);
   const startTimeRef = useRef<number>(0);
   const intervalRef = useRef<number | null>(null);
-  
+
   // Lifeline State
   const [isFiftyFiftyAvailable, setIsFiftyFiftyAvailable] = useState(true);
   const [isThirtySecAvailable, setIsThirtySecAvailable] = useState(true);
   const [isLevelDownAvailable, setIsLevelDownAvailable] = useState(true);
   const [disabledOptions, setDisabledOptions] = useState<number[]>([]);
   const [extraTime, setExtraTime] = useState(0);
-  
+
   // Animation
   const blinkAnim = useRef(new Animated.Value(1)).current;
-  
+
   const n = sanitizedQuestion.kthDigit;
   const ordinal = n + getOrdinalSuffix(n);
   const QuestionString = `what is the ${ordinal} digit from ${sanitizedQuestion.side} for the expression ${sanitizedQuestion.expression}`;
-  
+
   const sessionDetails = {
     userId: session.userId,
     soloSessionId: session.soloSessionId,
@@ -88,7 +97,7 @@ export default function QuestionScreen() {
   // Timer Functions
   useEffect(() => {
     startTimer();
-    
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
@@ -100,10 +109,10 @@ export default function QuestionScreen() {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-    
+
     startTimeRef.current = Date.now();
     setElapsedTime(0);
-    
+
     intervalRef.current = setInterval(() => {
       const currentTime = Date.now();
       const elapsed = currentTime - startTimeRef.current + extraTime;
@@ -123,7 +132,7 @@ export default function QuestionScreen() {
   };
 
   const addExtraTime = (milliseconds: number) => {
-    setExtraTime(prev => prev + milliseconds);
+    setExtraTime((prev) => prev + milliseconds);
   };
 
   // Animation Functions
@@ -153,7 +162,7 @@ export default function QuestionScreen() {
   const handleSelect = (value: number) => {
     if (!isChecking && !showResult && !disabledOptions.includes(value)) {
       setAnswer(value);
-      console.log("Selected answer:", value);
+      console.log('Selected answer:', value);
     }
   };
 
@@ -168,7 +177,7 @@ export default function QuestionScreen() {
   // handleSubmitSolo
   const handleSubmit = () => {
     if (answer === null) {
-      alert("Please select an answer");
+      alert('Please select an answer');
       return;
     }
 
@@ -178,15 +187,15 @@ export default function QuestionScreen() {
     startBlinking();
 
     const timeTaken = getTimeTaken();
-    console.log("Time taken (ms):", timeTaken);
-    
+    console.log('Time taken (ms):', timeTaken);
+
     setLoading(true);
-    
+
     const payload = {
       soloSessionId: session.soloSessionId,
       questionId: sanitizedQuestion.id,
       userAnswer: answer,
-      time: timeTaken
+      time: timeTaken,
     };
 
     nextQuestion(payload)
@@ -196,7 +205,7 @@ export default function QuestionScreen() {
         setCorrectAnswer(response.correctAnswer);
         setShowResult(true);
         console.log('nextQuestion response:', response);
-        
+
         if (response.success) {
           setTimeout(() => {
             if (response.isRoundCompleted) {
@@ -235,7 +244,7 @@ export default function QuestionScreen() {
   // Lifeline: 50-50
   const handleFiftyfiftySubmit = () => {
     if (!isFiftyFiftyAvailable || isChecking || showResult) return;
-    
+
     setLoading(true);
     const payload = {
       soloSessionId: session.soloSessionId,
@@ -262,7 +271,7 @@ export default function QuestionScreen() {
   // Lifeline: +30 Seconds
   const handleThirtyPlusSubmit = () => {
     if (!isThirtySecAvailable || isChecking || showResult) return;
-    
+
     // Subtract 30 seconds (30000 ms) from elapsed time
     addExtraTime(-30000);
     setIsThirtySecAvailable(false);
@@ -272,7 +281,7 @@ export default function QuestionScreen() {
   // Lifeline: Level Down
   const handleLevelDownSubmit = () => {
     if (!isLevelDownAvailable || isChecking || showResult) return;
-    
+
     setLoading(true);
     const payload = {
       soloSessionId: session.soloSessionId,
@@ -298,7 +307,7 @@ export default function QuestionScreen() {
   };
 
   return (
-    <LinearGradient 
+    <LinearGradient
       colors={colors.gradients.background}
       start={{ x: 0, y: 0 }}
       end={{ x: 0, y: 1 }}
@@ -307,8 +316,12 @@ export default function QuestionScreen() {
       <SafeAreaView style={styles.safe}>
         <View style={styles.detailsBox}>
           <View style={styles.questionMeta}>
-            <Text style={styles.questionNumber}>Q : <Text>{round}</Text></Text>
-            <Text style={styles.questionLevel}>Level : <Text>{sanitizedQuestion.level}</Text></Text>
+            <Text style={styles.questionNumber}>
+              Q : <Text>{round}</Text>
+            </Text>
+            <Text style={styles.questionLevel}>
+              Level : <Text>{sanitizedQuestion.level}</Text>
+            </Text>
           </View>
           <Text style={styles.question}>{QuestionString}</Text>
         </View>
@@ -320,7 +333,13 @@ export default function QuestionScreen() {
           </View>
           <View style={styles.hintBox}>
             <Text style={styles.hintText}>
-              {isChecking ? 'Checking... 🤔' : showResult ? (answer === correctAnswer ? 'Correct! 🎉' : 'Wrong! 😢') : 'Are you sure 💭 ?'}
+              {isChecking
+                ? 'Checking... 🤔'
+                : showResult
+                  ? answer === correctAnswer
+                    ? 'Correct! 🎉'
+                    : 'Wrong! 😢'
+                  : 'Are you sure 💭 ?'}
             </Text>
           </View>
         </View>
@@ -333,7 +352,8 @@ export default function QuestionScreen() {
                   const isDisabled = disabledOptions.includes(value);
                   const isSelected = answer === value;
                   const isCorrect = showResult && value === correctAnswer;
-                  const isWrong = showResult && value === answer && value !== correctAnswer;
+                  const isWrong =
+                    showResult && value === answer && value !== correctAnswer;
 
                   return (
                     <Animated.View
@@ -356,7 +376,9 @@ export default function QuestionScreen() {
                         <Text
                           style={[
                             styles.optionText,
-                            isSelected && !showResult && styles.optionTextSelected,
+                            isSelected &&
+                              !showResult &&
+                              styles.optionTextSelected,
                             (isCorrect || isWrong) && styles.optionTextResult,
                           ]}
                         >
@@ -371,23 +393,35 @@ export default function QuestionScreen() {
           </View>
         </View>
 
-        <View style={styles.lifelineBox}> 
+        <View style={styles.lifelineBox}>
           <TouchableOpacity
-            style={isFiftyFiftyAvailable ? styles.lifelineBtn : styles.disabledLifelineBtn} 
+            style={
+              isFiftyFiftyAvailable
+                ? styles.lifelineBtn
+                : styles.disabledLifelineBtn
+            }
             disabled={!isFiftyFiftyAvailable || isChecking || showResult}
             onPress={handleFiftyfiftySubmit}
           >
             <Text style={styles.lifelineBtnText}>50-50</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={isThirtySecAvailable ? styles.lifelineBtn : styles.disabledLifelineBtn} 
+            style={
+              isThirtySecAvailable
+                ? styles.lifelineBtn
+                : styles.disabledLifelineBtn
+            }
             disabled={!isThirtySecAvailable || isChecking || showResult}
             onPress={handleThirtyPlusSubmit}
           >
             <Text style={styles.lifelineBtnText}>+30 Sec</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={isLevelDownAvailable ? styles.lifelineBtn : styles.disabledLifelineBtn} 
+            style={
+              isLevelDownAvailable
+                ? styles.lifelineBtn
+                : styles.disabledLifelineBtn
+            }
             disabled={!isLevelDownAvailable || isChecking || showResult}
             onPress={handleLevelDownSubmit}
           >
@@ -395,13 +429,21 @@ export default function QuestionScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity 
-          style={[styles.nextBtn, (loading || isChecking || showResult || answer === null) && styles.nextBtnDisabled]} 
+        <TouchableOpacity
+          style={[
+            styles.nextBtn,
+            (loading || isChecking || showResult || answer === null) &&
+              styles.nextBtnDisabled,
+          ]}
           onPress={handleSubmit}
           disabled={loading || isChecking || showResult || answer === null}
         >
           <Text style={styles.startBtnText}>
-            {loading || isChecking ? 'Loading...' : showResult ? 'Next Question...' : 'Submit Answer'}
+            {loading || isChecking
+              ? 'Loading...'
+              : showResult
+                ? 'Next Question...'
+                : 'Submit Answer'}
           </Text>
         </TouchableOpacity>
       </SafeAreaView>
@@ -417,11 +459,11 @@ const makeStyles = (colors: ColorScheme) =>
     safe: {
       padding: 16,
       flex: 1,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     detailsBox: {
-      width: "100%",
+      width: '100%',
       backgroundColor: colors.card,
       paddingHorizontal: 20,
       paddingVertical: 20,
@@ -429,9 +471,9 @@ const makeStyles = (colors: ColorScheme) =>
       borderWidth: 3,
     },
     questionMeta: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
       marginBottom: 10,
     },
     questionNumber: {
@@ -445,7 +487,7 @@ const makeStyles = (colors: ColorScheme) =>
       paddingVertical: 5,
       borderRadius: 5,
       fontWeight: '800',
-      color: "#FFF"
+      color: '#FFF',
     },
     question: {
       color: colors.text,
@@ -453,9 +495,9 @@ const makeStyles = (colors: ColorScheme) =>
       fontWeight: '500',
     },
     answerMeta: {
-      width: "100%",
+      width: '100%',
       gap: 10,
-      alignItems: "center",
+      alignItems: 'center',
       paddingVertical: 20,
     },
     timer: {
@@ -464,9 +506,9 @@ const makeStyles = (colors: ColorScheme) =>
       paddingHorizontal: 15,
       paddingVertical: 8,
       borderRadius: 10,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
       gap: 10,
     },
     time: {
@@ -476,14 +518,14 @@ const makeStyles = (colors: ColorScheme) =>
       fontFamily: 'monospace',
     },
     hintBox: {
-      width: "100%",
+      width: '100%',
       backgroundColor: colors.card,
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
       paddingVertical: 10,
       borderRadius: 10,
       borderWidth: 3,
-      borderColor: colors.secondary
+      borderColor: colors.secondary,
     },
     hintText: {
       fontSize: 20,
@@ -494,13 +536,12 @@ const makeStyles = (colors: ColorScheme) =>
       paddingHorizontal: 10,
       marginVertical: 20,
     },
-    optionsContainer: {
-    },
+    optionsContainer: {},
     row: {
       paddingVertical: 15,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
       gap: 50,
     },
     optionBtn: {
@@ -542,7 +583,7 @@ const makeStyles = (colors: ColorScheme) =>
       color: '#FFF',
     },
     lifelineBox: {
-      flexDirection: "row",
+      flexDirection: 'row',
       gap: 10,
       marginTop: 10,
     },
@@ -586,5 +627,6 @@ const makeStyles = (colors: ColorScheme) =>
       color: colors.textSecondary,
       fontSize: 20,
       fontWeight: '700',
-    }
+    },
   });
+

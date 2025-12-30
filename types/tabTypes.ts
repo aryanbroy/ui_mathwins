@@ -16,7 +16,7 @@ type continueParams = {
 export type HomeTabStackParamList = {
   HomeMain: undefined;
   Daily: undefined;
-  Solo: undefined;
+  lobby: undefined;
   Question: sanitizedQuestion;
   roundOverview: continueParams;
   ad: continueParams;

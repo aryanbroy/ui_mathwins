@@ -8,7 +8,7 @@ import questionScreen from './question';
 // import adScreen from './adScreen';
 import roundOverview from './roundOverview';
 import LoginScreen from '@/app/login';
-import SoloScreen from './soloLobby';
+import lobbyScreen from './lobby';
 
 const Stack = createNativeStackNavigator<HomeTabStackParamList>();
 
@@ -30,9 +30,9 @@ export default function HomeTabLayout() {
         options={{ title: 'Daily' }}
       />
       <Stack.Screen
-      name="Solo"
-      component={SoloScreen}
-      options={{ title: 'Solo' }}
+        name="lobby"
+        component={lobbyScreen}
+        options={{ title: 'lobby' }}
       />
       <Stack.Screen
         name="Question"
@@ -62,7 +62,7 @@ export default function HomeTabLayout() {
       <Stack.Screen
         name="Instant"
         component={InstantLobby}
-        options={{ title: 'Lobby' }}
+        options={{ title: 'InstantLobby' }}
       />
     </Stack.Navigator>
   );
