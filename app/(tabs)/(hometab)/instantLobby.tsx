@@ -202,7 +202,7 @@ export default function InstantTournamentLobby() {
           <InstantTournamentScreen
             question={initialQuestion}
             sessionId={sessionId}
-            sessionDuration={15}
+            sessionDuration={3}
             setTourState={setTourState}
             setCurrentScore={setCurrentScore}
           />

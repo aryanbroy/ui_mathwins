@@ -1,10 +1,12 @@
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-type sanitizedQuestion = {
-  expression: String,
-  kthDigit: Number,
-  level: Number,
-  side: String
-} | any ;
+type sanitizedQuestion =
+  | {
+      expression: string;
+      kthDigit: number;
+      level: number;
+      side: string;
+    }
+  | any;
 type continueParams = {
   sessionDetails: {
     userId: string;
@@ -25,3 +27,9 @@ export type HomeTabStackParamList = {
 
 export type HomeScreenNavigationProp =
   NativeStackNavigationProp<HomeTabStackParamList>;
+
+export type TabList = {
+  user: undefined;
+};
+
+export type TabScreenNavigationProp = NativeStackNavigationProp<TabList>;

@@ -1,13 +1,17 @@
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 import { useAuth } from '@/context/authContext';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
+import { useNavigation } from '@react-navigation/native';
+import { TabScreenNavigationProp } from '@/types/tabTypes';
 
 export default function Header() {
   const { user } = useAuth();
   const { colors } = useAppTheme();
+  const navigation = useNavigation<TabScreenNavigationProp>();
   const styles = makeStyles(colors);
   function profileClick() {
-    console.log("Clicked Profile");
+    navigation.navigate('user');
+    console.log('Clicked Profile');
   }
 
   return (
@@ -15,9 +19,7 @@ export default function Header() {
       <View style={styles.leftSection}>
         <View style={styles.welcomeContainer}>
           <Text style={styles.welcomeText}>Welcome</Text>
-          <Text style={styles.username}>
-            {user?.name || "User"}
-          </Text>
+          <Text style={styles.username}>{user?.username || 'User'}</Text>
         </View>
 
         <View style={styles.coinContainer}>
@@ -26,14 +28,9 @@ export default function Header() {
         </View>
       </View>
 
-      <TouchableOpacity
-      onPress={profileClick} 
-      style={styles.avatarContainer}>
+      <TouchableOpacity onPress={profileClick} style={styles.avatarContainer}>
         <View style={styles.avatarBorder}>
-          <Image
-            source={{ uri: user?.picture }}
-            style={styles.avatar}
-          />
+          <Image source={{ uri: user?.picture }} style={styles.avatar} />
         </View>
       </TouchableOpacity>
     </View>
@@ -44,9 +41,9 @@ const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     content: {
       paddingTop: 5,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     },
 
     leftSection: {
@@ -55,25 +52,25 @@ const makeStyles = (colors: ColorScheme) =>
     },
 
     welcomeContainer: {
-      flexDirection: "row",
-      alignItems: "baseline",
+      flexDirection: 'row',
+      alignItems: 'baseline',
       marginBottom: 6,
       columnGap: 6,
     },
     welcomeText: {
       fontSize: 24,
-      fontWeight: "bold",
+      fontWeight: 'bold',
       color: colors.textSecondary,
     },
     username: {
       fontSize: 16,
-      fontWeight: "500",
+      fontWeight: '500',
       color: colors.textSecondary,
     },
 
     coinContainer: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       marginBottom: 12,
     },
     coinEmoji: {
@@ -83,12 +80,12 @@ const makeStyles = (colors: ColorScheme) =>
     coinText: {
       fontSize: 14,
       color: colors.textSecondary,
-      fontWeight: "400",
+      fontWeight: '400',
     },
 
     avatarContainer: {
-      justifyContent: "center",
-      alignItems: "center",
+      justifyContent: 'center',
+      alignItems: 'center',
     },
 
     avatarBorder: {

@@ -1,11 +1,11 @@
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Index from '.';
 import DailyScreen from './dailyLobby';
-import SoloScreen from './soloLobby';
+// import SoloScreen from './soloLobby';
 import { HomeTabStackParamList } from '@/types/tabTypes';
 import InstantLobby from './instantLobby';
 import questionScreen from './question';
-import adScreen from './adScreen';
+// import adScreen from './adScreen';
 import roundOverview from './roundOverview';
 import LoginScreen from '@/app/login';
 
@@ -13,10 +13,11 @@ const Stack = createNativeStackNavigator<HomeTabStackParamList>();
 
 export default function HomeTabLayout() {
   return (
-    <Stack.Navigator 
+    <Stack.Navigator
       screenOptions={{
         headerShown: false,
-      }}>
+      }}
+    >
       <Stack.Screen
         name="HomeMain"
         component={Index}
@@ -27,21 +28,21 @@ export default function HomeTabLayout() {
         component={DailyScreen}
         options={{ title: 'Daily' }}
       />
-      <Stack.Screen
-        name="Solo"
-        component={SoloScreen}
-        options={{ title: 'Solo' }}
-      />
+      {/* <Stack.Screen */}
+      {/*   name="Solo" */}
+      {/*   component={SoloScreen} */}
+      {/*   options={{ title: 'Solo' }} */}
+      {/* /> */}
       <Stack.Screen
         name="Question"
         component={questionScreen}
         options={{ title: 'question' }}
       />
-      <Stack.Screen
-        name="ad"
-        component={adScreen}
-        options={{ title: 'ad' }}
-      />
+      {/* <Stack.Screen */}
+      {/*   name="ad" */}
+      {/*   component={adScreen} */}
+      {/*   options={{ title: 'ad' }} */}
+      {/* /> */}
       <Stack.Screen
         name="roundOverview"
         component={roundOverview}
