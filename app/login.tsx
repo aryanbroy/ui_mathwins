@@ -30,7 +30,8 @@ export default function LoginScreen() {
   const [request, response, promptAsync] = Google.useAuthRequest({
       androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
       iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID, 
-      webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID
+      webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
+      // useProxy: true,
   })
 
   const handleGoogleSignIn = async () => {
@@ -43,6 +44,7 @@ export default function LoginScreen() {
   };
 
   React.useEffect(() => {
+    console.log(response);
     handleSignInWithGoogle();
   }, [response]);
   async function handleSignInWithGoogle() {
@@ -68,7 +70,7 @@ export default function LoginScreen() {
       });
       
       const user = await res.json();
-      // console.log("user :", user);
+      console.log("user given data:", user);
       navigation.navigate('HomeMain');
       return user; // return to handleSignInWithGoogle
     } catch (error) {

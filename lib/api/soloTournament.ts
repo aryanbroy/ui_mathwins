@@ -42,6 +42,10 @@ type loaderBoradParam = {
   start: number;
   end: number;
 };
+type lifelineParams = {
+  soloSessionId: string;
+  questionId: string;
+}
 export const nextQuestion = async (params: NextQuestionParams) => {
   try {
     console.log("ts next QS: ",params);
@@ -120,13 +124,52 @@ export const soloLeaderboard = async (params: loaderBoradParam) => {
 
 export const getSoloAtempts = async () => {
   try {
-    // const token = await AsyncStorage.getItem("token") as string;
+    const token = await AsyncStorage.getItem("token") as string;
     const res = await api.post(
       'api/solo/getRemainingSoloAttempts',
       {},
       {
         headers: {
-          Authorization: `Bearer ${JSON.parse('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJjbWptaWQzbHUwMDBlZmsyajRrOHl2aTA2IiwidXNlcm5hbWUiOiJTd2F5YW5zaHUiLCJlbWFpbCI6ImFyZ3Vzc3RvbnlAZ21haWwuY29tIiwiaWF0IjoxNzY2NzMxNTc1LCJleHAiOjE3NjczMzYzNzV9.JgfEvsmCpGGrl-5XpoXNd8a6oD5HinREJ1gRog5wJtM')}`,
+          Authorization: `Bearer ${JSON.parse(token)}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (err) {
+    const msg = parseApiError(err);
+    throw new Error(msg);
+  }
+}
+export const applyFiftyfifty = async (params: lifelineParams) => {
+    try {
+      console.log("apply 50-50 soloTournament.ts - ",params);
+      
+      const token = await AsyncStorage.getItem("token") as string;
+      const res = await api.post(
+        'api/lifeline/fiftyfifty',
+        {params},
+        {
+          headers: {
+            Authorization: `Bearer ${JSON.parse(token)}`,
+          },
+        }
+      );
+      return res.data;
+    } catch (err) {
+      const msg = parseApiError(err);
+      throw new Error(msg);
+    }
+  }
+  export const LevelDown = async (params: lifelineParams) => {
+    try {
+      console.log("apply leveldown soloTournament.ts - ",params);
+    const token = await AsyncStorage.getItem("token") as string;
+    const res = await api.post(
+      'api/lifeline/LevelDown',
+      {params},
+      {
+        headers: {
+          Authorization: `Bearer ${JSON.parse(token)}`,
         },
       }
     );

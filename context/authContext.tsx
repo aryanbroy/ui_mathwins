@@ -67,6 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const payload = {
         username: user.name,
         email: user.email,
+        picture: user.picture,
       }
       await loginUser(payload).then((response)=>{
         console.log("response :- ",response);

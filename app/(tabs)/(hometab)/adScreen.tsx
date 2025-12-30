@@ -6,7 +6,7 @@ import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 
-import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
+// import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
 
 type continueParams = {
   userId: string;
@@ -25,11 +25,11 @@ export default function adscreen() {
 // ad implementation :-   
 // npm i react-native-google-mobile-ads
 
-const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
-const bannerRef = useRef<BannerAd>(null);
-useForeground(() => {
-  Platform.OS === 'ios' && bannerRef.current?.load();
-});
+// const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
+// const bannerRef = useRef<BannerAd>(null);
+// useForeground(() => {
+//   Platform.OS === 'ios' && bannerRef.current?.load();
+// });
 
 // add to app.json :-
 // [
@@ -51,9 +51,8 @@ useForeground(() => {
     start={{ x: 0, y: 0 }}
     end={{ x: 0, y: 1 }}
     style={styles.container}>
-    <SafeAreaView style={styles.safe}>
+    {/* <SafeAreaView style={styles.safe}>
       <View style={styles.box}>
-        <>
           <View>
             <Text style={styles.message}>
               Google Ad Here
@@ -68,10 +67,9 @@ useForeground(() => {
           >
             <Text style={styles.startBtnText}>Skip</Text>
           </TouchableOpacity>
-          {/* <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} /> */}
-        </>
+          <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
       </View>
-    </SafeAreaView>
+    </SafeAreaView> */}
     </LinearGradient>
   );
 }

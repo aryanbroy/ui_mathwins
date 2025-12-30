@@ -16,7 +16,7 @@ export default function Header() {
         <View style={styles.welcomeContainer}>
           <Text style={styles.welcomeText}>Welcome</Text>
           <Text style={styles.username}>
-            {user?.name || "User"}
+            {user?.username || "User"}
           </Text>
         </View>
 
@@ -105,7 +105,6 @@ const makeStyles = (colors: ColorScheme) =>
       shadowRadius: 4,
       elevation: 5,
     },
-
     avatar: {
       width: 54,
       height: 54,

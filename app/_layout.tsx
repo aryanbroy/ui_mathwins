@@ -28,10 +28,11 @@ function RootNavigator() {
         )} */}
         {/**/}
         {/* <Stack.Screen name="login" /> */}
-        <Stack.Screen name="(tabs)" />
+        {/* <Stack.Screen name="(tabs)" /> */}
         {/* <Stack.Screen name="edit-profile" /> */}
         {/* <Stack.Screen name="adScreen" /> */}
         {/* <Stack.Screen name="rewardHistory" /> */}
+        <Stack.Screen name="question" />
       </Stack>
     </ThemeProvider>
   );
