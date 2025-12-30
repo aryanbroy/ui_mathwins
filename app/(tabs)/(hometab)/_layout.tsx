@@ -8,6 +8,7 @@ import questionScreen from './question';
 // import adScreen from './adScreen';
 import roundOverview from './roundOverview';
 import LoginScreen from '@/app/login';
+import SoloScreen from './soloLobby';
 
 const Stack = createNativeStackNavigator<HomeTabStackParamList>();
 
@@ -28,11 +29,11 @@ export default function HomeTabLayout() {
         component={DailyScreen}
         options={{ title: 'Daily' }}
       />
-      {/* <Stack.Screen */}
-      {/*   name="Solo" */}
-      {/*   component={SoloScreen} */}
-      {/*   options={{ title: 'Solo' }} */}
-      {/* /> */}
+      <Stack.Screen
+      name="Solo"
+      component={SoloScreen}
+      options={{ title: 'Solo' }}
+      />
       <Stack.Screen
         name="Question"
         component={questionScreen}

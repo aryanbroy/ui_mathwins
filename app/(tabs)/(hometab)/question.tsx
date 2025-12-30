@@ -158,6 +158,14 @@ export default function QuestionScreen() {
   };
 
   // Submit Answer
+  // handleSubmitSolo
+  // handleSubmitDaily
+  // handleSubmitInsatnt
+  // if (params) {
+    //   handleSubmitSolo || handleSubmitDaily || handleSubmitInsatnt
+  // }
+    
+  // handleSubmitSolo
   const handleSubmit = () => {
     if (answer === null) {
       alert("Please select an answer");
