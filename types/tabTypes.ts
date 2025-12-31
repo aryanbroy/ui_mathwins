@@ -10,7 +10,7 @@ type sanitizedQuestion =
 type continueParams = {
   sessionDetails: {
     userId: string;
-    soloSessionId: string;
+    sessionId: string;
   };
 };
 export type HomeTabStackParamList = {

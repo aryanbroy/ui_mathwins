@@ -31,7 +31,7 @@ export default function TournamentCards() {
       {/*  navigate to lobby (solo) */}
       <DailyCard onPress={() => navigation.navigate('Daily')} />
       <View style={styles.bottomRow}>
-        <SoloCard onPress={() => navigation.navigate('Solo')} />
+        <SoloCard onPress={() => navigation.navigate('lobby')} />
         <InstantCard onPress={() => navigation.navigate('Instant')} />
       </View>
     </View>

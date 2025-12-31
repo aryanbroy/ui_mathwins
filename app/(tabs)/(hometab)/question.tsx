@@ -27,8 +27,14 @@ type sanitizedQuestionType = {
 };
 
 type sanitizedSessionType = {
-  soloSessionId: string;
+  sessionId: string;
   userId: string;
+};
+
+type continueParams = {
+  userId: string;
+  sessionId: string;
+  bankedPoint: number;
 };
 
 const keypadLayout = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]];
@@ -91,7 +97,7 @@ export default function QuestionScreen() {
 
   const sessionDetails = {
     userId: session.userId,
-    soloSessionId: session.soloSessionId,
+    sessionId: session.sessionId,
   };
 
   // Timer Functions
@@ -190,9 +196,10 @@ export default function QuestionScreen() {
     console.log('Time taken (ms):', timeTaken);
 
     setLoading(true);
-
+    console.log("session : ",session);
+    
     const payload = {
-      soloSessionId: session.soloSessionId,
+      soloSessionId: session.sessionId,
       questionId: sanitizedQuestion.id,
       userAnswer: answer,
       time: timeTaken,
@@ -210,16 +217,22 @@ export default function QuestionScreen() {
           setTimeout(() => {
             if (response.isRoundCompleted) {
               setRound(response.roundNumber + 1);
-              navigation.navigate('ad', { sessionDetails });
+              console.log("response :- ",response);
+              const data : continueParams = {
+                userId: sessionDetails.userId,
+                sessionId: sessionDetails.sessionId,
+                bankedPoint: response.bankedPoint as number,
+              }
+              navigation.navigate('ad', { data });
             } else {
               resetQuestion();
               setSanitizedQuestion(response.nextQuestion);
             }
-          }, 3000);
+          }, 1500);
         } else {
           setTimeout(() => {
             navigation.navigate('HomeMain');
-          }, 3000);
+          }, 1500);
         }
       })
       .catch((err) => {
@@ -247,7 +260,7 @@ export default function QuestionScreen() {
 
     setLoading(true);
     const payload = {
-      soloSessionId: session.soloSessionId,
+      soloSessionId: session.sessionId,
       questionId: sanitizedQuestion.id,
     };
 
@@ -284,7 +297,7 @@ export default function QuestionScreen() {
 
     setLoading(true);
     const payload = {
-      soloSessionId: session.soloSessionId,
+      soloSessionId: session.sessionId,
       questionId: sanitizedQuestion.id,
     };
 
