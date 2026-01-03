@@ -78,8 +78,7 @@ export const submitQuestion = async (
       },
     });
     const resData: submitQuestionResponse = res.data;
-    const { question, session } = resData.data;
-    return { question, session };
+    return resData;
   } catch (err: any) {
     console.log(err);
     const msg = parseApiError(err);
@@ -111,10 +110,12 @@ export const fetchPastTournaments = async () => {
       method: 'get',
       url: 'api/instant/participated_tournaments',
     });
+    console.log('Fetching past tournaments: ', res);
     const resData: PastTournaments = res.data;
     const data = resData.data;
     return data;
   } catch (err: any) {
+    console.log('Error fetching past tournaments: ', err);
     const msg = parseApiError(err);
     throw new Error(msg);
   }

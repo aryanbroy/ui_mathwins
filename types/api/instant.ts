@@ -65,13 +65,17 @@ export type submitQuestionResponse = {
   statusCode: number;
   message: string;
   data: {
-    question: InstantQuestion;
-    session: InstantSession;
+    userId: string;
+    questionId: string;
+    nextQuestion: InstantQuestion;
+    currentScore: number;
+    correctAnswer: number;
   };
 };
 
 type InstantSession = {
   id: string;
+  userId: string;
   score: number;
   startedAt: Date;
   endsAt: Date;

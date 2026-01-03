@@ -1,3 +1,4 @@
+import { SessionType } from '@/app/(tabs)/(hometab)/lobby';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 type sanitizedQuestion =
   | {
@@ -16,7 +17,7 @@ type continueParams = {
 export type HomeTabStackParamList = {
   HomeMain: undefined;
   Daily: undefined;
-  lobby: undefined;
+  lobby: { sessionType: SessionType };
   Question: sanitizedQuestion;
   roundOverview: continueParams;
   ad: continueParams;

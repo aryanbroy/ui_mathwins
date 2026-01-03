@@ -16,6 +16,7 @@ export type DailyQuestion = {
 
 type dailySessionData = {
   session: {
+    userId: string;
     id: string;
     status: SessionStatus;
   };
@@ -34,9 +35,11 @@ export type submitQuestionSessionResponse = {
   statusCode: number;
   message: string;
   data: {
+    userId: string;
     questionId: string;
-    newQuestion: DailyQuestion;
+    nextQuestion: DailyQuestion;
     currentScore: number;
+    correctAnswer: number;
   };
 };
 
