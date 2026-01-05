@@ -29,7 +29,7 @@ export default function SoloScreen() {
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   const [totalAttempt, setTotalAttempt] = useState(0);
   const [remainingAttempt, setRemainingAttempt] = useState(0);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { user } = useAuth();
 
   // const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
@@ -46,6 +46,7 @@ export default function SoloScreen() {
         setTotalAttempt(res?.data?.totalDailyAttempts);
         setRemainingAttempt(res?.data.remainingAttempts);
       });
+      setLoading(false);
     }
     getRemainingAttemp();
   }, []);
@@ -82,37 +83,49 @@ export default function SoloScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <View style={styles.container}>
-        <LinearGradient
-          colors={colors.gradients.background}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={styles.container}
-        >
-          <View style={styles.box}>
-            <Image source={{ uri: user?.picture }} style={styles.avatar} />
-            <Text style={styles.attemptsText}>
-              Solo tournament attempts left : {remainingAttempt} /{' '}
-              {totalAttempt}
-            </Text>
-            <TouchableOpacity
-              disabled={loading}
-              style={styles.startBtn}
-              onPress={createSoloSession}
-            >
-              {loading ? (
-                <Text style={styles.startBtnText}>. . .</Text>
-              ) : (
-                <Text style={styles.startBtnText}>Start game</Text>
-              )}
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
-        {/* <View style={styles.bannerAd}>
-        <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
+      <LinearGradient
+        colors={colors.gradients.background}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.grediantBg}
+      >
+        <View style={styles.adArea1}>
+          ad here
+        </View>
+        <View style={styles.container}>
+          <LinearGradient
+            colors={colors.gradients.surface}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={styles.grediant}
+          >
+            <View style={styles.box}>
+              <Image source={{ uri: user?.picture }} style={styles.avatar} />
+              <Text style={styles.attemptsText}>
+                Solo tournament attempts left : {remainingAttempt} /{' '}{totalAttempt}
+              </Text>
+              <TouchableOpacity
+                disabled={loading}
+                style={loading ? styles.startBtnDiabled :  styles.startBtn}
+                onPress={createSoloSession}
+              >
+                {
+                  loading ? 
+                  <Text style={styles.startBtnText}>. . .</Text> :
+                  <Text style={styles.startBtnText}>Start game</Text>
+                }
+              </TouchableOpacity>
+            </View>
+          </LinearGradient>
+          {/* <View style={styles.bannerAd}>
+          <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
 
-      </View> */}
-      </View>
+        </View> */}
+        </View>
+        <View style={styles.adArea2}>
+          ad here
+        </View>
+      </LinearGradient>
     </SafeAreaView>
   );
 }
@@ -123,14 +136,35 @@ const makeStyles = (colors: ColorScheme) =>
       width: '100%',
       height: '100%',
     },
+    adArea1: {
+      marginBottom: 10,
+      backgroundColor: "#a1a1a1",
+      width: "100%",
+      height: 50,
+    },
+    adArea2: {
+      marginTop: 10,
+      backgroundColor: "#a1a1a1",
+      width: "100%",
+      height: 200,
+    },
     container: {
+    },
+    grediant: {
+      margin: 20,
       borderRadius: 20,
+    },
+    grediantBg: {
+
+      // flex: 1,
+      // alignItems: "center",
+      // justifyContent: "space-between"
     },
     box: {
       flex: 1,
       paddingHorizontal: 20,
       alignItems: 'center',
-      paddingVertical: 30,
+      paddingVertical: 20,
     },
     avatar: {
       width: 150,
@@ -143,7 +177,8 @@ const makeStyles = (colors: ColorScheme) =>
       fontSize: 15,
       fontWeight: '600',
       color: colors.textSecondary,
-      marginVertical: 12,
+      marginTop: 12,
+      marginBottom: 20,
     },
     bannerAd: {
       marginVertical: 20,
@@ -155,6 +190,20 @@ const makeStyles = (colors: ColorScheme) =>
       borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: "#FFFFFF"
+    },
+    startBtnDiabled: {
+      width: '100%',
+      backgroundColor: colors.textMuted,
+      paddingVertical: 12,
+      borderRadius: 10,
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: 10,
+      borderWidth: 1,
+      borderColor: "#FFFFFF"
     },
     startBtnText: {
       color: colors.textSecondary,

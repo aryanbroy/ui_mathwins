@@ -8,7 +8,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Rewards() {
-  const [ coins, setCoins ] = useState(2134);
+  const [ coins, setCoins ] = useState(3500);
   const [ maxCoins, setMaxCoins ] = useState(5000);
   const [ today, setToday ] = useState(5);
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -120,6 +120,7 @@ const makeStyles = (colors: ColorScheme) =>
       borderRadius: 20,
       paddingHorizontal: 10,
       paddingVertical: 20,
+      marginBottom: 20,
     },
     scrollView: {
       flex: 1,

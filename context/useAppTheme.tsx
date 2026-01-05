@@ -159,8 +159,7 @@ const darkColors: ColorScheme = {
   gradients: {
     // dark header / login background (can still be slightly purple)
     background: ["#6315FF", "#FFCCD7"],
-    // dark subtle panel behind cards (you can tint with purple if you want)
-    surface: ["#242424", "#000000"],
+    surface: ["#000000", "#353535"],
     primary: ["#6A4DFB", "#4C2FE0"],
     success: ["#22C55E", "#15803D"],
     warning: ["#FBBF24", "#D97706"],

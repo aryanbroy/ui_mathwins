@@ -8,7 +8,7 @@ type sanitizedQuestion =
     }
   | any;
 type continueParams = {
-  sessionDetails: {
+  params: {
     userId: string;
     sessionId: string;
   };
@@ -23,6 +23,7 @@ export type HomeTabStackParamList = {
   GameScreen: undefined;
   Instant: undefined;
   login: undefined;
+  editProfile: undefined;
 };
 
 export type HomeScreenNavigationProp =

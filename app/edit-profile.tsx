@@ -15,7 +15,7 @@ import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { useAuth } from '@/context/authContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function AvatarSelectionScreen() {
+export default function EditProfileScreen() {
   const { user } = useAuth();
   const [username, setUsername] = useState('');
   const [selectedAvatar, setSelectedAvatar] = useState(0);

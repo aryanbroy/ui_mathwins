@@ -164,7 +164,6 @@ export default function QuestionScreen() {
     blinkAnim.setValue(1);
   };
 
-  // Answer Selection
   const handleSelect = (value: number) => {
     if (!isChecking && !showResult && !disabledOptions.includes(value)) {
       setAnswer(value);
@@ -218,12 +217,12 @@ export default function QuestionScreen() {
             if (response.isRoundCompleted) {
               setRound(response.roundNumber + 1);
               console.log("response :- ",response);
-              const data : continueParams = {
-                userId: sessionDetails.userId,
-                sessionId: sessionDetails.sessionId,
-                bankedPoint: response.bankedPoint as number,
+              const params : continueParams = {
+                userId: sessionDetails?.userId as string,
+                sessionId: sessionDetails?.sessionId as string,
+                bankedPoint: response?.bankedPoint as number,
               }
-              navigation.navigate('ad', { data });
+              navigation.navigate('ad', { params });
             } else {
               resetQuestion();
               setSanitizedQuestion(response.nextQuestion);

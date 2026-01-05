@@ -20,12 +20,12 @@ function RootNavigator() {
   return (
     <ThemeProvider>
       <Stack screenOptions={{ headerShown: false }}>
-        {/* {user ? (
+        {user ? (
           <Stack.Screen name="(tabs)" />
           // <Stack.Screen name="edit-profile" />
         ) : (
           <Stack.Screen name="login" />
-        )} */}
+        )}
         {/**/}
         {/* <Stack.Screen name="login" /> */}
         {/* <Stack.Screen name="(tabs)" /> */}

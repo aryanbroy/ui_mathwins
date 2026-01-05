@@ -20,13 +20,13 @@ export default function adscreen() {
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   const [disableSkip, setDisableSkip] = useState(false);
   const route = useRoute<any>();
-  const data = route.params.data as continueParams;
-  const sessionDetails = {
-    userId: data.userId,
-    sessionId: data.sessionId,
-    bankedPoint: data.bankedPoint
-  }
-  console.log("ad : ",data);
+  const params = route.params.params as continueParams;
+  // const sessionDetails = {
+  //   userId: data.userId,
+  //   sessionId: data.sessionId,
+  //   bankedPoint: data.bankedPoint
+  // }
+  console.log("ad : ",params);
 
 // ad implementation :-   
 // npm i react-native-google-mobile-ads
@@ -75,7 +75,7 @@ export default function adscreen() {
 
   
   function handleSkip(){
-    navigation.navigate('roundOverview',{sessionDetails})
+    navigation.navigate('roundOverview',{params})
   }
 
   return (

@@ -24,7 +24,10 @@ export default function UserProfileScreen() {
   function loginHandle(){
     console.log("login");
     navigation.navigate('login');
-    
+  }
+  function handleEditProfile(){
+    console.log("Edit-Profile");
+    navigation.navigate('editProfile');
   }
   return (
     <ScrollView
@@ -61,8 +64,9 @@ export default function UserProfileScreen() {
               </View>
             }
 
-
-            <TouchableOpacity style={styles.editProfileButton}>
+            <TouchableOpacity 
+            onPress={handleEditProfile}
+            style={styles.editProfileButton}>
               <View style={styles.editIconWrapper}>
                 <MaterialCommunityIcons
                   name="account-edit"
@@ -169,6 +173,15 @@ export default function UserProfileScreen() {
                 <View style={styles.rowLeft}>
                   <Feather name="mail" size={22} style={styles.rowIcon} />
                   <Text style={styles.rowLabel}>Contact Us</Text>
+                </View>
+                <Entypo name="chevron-right" size={18} color={colors.textMuted} />
+              </TouchableOpacity>
+
+              {/* Logout */}
+              <TouchableOpacity style={styles.row}>
+                <View style={styles.rowLeft}>
+                  <MaterialIcons name="logout" size={22} style={styles.rowIcon} />
+                  <Text style={styles.rowLabel}>Logout</Text>
                 </View>
                 <Entypo name="chevron-right" size={18} color={colors.textMuted} />
               </TouchableOpacity>

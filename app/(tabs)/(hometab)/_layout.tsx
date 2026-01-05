@@ -10,6 +10,7 @@ import roundOverview from './roundOverview';
 import LoginScreen from '@/app/login';
 import lobbyScreen from './lobby';
 import adScreen from './adScreen';
+import EditProfileScreen from '@/app/edit-profile';
 
 const Stack = createNativeStackNavigator<HomeTabStackParamList>();
 
@@ -54,6 +55,11 @@ export default function HomeTabLayout() {
         name="login"
         component={LoginScreen}
         options={{ title: 'login' }}
+      />
+      <Stack.Screen
+        name="editProfile"
+        component={EditProfileScreen}
+        options={{ title: 'editProfile' }}
       />
       {/* <Stack.Screen */}
       {/*   name="GameScreen" */}
