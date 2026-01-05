@@ -10,7 +10,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 
 type continueParams = {
   userId: string;
-  soloSessionId: string;
+  sessionId: string;
+  bankedPoint: number;
 };
 
 export default function adscreen() {
@@ -19,8 +20,13 @@ export default function adscreen() {
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   const [disableSkip, setDisableSkip] = useState(false);
   const route = useRoute<any>();
-  const sessionDetails = route.params.sessionDetails as continueParams;
-  console.log("ad : ",sessionDetails);
+  const data = route.params.data as continueParams;
+  const sessionDetails = {
+    userId: data.userId,
+    sessionId: data.sessionId,
+    bankedPoint: data.bankedPoint
+  }
+  console.log("ad : ",data);
 
 // ad implementation :-   
 // npm i react-native-google-mobile-ads
@@ -78,7 +84,7 @@ export default function adscreen() {
     start={{ x: 0, y: 0 }}
     end={{ x: 0, y: 1 }}
     style={styles.container}>
-    {/* <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe}>
       <View style={styles.box}>
           <View>
             <Text style={styles.message}>
@@ -94,9 +100,9 @@ export default function adscreen() {
           >
             <Text style={styles.startBtnText}>Skip</Text>
           </TouchableOpacity>
-          <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
+          {/* <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} /> */}
       </View>
-    </SafeAreaView> */}
+    </SafeAreaView>
     </LinearGradient>
   );
 }

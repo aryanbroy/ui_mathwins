@@ -33,6 +33,12 @@ type sanitizedQuestionType = {
   side: string;
 };
 
+type continueParams = {
+  userId: string;
+  sessionId: string;
+  bankedPoint: number;
+};
+
 const keypadLayout = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]];
 
 function getOrdinalSuffix(n: number) {
@@ -140,7 +146,7 @@ export default function QuestionScreen() {
 
   const sessionDetails = {
     userId: session.userId,
-    soloSessionId: session.sessionId,
+    sessionId: session.sessionId,
   };
 
   useEffect(() => {
@@ -372,7 +378,6 @@ export default function QuestionScreen() {
     setLoading(true);
 
     const { nextQuestionFn } = getApiFns();
-
     console.log('submitting a question');
 
     nextQuestionFn()
@@ -402,17 +407,23 @@ export default function QuestionScreen() {
             setTimeout(() => {
               if (response.isRoundCompleted) {
                 setRound(response.roundNumber + 1);
-                navigation.navigate('ad', { sessionDetails });
+                console.log('response :- ', response);
+                const params: continueParams = {
+                  userId: sessionDetails?.userId as string,
+                  sessionId: sessionDetails?.sessionId as string,
+                  bankedPoint: response?.bankedPoint as number,
+                };
+                navigation.navigate('ad', { params });
               } else {
                 resetQuestion();
                 setSanitizedQuestion(response.nextQuestion);
               }
-            }, 3000);
+            }, 1500);
           }
         } else {
           setTimeout(() => {
             navigation.navigate('HomeMain');
-          }, 3000);
+          }, 1500);
         }
       })
       .catch((err) => {
