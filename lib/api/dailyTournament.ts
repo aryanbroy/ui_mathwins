@@ -6,15 +6,15 @@ import {
   submitQuestionSessionResponse,
 } from '@/types/api/daily';
 import { api } from './client';
-import { parseApiError } from './parseApiError';
+import { ApiHandledError, parseApiError } from './parseApiError';
 
 export const getDailyAttempts = async () => {
   try {
     const res = await api.get('api/daily/attempts');
     return res.data;
   } catch (err) {
-    const msg = parseApiError(err);
-    throw new Error(msg);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
   }
 };
 
@@ -24,8 +24,8 @@ export const getDailyTournamentDetails = async () => {
     console.log(res.data);
     return res.data;
   } catch (err) {
-    const msg = parseApiError(err);
-    throw new Error(msg);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
   }
 };
 
@@ -36,8 +36,8 @@ export const createDailySession =
       const resData: createDailySessionResponse = res.data;
       return resData;
     } catch (err) {
-      const msg = parseApiError(err);
-      throw new Error(msg);
+      const { status, message } = parseApiError(err);
+      throw new ApiHandledError(status, message);
     }
   };
 
@@ -62,8 +62,8 @@ export const submitQuestion = async ({
     return resData;
   } catch (err) {
     console.log('error submitting question: ', err);
-    const msg = parseApiError(err);
-    throw new Error(msg);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
   }
 };
 
@@ -81,8 +81,8 @@ export const finalSubmission = async ({ sessionId }: { sessionId: string }) => {
     return resData;
   } catch (err) {
     console.log('error in final submission: ', err);
-    const msg = parseApiError(err);
-    throw new Error(msg);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
   }
 };
 
@@ -96,17 +96,13 @@ export const fetchDailyLeaderboard = async (page: number) => {
         page: page,
       },
     });
-    console.log('Response:', res);
-    console.log('Response data:', res.data);
+    console.log(res);
     const resData: LeaderboardRes = res.data;
     const { leaderboard } = resData.data;
     return leaderboard;
   } catch (err: any) {
-    console.log('Full error object:', err);
-    console.log('Error response:', err.response);
-    console.log('Error response data:', err.response?.data);
-    console.log('Error message:', err.message);
-    const msg = parseApiError(err);
-    throw new Error(msg);
+    console.log('Error fetching leaderboard: ', err);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
   }
 };

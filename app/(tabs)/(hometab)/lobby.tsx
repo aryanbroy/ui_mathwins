@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -20,6 +20,7 @@ import {
   createDailySession,
   getDailyAttempts,
 } from '@/lib/api/dailyTournament';
+import { ErrObject } from '@/lib/api/parseApiError';
 
 export type SessionInfo = {
   userId: string;
@@ -36,11 +37,6 @@ export enum SessionType {
 
 type RouteParams = {
   sessionType: SessionType;
-};
-
-export type ErrObject = {
-  status: number;
-  message: string;
 };
 
 export default function SoloScreen() {
@@ -81,11 +77,7 @@ export default function SoloScreen() {
             setRemainingAttempt(res?.data.remainingAttempts);
           });
           break;
-
-        default:
-          break;
       }
-      //get Remaining Attempts
     }
     getRemainingAttemp();
   }, [route.params]);
@@ -114,6 +106,7 @@ export default function SoloScreen() {
         status: 500,
         message: err?.message ?? 'Failed to start game',
       };
+      console.log(errObj);
       setErr(errObj);
     } finally {
       setLoading(false);
@@ -142,10 +135,6 @@ export default function SoloScreen() {
       .catch();
   }
 
-  async function createInstantSession() {
-    // await instant session join or create
-  }
-
   async function startGame() {
     const { sessionType } = route.params;
     console.log(`Start game for ${sessionType} tournament`);
@@ -154,7 +143,8 @@ export default function SoloScreen() {
         await startDailyGame();
         break;
       case SessionType.SOLO:
-        console.log('start solo game');
+        await createSoloSession();
+        break;
       case SessionType.INSTANT:
         console.log('start instant game');
       default:

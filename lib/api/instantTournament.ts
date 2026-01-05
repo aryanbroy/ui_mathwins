@@ -8,6 +8,7 @@ import {
 } from '@/types/api/instant';
 import { api } from './client';
 import { parseApiError } from './parseApiError';
+import axios from 'axios';
 
 export const joinOrCreateTournament = async () => {
   try {
@@ -107,10 +108,9 @@ export const finalSubmission = async (sessionId: string) => {
 export const fetchPastTournaments = async () => {
   try {
     const res = await api({
-      method: 'get',
+      method: 'GET',
       url: 'api/instant/participated_tournaments',
     });
-    console.log('Fetching past tournaments: ', res);
     const resData: PastTournaments = res.data;
     const data = resData.data;
     return data;
