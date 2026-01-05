@@ -69,7 +69,7 @@ export default function TournamentScreen({
         timeTaken,
       });
       const data = res.data;
-      setDisplayQuestion(data.newQuestion);
+      setDisplayQuestion(data.nextQuestion);
       setCurrentScore(data.currentScore);
     } catch (err: any) {
       setErr(err);

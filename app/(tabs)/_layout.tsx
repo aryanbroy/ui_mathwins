@@ -1,10 +1,10 @@
 import { Gift, Home, Trophy, User } from 'lucide-react-native';
 import useAppTheme, { ThemeProvider } from '../../context/useAppTheme';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import LeaderBoard from './leaderBoard';
 import Rewards from './rewards';
 import UserProfileScreen from './user';
 import HomeTabLayout from './(hometab)/_layout';
+import LeaderboardComponent from './leaderBoard';
 
 const Tab = createBottomTabNavigator();
 
@@ -42,7 +42,7 @@ function TabNavigator() {
 
       <Tab.Screen
         name="leaderBoard"
-        component={LeaderBoard}
+        component={LeaderboardComponent}
         options={{
           title: 'LeaderBoard',
           tabBarIcon: ({ color }) => <Trophy color={color} />,

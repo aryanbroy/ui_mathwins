@@ -4,7 +4,7 @@ import { View, StyleSheet, StatusBar, ScrollView, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { dummyUsers } from './(hometab)';
 import LeaderboardCard from '@/components/Home/LeaderboardCard';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchDailyLeaderboard } from '@/lib/api/dailyTournament';
 import { InstantTournamentCard } from '@/components/Home/InstantTournamentCard';
 import { fetchPastTournaments } from '@/lib/api/instantTournament';
@@ -30,36 +30,40 @@ export default function LeaderBoard() {
     InstantParticipant[] | null
   >(null);
 
-  const getDailyLeaderboard = useCallback(async () => {
-    console.log('fetching daily leaderboard');
-    const leaderboard = await fetchDailyLeaderboard(page);
-    const rankedLeaderboard: RankedLeaderboard[] = leaderboard.map(
-      (entry, index) => ({
-        ...entry,
-        rank: index + 1,
-      })
-    );
-    setDailyLeaderboard(rankedLeaderboard);
-  }, [page]);
-
-  const getInstantTournaments = useCallback(async () => {
-    setErrMsg(null);
-    console.log('fetching instant tournaments');
-    try {
-      const tournaments: InstantParticipant[] = await fetchPastTournaments();
-      setInstantTournamentsPlayed(tournaments);
-    } catch (err: any) {
-      setErrMsg(err?.message ?? 'Failed to load daily attempts');
-    }
-  }, []);
-
   useEffect(() => {
+    const getDailyLeaderboard = async () => {
+      setErrMsg(null);
+      try {
+        const leaderboard = await fetchDailyLeaderboard(page);
+        const rankedLeaderboard: RankedLeaderboard[] = leaderboard.map(
+          (entry, index) => ({
+            ...entry,
+            rank: index + 1,
+          })
+        );
+        setDailyLeaderboard(rankedLeaderboard);
+      } catch (err: any) {
+        setErrMsg(err?.message ?? 'Failed to load daily attempts');
+      }
+    };
+
+    const getInstantTournaments = async () => {
+      setErrMsg(null);
+      console.log('fetching instant tournaments');
+      try {
+        const tournaments: InstantParticipant[] = await fetchPastTournaments();
+        setInstantTournamentsPlayed(tournaments);
+      } catch (err: any) {
+        setErrMsg(err?.message ?? 'Failed to load daily attempts');
+      }
+    };
+
     if (activeTab === 'daily') {
       getDailyLeaderboard();
     } else if (activeTab === 'instant') {
       getInstantTournaments();
     }
-  }, [getDailyLeaderboard, activeTab, getInstantTournaments]);
+  }, [activeTab, page]);
 
   const onClick = (value: number) => {
     setPage(value);
@@ -69,10 +73,16 @@ export default function LeaderBoard() {
     console.log('active tab: ', activeTab);
     switch (activeTab) {
       case 'allTime':
-        return (
+        return dummyUsers.length > 3 ? (
           <>
             <TopThreePodium />
             {dummyUsers.slice(3).map((u) => (
+              <LeaderboardCard key={`all-${u.rank}`} {...u} />
+            ))}
+          </>
+        ) : (
+          <>
+            {dummyUsers.map((u) => (
               <LeaderboardCard key={`all-${u.rank}`} {...u} />
             ))}
           </>
@@ -105,8 +115,6 @@ export default function LeaderBoard() {
             ))}
           </>
         );
-      case 'solo':
-        return <Text style={styles.placeholder}>Play a solo match!</Text>;
     }
   };
 
@@ -135,11 +143,6 @@ export default function LeaderBoard() {
             onPress={() => setActiveTab('instant')}
             active={activeTab === 'instant'}
           />
-          <Tab
-            label="Solo"
-            onPress={() => setActiveTab('solo')}
-            active={activeTab === 'solo'}
-          />
         </View>
 
         <ScrollView
@@ -154,9 +157,12 @@ export default function LeaderBoard() {
             style={styles.bottomGradient}
           >
             {errMsg != null ? (
-              <Text style={styles.placeholder}>
-                Error fetching leaderboard! Try again later
-              </Text>
+              <>
+                <Text style={styles.placeholder}>
+                  Error fetching leaderboard! Try again later
+                </Text>
+                {/* <TouchableOpacity onPress={retry}>Press me</TouchableOpacity> */}
+              </>
             ) : (
               renderContent()
             )}

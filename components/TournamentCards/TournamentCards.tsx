@@ -7,6 +7,7 @@ import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
+import { SessionType } from '@/app/(tabs)/(hometab)/lobby';
 
 export default function TournamentCards() {
   const { colors } = useAppTheme();
@@ -29,9 +30,21 @@ export default function TournamentCards() {
         </LinearGradient>
       </View>
       {/*  navigate to lobby (solo) */}
-      <DailyCard onPress={() => navigation.navigate('Daily')} />
+      <DailyCard
+        onPress={() => {
+          navigation.navigate('lobby', {
+            sessionType: SessionType.DAILY,
+          });
+        }}
+      />
       <View style={styles.bottomRow}>
-        <SoloCard onPress={() => navigation.navigate('lobby')} />
+        <SoloCard
+          onPress={() =>
+            navigation.navigate('lobby', {
+              sessionType: SessionType.SOLO,
+            })
+          }
+        />
         <InstantCard onPress={() => navigation.navigate('Instant')} />
       </View>
     </View>

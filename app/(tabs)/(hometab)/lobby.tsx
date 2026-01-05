@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -8,7 +8,7 @@ import {
   Image,
 } from 'react-native';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
-import { useNavigation } from '@react-navigation/native';
+import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import { getSoloAtempts, soloStart } from '@/lib/api/soloTournament';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,12 +16,28 @@ import { useAuth } from '@/context/authContext';
 // import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import {
+  createDailySession,
+  getDailyAttempts,
+} from '@/lib/api/dailyTournament';
+import { ErrObject } from '@/lib/api/parseApiError';
+
+export type SessionInfo = {
+  userId: string;
+  sessionId: string;
+  sessionType: SessionType;
+  sessionDuration: number;
+};
 
 export enum SessionType {
   SOLO = 'solo',
   DAILY = 'daily',
   INSTANT = 'instant',
 }
+
+type RouteParams = {
+  sessionType: SessionType;
+};
 
 export default function SoloScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -31,6 +47,9 @@ export default function SoloScreen() {
   const [remainingAttempt, setRemainingAttempt] = useState(0);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const route = useRoute<RouteProp<{ params: RouteParams }>>();
+
+  const [err, setErr] = useState<ErrObject | null>(null);
 
   // const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
   // const bannerRef = useRef<BannerAd>(null);
@@ -39,17 +58,60 @@ export default function SoloScreen() {
   // });
 
   useEffect(() => {
+    const { sessionType } = route.params;
+    console.log('Session type: ', route.params.sessionType);
     async function getRemainingAttemp(): Promise<any> {
-      //get Remaining Attempts
-      await getSoloAtempts().then((res) => {
-        console.log(res);
-        setTotalAttempt(res?.data?.totalDailyAttempts);
-        setRemainingAttempt(res?.data.remainingAttempts);
-      });
-      setLoading(false);
+      switch (sessionType) {
+        case SessionType.DAILY:
+          await getDailyAttempts().then((res) => {
+            const attempts = res.data.dailyAttemptCount;
+            console.log('Attempts: ', attempts);
+            setTotalAttempt(300);
+            setRemainingAttempt(300 - attempts);
+          });
+          break;
+        case SessionType.SOLO:
+          await getSoloAtempts().then((res) => {
+            console.log(res);
+            setTotalAttempt(res?.data?.totalDailyAttempts);
+            setRemainingAttempt(res?.data.remainingAttempts);
+          });
+          break;
+      }
     }
     getRemainingAttemp();
-  }, []);
+  }, [route.params]);
+
+  async function startDailyGame() {
+    setLoading(true);
+    setErr(null);
+    try {
+      const res = await createDailySession();
+      console.log('Create daily session res: ', res);
+      const data = res.data;
+      const { firstQuestion, session } = data;
+      const sanitizedAttempt: SessionInfo = {
+        userId: session.userId,
+        sessionId: session.id,
+        sessionType: SessionType.DAILY,
+        sessionDuration: 3000,
+      };
+      navigation.navigate('Question', {
+        session: sanitizedAttempt,
+        sanitizedQuestion: firstQuestion,
+      });
+    } catch (err: any) {
+      console.log(err);
+      const errObj: ErrObject = {
+        status: 500,
+        message: err?.message ?? 'Failed to start game',
+      };
+      console.log(errObj);
+      setErr(errObj);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function createSoloSession() {
     setLoading(true);
@@ -58,7 +120,7 @@ export default function SoloScreen() {
     await soloStart()
       .then((res) => {
         console.log('soloStart : ', res);
-        const sanitizedAttemp = {
+        const sanitizedAttempt: SessionInfo = {
           userId: res.sanitizedAttemp.userId,
           sessionId: res.sanitizedAttemp.id,
           sessionType: SessionType.SOLO,
@@ -66,19 +128,28 @@ export default function SoloScreen() {
         };
         setLoading(false);
         navigation.navigate('Question', {
-          session: sanitizedAttemp,
+          session: sanitizedAttempt,
           sanitizedQuestion: res.sanitizedQuestion,
         });
       })
       .catch();
   }
 
-  async function createDailySession() {
-    // await daily session join or create
-  }
-
-  async function createInstantSession() {
-    // await instant session join or create
+  async function startGame() {
+    const { sessionType } = route.params;
+    console.log(`Start game for ${sessionType} tournament`);
+    switch (sessionType) {
+      case SessionType.DAILY:
+        await startDailyGame();
+        break;
+      case SessionType.SOLO:
+        await createSoloSession();
+        break;
+      case SessionType.INSTANT:
+        console.log('start instant game');
+      default:
+        break;
+    }
   }
 
   return (

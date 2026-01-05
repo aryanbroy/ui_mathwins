@@ -8,6 +8,7 @@ import {
 } from '@/types/api/instant';
 import { api } from './client';
 import { parseApiError } from './parseApiError';
+import axios from 'axios';
 
 export const joinOrCreateTournament = async () => {
   try {
@@ -78,8 +79,7 @@ export const submitQuestion = async (
       },
     });
     const resData: submitQuestionResponse = res.data;
-    const { question, session } = resData.data;
-    return { question, session };
+    return resData;
   } catch (err: any) {
     console.log(err);
     const msg = parseApiError(err);
@@ -108,13 +108,14 @@ export const finalSubmission = async (sessionId: string) => {
 export const fetchPastTournaments = async () => {
   try {
     const res = await api({
-      method: 'get',
+      method: 'GET',
       url: 'api/instant/participated_tournaments',
     });
     const resData: PastTournaments = res.data;
     const data = resData.data;
     return data;
   } catch (err: any) {
+    console.log('Error fetching past tournaments: ', err);
     const msg = parseApiError(err);
     throw new Error(msg);
   }

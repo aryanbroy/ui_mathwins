@@ -21,6 +21,7 @@ import {
   startInstantSession,
 } from '@/lib/api/instantTournament';
 import { InstantQuestion, Player } from '@/types/api/instant';
+import { SessionInfo, SessionType } from './lobby';
 
 export default function InstantTournamentLobby() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -108,7 +109,17 @@ export default function InstantTournamentLobby() {
       setInitialQuestion(question);
       console.log('Session info: ', session);
       setSessionId(session.id);
-      setTourState(TournamentState.PLAYING);
+      const sanitizedAttempt: SessionInfo = {
+        userId: session.userId,
+        sessionId: session.id,
+        sessionType: SessionType.INSTANT,
+        sessionDuration: 3000,
+      };
+      navigation.navigate('Question', {
+        session: sanitizedAttempt,
+        sanitizedQuestion: question,
+      });
+      // setTourState(TournamentState.PLAYING);
     } catch (err: any) {
       setErrMsg(err?.message ?? 'Failed to start game');
     } finally {

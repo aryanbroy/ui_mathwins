@@ -3,13 +3,14 @@ import { api } from './client';
 import { parseApiError } from './parseApiError';
 import LeaderBoard from '@/app/(tabs)/leaderBoard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SessionType } from '@/app/(tabs)/(hometab)/lobby';
 
 export const soloStart = async () => {
   try {
     // console.log("userId : ",userId);
-    const token = await AsyncStorage.getItem("token") as string;
+    const token = (await AsyncStorage.getItem('token')) as string;
     const res = await api.post(
-      "api/solo/start",
+      'api/solo/start',
       {},
       {
         headers: {
@@ -24,7 +25,7 @@ export const soloStart = async () => {
   }
 };
 // export const nextQuestion = async ({userId,soloSessionId,questionId,userAnswer,time}: any) => {
-  type NextQuestionParams = {
+type NextQuestionParams = {
   // userId: string;
   soloSessionId: string;
   questionId: string;
@@ -43,23 +44,20 @@ type loaderBoradParam = {
   end: number;
 };
 type lifelineParams = {
-  soloSessionId: string;
+  sessionType: SessionType;
+  sessionId: string;
   questionId: string;
-}
+};
 export const nextQuestion = async (params: NextQuestionParams) => {
   try {
-    console.log("ts next QS: ",params);
-    
-    const token = await AsyncStorage.getItem("token") as string;
-    const res = await api.post(
-      'api/solo/nextquestion', 
-      params,
-      {
-        headers: {
-          Authorization: `Bearer ${JSON.parse(token)}`,
-        },
-      }
-    );
+    console.log('ts next QS: ', params);
+
+    const token = (await AsyncStorage.getItem('token')) as string;
+    const res = await api.post('api/solo/nextquestion', params, {
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      },
+    });
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
@@ -68,16 +66,12 @@ export const nextQuestion = async (params: NextQuestionParams) => {
 };
 export const continueSolo = async (params: continueParams) => {
   try {
-    const token = await AsyncStorage.getItem("token") as string;
-    const res = await api.post(
-      'api/solo/continue',
-      params,
-      {
-        headers: {
-          Authorization: `Bearer ${JSON.parse(token)}`,
-        },
-      }
-    );
+    const token = (await AsyncStorage.getItem('token')) as string;
+    const res = await api.post('api/solo/continue', params, {
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      },
+    });
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
@@ -86,16 +80,12 @@ export const continueSolo = async (params: continueParams) => {
 };
 export const quitSolo = async (params: quitParams) => {
   try {
-    const token = await AsyncStorage.getItem("token") as string;
-    const res = await api.post(
-      'api/solo/quit',
-      params,
-      {
-        headers: {
-          Authorization: `Bearer ${JSON.parse(token)}`,
-        },
-      }
-    );
+    const token = (await AsyncStorage.getItem('token')) as string;
+    const res = await api.post('api/solo/quit', params, {
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      },
+    });
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
@@ -124,7 +114,7 @@ export const soloLeaderboard = async (params: loaderBoradParam) => {
 
 export const getSoloAtempts = async () => {
   try {
-    const token = await AsyncStorage.getItem("token") as string;
+    const token = (await AsyncStorage.getItem('token')) as string;
     const res = await api.post(
       'api/solo/getRemainingSoloAttempts',
       {},
@@ -139,34 +129,15 @@ export const getSoloAtempts = async () => {
     const msg = parseApiError(err);
     throw new Error(msg);
   }
-}
+};
 export const applyFiftyfifty = async (params: lifelineParams) => {
-    try {
-      console.log("apply 50-50 soloTournament.ts - ",params);
-      
-      const token = await AsyncStorage.getItem("token") as string;
-      const res = await api.post(
-        'api/lifeline/fiftyfifty',
-        {params},
-        {
-          headers: {
-            Authorization: `Bearer ${JSON.parse(token)}`,
-          },
-        }
-      );
-      return res.data;
-    } catch (err) {
-      const msg = parseApiError(err);
-      throw new Error(msg);
-    }
-  }
-  export const LevelDown = async (params: lifelineParams) => {
-    try {
-      console.log("apply leveldown soloTournament.ts - ",params);
-    const token = await AsyncStorage.getItem("token") as string;
+  try {
+    console.log('apply 50-50 soloTournament.ts - ', params);
+
+    const token = (await AsyncStorage.getItem('token')) as string;
     const res = await api.post(
-      'api/lifeline/LevelDown',
-      {params},
+      'api/lifeline/fiftyfifty',
+      { params },
       {
         headers: {
           Authorization: `Bearer ${JSON.parse(token)}`,
@@ -178,4 +149,24 @@ export const applyFiftyfifty = async (params: lifelineParams) => {
     const msg = parseApiError(err);
     throw new Error(msg);
   }
-}
+};
+export const LevelDown = async (params: lifelineParams) => {
+  try {
+    console.log('apply leveldown soloTournament.ts - ', params);
+    const token = (await AsyncStorage.getItem('token')) as string;
+    const res = await api.post(
+      'api/lifeline/LevelDown',
+      { params },
+      {
+        headers: {
+          Authorization: `Bearer ${JSON.parse(token)}`,
+        },
+      }
+    );
+    return res.data;
+  } catch (err) {
+    const msg = parseApiError(err);
+    throw new Error(msg);
+  }
+};
+
