@@ -34,6 +34,7 @@ type sanitizedQuestionType = {
 };
 
 type continueParams = {
+  sessionType: SessionType;
   userId: string;
   sessionId: string;
   bankedPoint: number;
@@ -567,6 +568,7 @@ const startGlitchEffect = () => {
               soloSessionId: session.sessionId,
               questionId: sanitizedQuestion.id,
               userAnswer: answer!,
+              sessionType: SessionType.SOLO,
               time: timeTaken,
             }),
         };
@@ -608,12 +610,12 @@ const startGlitchEffect = () => {
       .then((response: any) => {
         stopBlinking();
         setIsChecking(false);
-        setCorrectAnswer(response.correctAnswer);
+        setCorrectAnswer(response.data.correctAnswer);
         setShowResult(true);
         console.log('Response: ', response);
         console.log('answer: ', answer);
 
-        if (response.success) {
+        if (response.data.success) {
           if (
             session.sessionType === SessionType.DAILY ||
             session.sessionType === SessionType.INSTANT
@@ -628,18 +630,19 @@ const startGlitchEffect = () => {
             }, 1200);
           } else if (session.sessionType === SessionType.SOLO) {
             setTimeout(() => {
-              if (response.isRoundCompleted) {
-                setRound(response.roundNumber + 1);
+              if (response.data.isRoundCompleted) {
+                setRound(response.data.roundNumber + 1);
                 console.log('response :- ', response);
                 const params: continueParams = {
+                  sessionType: session.sessionType,
                   userId: sessionDetails?.userId as string,
                   sessionId: sessionDetails?.sessionId as string,
-                  bankedPoint: response?.bankedPoint as number,
+                  bankedPoint: response?.data.bankedPoint as number,
                 };
                 navigation.navigate('ad', { params });
               } else {
                 resetQuestion();
-                setSanitizedQuestion(response.nextQuestion);
+                setSanitizedQuestion(response.data.nextQuestion);
                 startTimer();
               }
             }, 1500);

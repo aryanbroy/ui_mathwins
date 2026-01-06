@@ -8,6 +8,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { continueSolo } from '@/lib/api/soloTournament';
 import { quitSolo } from '@/lib/api/soloTournament';
 import LeaderboardCard from '@/components/Home/LeaderboardCard';
+import { parseApiError } from '@/lib/api/parseApiError';
+
+export enum SessionType {
+  SOLO = 'solo',
+  DAILY = 'daily',
+}
 
 type continueParams = {
   userId: string;
@@ -95,21 +101,25 @@ export default function roundOverview() {
     console.log("Quit Clicked");
     // navigation.navigate('HomeMain');
     const payload = {
-      soloSessionId: sessionDetails.sessionId,
+      sessionId: sessionDetails.sessionId,
+      sessionType: SessionType.SOLO,
     }
     quitSolo(payload)
-      .then((response)=>{
-        console.log("response continue : ",response);
-        navigation.navigate('HomeMain');
-      }).catch((err)=>{
-        console.log(err);
-      });
+    .then((response)=>{
+      console.log("response continue : ",response);
+      navigation.navigate('HomeMain');
+    }).catch((err)=>{
+      console.log(err);
+    });
   }
   function handleContinue(){
     console.log("Continue Clicked");
     const payload = {
-      soloSessionId: sessionDetails.sessionId,
+      sessionType: SessionType.SOLO,
+      sessionId: sessionDetails.sessionId,
     }
+    console.log("continue : ",payload);
+    
     continueSolo(payload)
       .then((response)=>{
         console.log("response continue : ",response);

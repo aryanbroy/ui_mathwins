@@ -5,10 +5,13 @@ import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SessionType } from '@/app/(tabs)/(hometab)/lobby';
+
 
 // import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
 
 type continueParams = {
+  sessionType: SessionType;
   userId: string;
   sessionId: string;
   bankedPoint: number;

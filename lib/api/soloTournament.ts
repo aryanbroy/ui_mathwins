@@ -21,22 +21,26 @@ export const soloStart = async () => {
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
-    throw new Error(msg);
+    throw new Error(msg.message);
   }
 };
 // export const nextQuestion = async ({userId,soloSessionId,questionId,userAnswer,time}: any) => {
 type NextQuestionParams = {
   // userId: string;
+  sessionType: SessionType;
   soloSessionId: string;
   questionId: string;
   userAnswer: number;
   time: number;
 };
+
 type continueParams = {
-  soloSessionId: string;
+  sessionType: SessionType;
+  sessionId: string;
 };
 type quitParams = {
-  soloSessionId: string;
+  sessionType: SessionType;
+  sessionId: string;
 };
 type loaderBoradParam = {
   todayDate: string;
@@ -61,7 +65,7 @@ export const nextQuestion = async (params: NextQuestionParams) => {
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
-    throw new Error(msg);
+    throw new Error(msg.message);
   }
 };
 export const continueSolo = async (params: continueParams) => {
@@ -75,7 +79,7 @@ export const continueSolo = async (params: continueParams) => {
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
-    throw new Error(msg);
+    throw new Error(msg.message);
   }
 };
 export const quitSolo = async (params: quitParams) => {
@@ -89,7 +93,7 @@ export const quitSolo = async (params: quitParams) => {
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
-    throw new Error(msg);
+    throw new Error(msg.message);
   }
 };
 export const finalsubmission = async (params: quitParams) => {
@@ -98,7 +102,7 @@ export const finalsubmission = async (params: quitParams) => {
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
-    throw new Error(msg);
+    throw new Error(msg.message);
   }
 };
 export const soloLeaderboard = async (params: loaderBoradParam) => {
@@ -108,7 +112,7 @@ export const soloLeaderboard = async (params: loaderBoradParam) => {
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
-    throw new Error(msg);
+    throw new Error(msg.message);
   }
 };
 
@@ -127,7 +131,7 @@ export const getSoloAtempts = async () => {
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
-    throw new Error(msg);
+    throw new Error(msg.message);
   }
 };
 export const applyFiftyfifty = async (params: lifelineParams) => {
@@ -147,7 +151,7 @@ export const applyFiftyfifty = async (params: lifelineParams) => {
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
-    throw new Error(msg);
+    throw new Error(msg.message);
   }
 };
 export const LevelDown = async (params: lifelineParams) => {
@@ -166,7 +170,7 @@ export const LevelDown = async (params: lifelineParams) => {
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
-    throw new Error(msg);
+    throw new Error(msg.message);
   }
 };
 
