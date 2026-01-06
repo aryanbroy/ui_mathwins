@@ -56,8 +56,9 @@ export default function roundOverview() {
     points: 1380,
     medalColor: null,
   }];
-  const sessionDetails = route.params.sessionDetails as continueParams;
+  const sessionDetails = route.params.params as continueParams;
   // const [ sessionDetails, setSessionDetails ] = useState({
+  //   bankedPoint: 4,
   //   userId: "787878787878",
   //   soloSessionId: "4545454545",
   // });
@@ -112,7 +113,7 @@ export default function roundOverview() {
     continueSolo(payload)
       .then((response)=>{
         console.log("response continue : ",response);
-        navigation.navigate('Question',{ session: sessionDetails, sanitizedQuestion : response.questions })
+        navigation.navigate('Question',{ session: sessionDetails, sanitizedQuestion : response.data.questions })
       }).catch((err)=>{
         console.log(err);
       });
@@ -139,7 +140,8 @@ export default function roundOverview() {
             showGif ? 
             <View style={styles.gifContainer}>
               <Image
-                source={require('@/assets/images/Game_Win_GIF.gif')}
+                source={require('@/assets/images/icons8-coin.gif')}
+                // source={require('https://tenor.com/view/oytothe-world-coin-happy-hanukkah-raining-falling-gif-14463297')}
                 style={styles.gifImage}
                 resizeMode="contain"
               />
@@ -260,6 +262,7 @@ const makeStyles = (colors: ColorScheme) =>
     gifImage: {
       width: 120,
       height: 120,
+      borderRadius: "100%",
       marginBottom: 16,
     },
     loadingText: {

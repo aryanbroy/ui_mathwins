@@ -75,6 +75,7 @@ export default function SoloScreen() {
             console.log(res);
             setTotalAttempt(res?.data?.totalDailyAttempts);
             setRemainingAttempt(res?.data.remainingAttempts);
+            setLoading(false);
           });
           break;
       }
@@ -121,15 +122,15 @@ export default function SoloScreen() {
       .then((res) => {
         console.log('soloStart : ', res);
         const sanitizedAttempt: SessionInfo = {
-          userId: res.sanitizedAttemp.userId,
-          sessionId: res.sanitizedAttemp.id,
+          userId: res.data.sanitizedAttemp.userId,
+          sessionId: res.data.sanitizedAttemp.id,
           sessionType: SessionType.SOLO,
           sessionDuration: 60000,
         };
         setLoading(false);
         navigation.navigate('Question', {
           session: sanitizedAttempt,
-          sanitizedQuestion: res.sanitizedQuestion,
+          sanitizedQuestion: res.data.sanitizedQuestion,
         });
       })
       .catch();
