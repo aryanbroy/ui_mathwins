@@ -24,9 +24,11 @@ import {
   finalSubmission as finalInstantSubmission,
 } from '@/lib/api/instantTournament';
 import ScoreSubmitScreen from '@/components/ScoreSubmitScreen';
+import ResultPopup from '@/components/QuestionScreen/ResultPopup';
 
 type sanitizedQuestionType = {
   id: string;
+  questionIndex: number;
   expression: string;
   kthDigit: number;
   level: number;
@@ -102,6 +104,8 @@ export default function QuestionScreen() {
   const [screenState, setScreenState] = useState('playing');
   const [currentScore, setCurrentScore] = useState<number>(0);
 
+  const [showPopup, setShowPopup] = useState(false);
+
   const [isSubmittingSession, setIsSubmittingSession] =
     useState<boolean>(false);
   const questionStartRemainingRef = useRef<number>(0);
@@ -163,7 +167,7 @@ export default function QuestionScreen() {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // EMPTY deps
+  }, []); 
 
   // Timer Functions
   // useEffect(() => {
@@ -508,33 +512,27 @@ const startGlitchEffect = () => {
   glitchCycle();
 };
 
-
-  // Replace the stopBlinking function with this:
-  const stopBlinking = () => {
-    blinkAnims.forEach(anim => {
-      anim.stopAnimation();
-      anim.setValue(1);
-    });
-  };
+const stopBlinking = () => {
+  blinkAnims.forEach(anim => {
+    anim.stopAnimation();
+    anim.setValue(1);
+  });
+};
 
   const handleSelect = (value: number) => {
     if (!isChecking && !showResult && !disabledOptions.includes(value)) {
       setAnswer(value);
-      console.log('Selected answer:', value);
+      console.log('Selected answer:', value, " - answer : ", answer);
+      setTimeout(() => {
+        handleSubmit(value);
+      }, 300);
+    } else {
+      console.log("noo");
+      
     }
   };
 
-  // Submit Answer
-  // handleSubmitSolo
-  // handleSubmitDaily
-  // handleSubmitInsatnt
-  // if (params) {
-  //   handleSubmitSolo || handleSubmitDaily || handleSubmitInsatnt
-  // }
-
-  // handleSubmitSolo
-
-  const getApiFns = () => {
+  const getApiFns = (selectedAnswer: number) => {
     const timeTaken = getTimeTaken();
 
     switch (session.sessionType) {
@@ -544,7 +542,7 @@ const startGlitchEffect = () => {
             submitQuestion({
               dailyTournamentSessionId: session.sessionId,
               questionId: sanitizedQuestion.id,
-              answer: answer!,
+              answer: selectedAnswer!,
               timeTaken,
             }),
         };
@@ -567,7 +565,7 @@ const startGlitchEffect = () => {
             nextQuestion({
               soloSessionId: session.sessionId,
               questionId: sanitizedQuestion.id,
-              userAnswer: answer!,
+              userAnswer: selectedAnswer!,
               sessionType: SessionType.SOLO,
               time: timeTaken,
             }),
@@ -575,11 +573,11 @@ const startGlitchEffect = () => {
     }
   };
 
-  const handleSubmit = async () => {
-    if (answer === null) {
-      alert('Please select an answer');
-      return;
-    }
+  const handleSubmit = async (selectedAnswer: number) => {
+    // if (answer === null) {
+    //   alert('Please select an answer');
+    //   return;
+    // }
 
     if (
       session.sessionType === SessionType.DAILY ||
@@ -595,15 +593,15 @@ const startGlitchEffect = () => {
     // startBlinking();
     // startSlotMachineEffect();
     // startWaveEffect();
-    // startPulseWave();
-    startGlitchEffect();
+    startPulseWave();
+    // startGlitchEffect();
 
     const timeTaken = getTimeTaken();
     console.log('Time taken (ms):', timeTaken);
 
     setLoading(true);
 
-    const { nextQuestionFn } = getApiFns();
+    const { nextQuestionFn } = getApiFns(selectedAnswer);
     console.log('submitting a question');
 
     nextQuestionFn()
@@ -614,6 +612,7 @@ const startGlitchEffect = () => {
         setShowResult(true);
         console.log('Response: ', response);
         console.log('answer: ', answer);
+        setShowPopup(true);
 
         if (response.data.success) {
           if (
@@ -630,6 +629,7 @@ const startGlitchEffect = () => {
             }, 1200);
           } else if (session.sessionType === SessionType.SOLO) {
             setTimeout(() => {
+              setShowPopup(false);
               if (response.data.isRoundCompleted) {
                 setRound(response.data.roundNumber + 1);
                 console.log('response :- ', response);
@@ -649,6 +649,7 @@ const startGlitchEffect = () => {
           }
         } else {
           setTimeout(() => {
+            setShowPopup(false);
             navigation.navigate('HomeMain');
           }, 1500);
         }
@@ -764,7 +765,7 @@ const startGlitchEffect = () => {
               <View style={styles.detailsBox}>
                 <View style={styles.questionMeta}>
                   <Text style={styles.questionNumber}>
-                    Q : <Text>{round}</Text>
+                    Q : <Text>{sanitizedQuestion.questionIndex}</Text>
                   </Text>
                   <Text style={styles.questionLevel}>
                     Level : <Text>{sanitizedQuestion.level}</Text>
@@ -889,6 +890,7 @@ const startGlitchEffect = () => {
                 </TouchableOpacity>
               </View>
 
+              {/* 
               <TouchableOpacity
                 style={[
                   styles.nextBtn,
@@ -906,8 +908,17 @@ const startGlitchEffect = () => {
                     : showResult
                       ? 'Next Question...'
                       : 'Submit Answer'}
-                </Text>
+                </Text> 
               </TouchableOpacity>
+              */}
+              <ResultPopup
+                visible={showPopup}
+                isCorrect={answer === correctAnswer}
+                correctAnswer={correctAnswer ?? 0}
+                userAnswer={answer}
+                onClose={() => setShowPopup(false)}
+                colors={colors}
+              />
             </SafeAreaView>
           </LinearGradient>
         );

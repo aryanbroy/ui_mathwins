@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {View,Text,TextInput,StyleSheet,TouchableOpacity,Pressable,StatusBar} from "react-native";
+import {View,Text,TextInput,StyleSheet,TouchableOpacity,Pressable,StatusBar, ScrollView} from "react-native";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,10 +7,10 @@ import * as WebBrowser from "expo-web-browser"
 import * as Google from "expo-auth-session/providers/google"
 import { useAuth } from "../context/authContext";
 import useAppTheme from "@/context/useAppTheme";
-import BackgroundTexture from "@/components/Texture/BackgroundTexture";
 import type { ColorScheme } from "@/context/useAppTheme";
 import { useNavigation } from "expo-router";
 import { HomeScreenNavigationProp } from "@/types/tabTypes";
+import BackgroundTextTexture from "@/components/Texture/BackgroundTextTexture";
 
 type UserData = {
     name?: string;
@@ -87,8 +87,8 @@ export default function LoginScreen() {
         style={styles.gradient}
       >
         <SafeAreaView style={styles.safe}>
-          <BackgroundTexture />
-          <StatusBar barStyle={colors.statusBarStyle} />
+          <BackgroundTextTexture></BackgroundTextTexture>
+          {/* <StatusBar barStyle={colors.statusBarStyle} /> */}
 
           <View style={styles.topSection}>
             <View style={styles.headerTextContainer}>
@@ -114,6 +114,12 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.card}>
+            <ScrollView
+              style={styles.scroll}
+              bounces={false}
+              alwaysBounceVertical={false}
+              showsVerticalScrollIndicator={false}
+            >
             <LinearGradient
               colors={colors.gradients.surface}
               start={{ x: 0, y: 0 }}
@@ -177,6 +183,17 @@ export default function LoginScreen() {
                 <View style={styles.dividerLine} />
               </View>
 
+              <View style={styles.fieldGroup}>
+                <Text style={styles.label}>Enter Referal Code</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="xxx xxx"
+                  placeholderTextColor={colors.textMuted}
+                  keyboardType="phone-pad"
+                  value={phone}
+                  onChangeText={setPhone}
+                />
+              </View>
               <TouchableOpacity
                 style={styles.googleButton}
                 onPress={handleGoogleSignIn}
@@ -187,6 +204,7 @@ export default function LoginScreen() {
                 <Text style={styles.googleText}>Continue with Google</Text>
               </TouchableOpacity>
             </LinearGradient>
+            </ScrollView>
           </View>
         </SafeAreaView>
       </LinearGradient>
@@ -197,6 +215,9 @@ const CARD_RADIUS = 20;
 const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     gradient: {
+      flex: 1,
+    },
+    scroll: { 
       flex: 1,
     },
     gradient2: {
@@ -210,7 +231,7 @@ const makeStyles = (colors: ColorScheme) =>
       flex: 1,
     },
     topSection: {
-      flex: 1,
+      height: 350,
     },
     headerTextContainer: {
       flex: 1,
@@ -258,23 +279,25 @@ const makeStyles = (colors: ColorScheme) =>
     },
 
     card: {
-      flex: 1.4,
+      flex: 1,
       shadowColor: colors.shadow,
       shadowOpacity: 0.12,
       shadowRadius: 10,
       elevation: 4,
+      width: "100%",
+      bottom: 0,
+      position: "absolute"
     },
-
     tabRow: {
       flexDirection: "row",
-      marginBottom: 60,
+      marginBottom: 40,
     },
     tabButton: {
       flex: 1,
       paddingVertical: 12,
       borderRadius: 10,
       alignItems: "center",
-      marginRight: 12,
+      // marginRight: 12,
     },
     tabButtonActive: {
       backgroundColor: colors.primary,
@@ -289,7 +312,7 @@ const makeStyles = (colors: ColorScheme) =>
     },
 
     fieldGroup: {
-      marginBottom: 60,
+      marginBottom: 20,
     },
     label: {
       fontSize: 14,
@@ -349,7 +372,7 @@ const makeStyles = (colors: ColorScheme) =>
       shadowOpacity: 0.05,
       shadowRadius: 8,
       elevation: 2,
-      marginBottom: 16,
+      marginBottom: 60,
     },
     googleIcon: {
       width: 26,

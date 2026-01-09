@@ -22,18 +22,22 @@ export default function Rewards() {
       end={{ x: 0, y: 1 }}
       style={styles.gradient}
     >
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+      <ScrollView 
+      bounces={false}
+      alwaysBounceVertical={false}
+      showsVerticalScrollIndicator={false}
+      style={styles.scrollView} 
+      contentContainerStyle={styles.scrollContent}>
       <SafeAreaView style={styles.safe}>
-          <BackgroundTextTexture></BackgroundTextTexture>
           <View style={styles.adArea1}>
-            ad here
+            <Text>ad here</Text>
           </View>
           <View style={styles.screen}>
             <Text style={styles.headerTitle}>YOUR REWARDS</Text>
             <Text style={styles.headerSubtitle}>Guess what you have earned !!</Text>
           </View>
           <LinearGradient
-            colors={["#FFB8C4", "#9087E5"]}
+            colors={colors.gradients.surface}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
             style={styles.gradient2}
@@ -100,7 +104,7 @@ export default function Rewards() {
             </View>
           </LinearGradient>
           <View style={styles.adArea2}>
-            ad here
+            <Text>ad here</Text>
           </View>
       </SafeAreaView>
       </ScrollView>
@@ -117,10 +121,10 @@ const makeStyles = (colors: ColorScheme) =>
     gradient2: {
       width: "100%",
       flex: 1,
-      borderRadius: 20,
+      borderTopEndRadius: 10,
+      borderTopLeftRadius: 10,
       paddingHorizontal: 10,
       paddingVertical: 20,
-      marginBottom: 20,
     },
     scrollView: {
       flex: 1,
@@ -151,7 +155,7 @@ const makeStyles = (colors: ColorScheme) =>
       marginTop: 20,
     },
     headerSubtitle: {
-      fontSize: 15,
+      fontSize: 12,
       color: colors.textSecondary,
       textAlign: 'center',
       marginBottom: 40,
@@ -173,7 +177,7 @@ const makeStyles = (colors: ColorScheme) =>
       paddingHorizontal: 10,
       paddingVertical: 20,
       borderRadius: 20,
-      backgroundColor: colors.bg,
+      backgroundColor: colors.card,
       flex: 1,
       gap: 0,
       flexDirection: 'row',
@@ -245,7 +249,7 @@ const makeStyles = (colors: ColorScheme) =>
       alignItems: 'center',
       justifyContent: 'space-between',
       gap: 10,
-      backgroundColor: colors.bg,
+      backgroundColor: colors.card,
     },
     dailyLoginContent: {
       flexDirection: 'row',
@@ -265,8 +269,6 @@ const makeStyles = (colors: ColorScheme) =>
       paddingHorizontal: 20,
       paddingVertical: 10,
       borderRadius: 10,
-      borderWidth: 2,
-      borderColor: colors.text,
     },
     claimButtonText: {
       fontSize: 15,
@@ -274,7 +276,7 @@ const makeStyles = (colors: ColorScheme) =>
       color: colors.textSecondary,
     },
     coinsCard: {
-      backgroundColor: colors.bg,
+      backgroundColor: colors.card,
       borderRadius: 20,
       padding: 20,
       marginBottom: 24,
@@ -324,8 +326,7 @@ const makeStyles = (colors: ColorScheme) =>
       paddingHorizontal: 30,
       borderRadius: 10,
       alignSelf: 'center',
-      borderWidth: 2,
-      borderColor: "#000",
+      marginVertical: 20,
     },
     historyButtonText: {
       fontSize: 16,
@@ -333,7 +334,6 @@ const makeStyles = (colors: ColorScheme) =>
       color: '#FFF',
     },
     adArea2: {
-      marginTop: 10,
       backgroundColor: "#a1a1a1",
       width: "100%",
       height: 200,

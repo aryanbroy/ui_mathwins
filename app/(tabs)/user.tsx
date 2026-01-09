@@ -11,7 +11,7 @@ import { HomeScreenNavigationProp } from '@/types/tabTypes';
 
 export default function UserProfileScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const { userToken, user } = useAuth();
+  const { userToken, user, logout } = useAuth();
   // const decoded = Jwt.verify(userToken, 'super-secret-key-change-this');
   console.log("userT : ",userToken);
   console.log("user : ",user);
@@ -108,6 +108,51 @@ export default function UserProfileScreen() {
                 />
               </View>
 
+
+              {/* Sound Effect */}
+              <View style={styles.row}>
+                <View style={styles.rowLeft}>
+                  <Feather name="sun" size={22} style={styles.rowIcon} />
+                  <Text style={styles.rowLabel}>Sound Effect</Text>
+                </View>
+
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={setNotificationsEnabled}
+                  trackColor={{
+                    false: colors.controls.switchTrackOff,
+                    true: colors.controls.switchTrackOn,
+                  }}
+                  thumbColor={
+                    notificationsEnabled
+                      ? colors.controls.switchThumbOn
+                      : colors.controls.switchThumbOff
+                  }
+                />
+              </View>
+              
+              {/* Haptics */}
+              <View style={styles.row}>
+                <View style={styles.rowLeft}>
+                  <Feather name="sun" size={22} style={styles.rowIcon} />
+                  <Text style={styles.rowLabel}>Haptics</Text>
+                </View>
+
+                <Switch
+                  value={notificationsEnabled}
+                  onValueChange={setNotificationsEnabled}
+                  trackColor={{
+                    false: colors.controls.switchTrackOff,
+                    true: colors.controls.switchTrackOn,
+                  }}
+                  thumbColor={
+                    notificationsEnabled
+                      ? colors.controls.switchThumbOn
+                      : colors.controls.switchThumbOff
+                  }
+                />
+              </View>
+              
               {/* Dark Mode */}
               <View style={styles.row}>
                 <View style={styles.rowLeft}>
@@ -178,12 +223,11 @@ export default function UserProfileScreen() {
               </TouchableOpacity>
 
               {/* Logout */}
-              <TouchableOpacity style={styles.row}>
+              <TouchableOpacity style={styles.row} onPress={logout}>
                 <View style={styles.rowLeft}>
                   <MaterialIcons name="logout" size={22} style={styles.rowIcon} />
                   <Text style={styles.rowLabel}>Logout</Text>
                 </View>
-                <Entypo name="chevron-right" size={18} color={colors.textMuted} />
               </TouchableOpacity>
             </View>
           </LinearGradient>
