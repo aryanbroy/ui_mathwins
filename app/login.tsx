@@ -114,17 +114,17 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.card}>
-            <ScrollView
-              style={styles.scroll}
-              bounces={false}
-              alwaysBounceVertical={false}
-              showsVerticalScrollIndicator={false}
-            >
             <LinearGradient
               colors={colors.gradients.surface}
               start={{ x: 0, y: 0 }}
               end={{ x: 0, y: 1 }}
               style={styles.gradient2}
+            >
+            <ScrollView
+              style={styles.scroll}
+              bounces={false}
+              alwaysBounceVertical={false}
+              showsVerticalScrollIndicator={false}
             >
               <View style={styles.tabRow}>
                 <Pressable
@@ -203,8 +203,8 @@ export default function LoginScreen() {
                 </View>
                 <Text style={styles.googleText}>Continue with Google</Text>
               </TouchableOpacity>
-            </LinearGradient>
             </ScrollView>
+            </LinearGradient>
           </View>
         </SafeAreaView>
       </LinearGradient>
@@ -217,21 +217,21 @@ const makeStyles = (colors: ColorScheme) =>
     gradient: {
       flex: 1,
     },
-    scroll: { 
-      flex: 1,
-    },
-    gradient2: {
-      flex: 1,
-      paddingHorizontal: 24,
-      paddingTop: 24,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-    },
     safe: {
       flex: 1,
     },
     topSection: {
-      height: 350,
+      height: "35%",
+      justifyContent: "center",
+    },
+    gradient2: {
+      flex: 1,
+      paddingHorizontal: 20,
+      paddingTop: 24,
+      paddingBottom: 32,
+    },
+    scroll: {
+      paddingBottom: 40,
     },
     headerTextContainer: {
       flex: 1,
@@ -240,12 +240,12 @@ const makeStyles = (colors: ColorScheme) =>
     title: {
       fontSize: 32,
       fontWeight: "800",
-      marginBottom: 10,
       textAlign: "center",
       color: colors.textOnPrimary,
     },
     subtitle: {
       fontSize: 14,
+      marginBottom: 20,
       textAlign: "center",
       color: colors.textOnPrimary,
     },
@@ -284,20 +284,20 @@ const makeStyles = (colors: ColorScheme) =>
       shadowOpacity: 0.12,
       shadowRadius: 10,
       elevation: 4,
-      width: "100%",
-      bottom: 0,
-      position: "absolute"
+      overflow: "hidden",
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
     },
     tabRow: {
       flexDirection: "row",
       marginBottom: 40,
+      // backgroundColor: "#1a1a1a"
     },
     tabButton: {
       flex: 1,
       paddingVertical: 12,
       borderRadius: 10,
       alignItems: "center",
-      // marginRight: 12,
     },
     tabButtonActive: {
       backgroundColor: colors.primary,
