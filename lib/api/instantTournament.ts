@@ -7,8 +7,7 @@ import {
   submitQuestionResponse,
 } from '@/types/api/instant';
 import { api } from './client';
-import { parseApiError } from './parseApiError';
-import axios from 'axios';
+import { ApiHandledError, parseApiError } from './parseApiError';
 
 export const joinOrCreateTournament = async () => {
   try {
@@ -18,8 +17,8 @@ export const joinOrCreateTournament = async () => {
     return data;
   } catch (err: any) {
     console.log('error joining tournamnet: ', err);
-    const msg = parseApiError(err);
-    throw new Error(msg);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
   }
 };
 
@@ -37,8 +36,8 @@ export const fetchTournamentPlayers = async (tournamentId: string) => {
     return { playersCount, firstFivePlayers };
   } catch (err: any) {
     console.log('error fetching players: ', err);
-    const msg = parseApiError(err);
-    throw new Error(msg);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
   }
 };
 
@@ -56,8 +55,8 @@ export const startInstantSession = async (roomId: string) => {
     const { question, session } = resData.data;
     return { question, session };
   } catch (err: any) {
-    const msg = parseApiError(err);
-    throw new Error(msg);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
   }
 };
 
@@ -82,8 +81,8 @@ export const submitQuestion = async (
     return resData;
   } catch (err: any) {
     console.log(err);
-    const msg = parseApiError(err);
-    throw new Error(msg);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
   }
 };
 
@@ -100,8 +99,8 @@ export const finalSubmission = async (sessionId: string) => {
     const sessionData = resData.data.session;
     return sessionData;
   } catch (err: any) {
-    const msg = parseApiError(err);
-    throw new Error(msg);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
   }
 };
 
@@ -116,7 +115,7 @@ export const fetchPastTournaments = async () => {
     return data;
   } catch (err: any) {
     console.log('Error fetching past tournaments: ', err);
-    const msg = parseApiError(err);
-    throw new Error(msg);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
   }
 };

@@ -1,19 +1,47 @@
-import BackgroundTextTexture from '@/components/Texture/BackgroundTextTexture';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
+import { ErrObject } from '@/lib/api/parseApiError';
+import { claimDailyReward } from '@/lib/api/rewards';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from 'expo-router';
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function Rewards() {
-  const [ coins, setCoins ] = useState(3500);
-  const [ maxCoins, setMaxCoins ] = useState(5000);
-  const [ today, setToday ] = useState(5);
+  const [coins, setCoins] = useState(3500);
+  const [maxCoins, setMaxCoins] = useState(5000);
+  const [today, setToday] = useState(5);
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
+  const [err, setErr] = useState<ErrObject | null>(null);
+  const [isClaimBtnLoading, setIsClaimBtnLoading] = useState<boolean>(false);
+
+  const claimBtnPress = async () => {
+    console.log('claim btn pressed');
+    setIsClaimBtnLoading(true);
+    try {
+      const response = await claimDailyReward();
+      console.log('Daily reward: ', response);
+    } catch (err: any) {
+      const errObj: ErrObject = {
+        status: err?.status ?? 500,
+        message: err?.message ?? 'Failed to claim reward',
+      };
+      console.log(errObj);
+      setErr(errObj);
+    } finally {
+      setIsClaimBtnLoading(false);
+    }
+  };
 
   return (
     <LinearGradient
@@ -22,18 +50,25 @@ export default function Rewards() {
       end={{ x: 0, y: 1 }}
       style={styles.gradient}
     >
-      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
-      <SafeAreaView style={styles.safe}>
-          <BackgroundTextTexture></BackgroundTextTexture>
+      <ScrollView
+        bounces={false}
+        alwaysBounceVertical={false}
+        showsVerticalScrollIndicator={false}
+        style={styles.scrollView}
+        contentContainerStyle={styles.scrollContent}
+      >
+        <SafeAreaView style={styles.safe}>
           <View style={styles.adArea1}>
-            ad here
+            <Text>ad here</Text>
           </View>
           <View style={styles.screen}>
             <Text style={styles.headerTitle}>YOUR REWARDS</Text>
-            <Text style={styles.headerSubtitle}>Guess what you have earned !!</Text>
+            <Text style={styles.headerSubtitle}>
+              Guess what you have earned !!
+            </Text>
           </View>
           <LinearGradient
-            colors={["#FFB8C4", "#9087E5"]}
+            colors={colors.gradients.surface}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
             style={styles.gradient2}
@@ -55,16 +90,10 @@ export default function Rewards() {
                             style={[
                               styles.streakDay,
                               day === today && styles.streakDayActive,
-                              day === today+1 && styles.streakDayNext,
+                              day === today + 1 && styles.streakDayNext,
                             ]}
                           >
-                            <Text
-                              style={[
-                                styles.streakDayText,
-                              ]}
-                            >
-                              {day}
-                            </Text>
+                            <Text style={[styles.streakDayText]}>{day}</Text>
                           </View>
                           {day < 7 && <View style={styles.streakConnector} />}
                         </View>
@@ -78,31 +107,49 @@ export default function Rewards() {
                   <Text style={styles.calendarIcon}>📅</Text>
                   <Text style={styles.dailyLoginText}>DAILY LOGIN REWARD</Text>
                 </View>
-                <TouchableOpacity style={styles.claimButton}>
-                  <Text style={styles.claimButtonText}>CLAIM</Text>
+                <TouchableOpacity
+                  style={styles.claimButton}
+                  onPress={claimBtnPress}
+                >
+                  {isClaimBtnLoading ? (
+                    <ActivityIndicator />
+                  ) : (
+                    <Text style={styles.claimButtonText}>CLAIM</Text>
+                  )}
                 </TouchableOpacity>
               </View>
               <View style={styles.coinsCard}>
                 <View style={styles.progressBarContainer}>
-                  <View style={[styles.progressBarFill, { width: `${(coins / maxCoins) * 100}%` }]} />
+                  <View
+                    style={[
+                      styles.progressBarFill,
+                      { width: `${(coins / maxCoins) * 100}%` },
+                    ]}
+                  />
                 </View>
                 <View style={styles.coinsInfo}>
                   <Text style={styles.coinIcon}>🪙</Text>
-                  <Text style={styles.coinsText}>{coins}/{maxCoins} COINS</Text>
+                  <Text style={styles.coinsText}>
+                    {coins}/{maxCoins} COINS
+                  </Text>
                 </View>
                 <TouchableOpacity style={styles.redeemButton}>
-                  <Text style={styles.redeemButtonText}>REDEEM YOUR REWARDS</Text>
+                  <Text style={styles.redeemButtonText}>
+                    REDEEM YOUR REWARDS
+                  </Text>
                 </TouchableOpacity>
               </View>
               <TouchableOpacity style={styles.historyButton}>
-                <Text style={styles.historyButtonText}>View Reward history</Text>
+                <Text style={styles.historyButtonText}>
+                  View Reward history
+                </Text>
               </TouchableOpacity>
             </View>
           </LinearGradient>
           <View style={styles.adArea2}>
-            ad here
+            <Text>ad here</Text>
           </View>
-      </SafeAreaView>
+        </SafeAreaView>
       </ScrollView>
     </LinearGradient>
   );
@@ -111,16 +158,15 @@ export default function Rewards() {
 const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     gradient: {
-      width: "100%",
+      width: '100%',
       flex: 1,
     },
     gradient2: {
-      width: "100%",
-      flex: 1,
-      borderRadius: 20,
+      width: '100%',
+      borderTopEndRadius: 10,
+      borderTopLeftRadius: 10,
       paddingHorizontal: 10,
       paddingVertical: 20,
-      marginBottom: 20,
     },
     scrollView: {
       flex: 1,
@@ -129,18 +175,15 @@ const makeStyles = (colors: ColorScheme) =>
       paddingBottom: 20,
     },
     safe: {
-      width: "100%",
-      height: "100%",
-      display: "flex",
-      alignItems: "center",
+      width: '100%',
     },
     screen: {
-      width: "100%",
+      width: '100%',
     },
     adArea1: {
       marginBottom: 10,
-      backgroundColor: "#a1a1a1",
-      width: "100%",
+      backgroundColor: '#a1a1a1',
+      width: '100%',
       height: 50,
     },
     headerTitle: {
@@ -151,34 +194,34 @@ const makeStyles = (colors: ColorScheme) =>
       marginTop: 20,
     },
     headerSubtitle: {
-      fontSize: 15,
+      fontSize: 12,
       color: colors.textSecondary,
       textAlign: 'center',
       marginBottom: 40,
     },
     box: {
-      width: "100%",
-      overflow: "hidden",
+      width: '100%',
+      overflow: 'hidden',
       borderRadius: 20,
       // paddingHorizontal: 10,
       // backgroundColor: "#ff0000ff"
     },
     streakCard: {
       // backgroundColor: '#FFF',
-      maxWidth: "100%",
-      minWidth: "100%",
+      maxWidth: '100%',
+      minWidth: '100%',
       marginBottom: 16,
     },
     streakContent: {
       paddingHorizontal: 10,
       paddingVertical: 20,
       borderRadius: 20,
-      backgroundColor: colors.bg,
+      backgroundColor: colors.card,
       flex: 1,
       gap: 0,
       flexDirection: 'row',
-      alignItems: "center",
-      justifyContent: "space-between"
+      alignItems: 'center',
+      justifyContent: 'space-between',
     },
     emojiBox: {
       width: 50,
@@ -189,7 +232,7 @@ const makeStyles = (colors: ColorScheme) =>
     },
     streakTextContainer: {
       flex: 1,
-      alignItems: "flex-end"
+      alignItems: 'flex-end',
     },
     streakTitle: {
       fontSize: 14,
@@ -210,7 +253,7 @@ const makeStyles = (colors: ColorScheme) =>
     streakDay: {
       width: 30,
       height: 30,
-      borderRadius: "100%",
+      borderRadius: '100%',
       backgroundColor: '#E5E7EB',
       alignItems: 'center',
       justifyContent: 'center',
@@ -236,20 +279,20 @@ const makeStyles = (colors: ColorScheme) =>
       marginHorizontal: 2,
     },
     dailyLoginCard: {
-      // minWidth: "100%",
       borderRadius: 20,
       padding: 20,
       marginBottom: 16,
-      flex: 1,
+      minHeight: 80,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
-      gap: 10,
-      backgroundColor: colors.bg,
+      backgroundColor: colors.card,
     },
     dailyLoginContent: {
       flexDirection: 'row',
       alignItems: 'center',
+      gap: 10,
+      flexShrink: 1,
     },
     calendarIcon: {
       fontSize: 30,
@@ -259,14 +302,18 @@ const makeStyles = (colors: ColorScheme) =>
       fontSize: 16,
       fontWeight: 'bold',
       color: colors.text,
+      flexShrink: 1,
+      lineHeight: 22,
     },
     claimButton: {
       backgroundColor: '#FF6B9D',
-      paddingHorizontal: 20,
-      paddingVertical: 10,
-      borderRadius: 10,
-      borderWidth: 2,
-      borderColor: colors.text,
+      paddingHorizontal: 22,
+      // paddingVertical: 12,
+      borderRadius: 12,
+      height: 44,
+      minWidth: 90,
+      alignItems: 'center',
+      justifyContent: 'center',
     },
     claimButtonText: {
       fontSize: 15,
@@ -274,7 +321,7 @@ const makeStyles = (colors: ColorScheme) =>
       color: colors.textSecondary,
     },
     coinsCard: {
-      backgroundColor: colors.bg,
+      backgroundColor: colors.card,
       borderRadius: 20,
       padding: 20,
       marginBottom: 24,
@@ -324,8 +371,7 @@ const makeStyles = (colors: ColorScheme) =>
       paddingHorizontal: 30,
       borderRadius: 10,
       alignSelf: 'center',
-      borderWidth: 2,
-      borderColor: "#000",
+      marginVertical: 20,
     },
     historyButtonText: {
       fontSize: 16,
@@ -333,9 +379,8 @@ const makeStyles = (colors: ColorScheme) =>
       color: '#FFF',
     },
     adArea2: {
-      marginTop: 10,
-      backgroundColor: "#a1a1a1",
-      width: "100%",
+      backgroundColor: '#a1a1a1',
+      width: '100%',
       height: 200,
-    }
+    },
   });
