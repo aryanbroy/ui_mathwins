@@ -8,6 +8,12 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { continueSolo } from '@/lib/api/soloTournament';
 import { quitSolo } from '@/lib/api/soloTournament';
 import LeaderboardCard from '@/components/Home/LeaderboardCard';
+import { parseApiError } from '@/lib/api/parseApiError';
+
+export enum SessionType {
+  SOLO = 'solo',
+  DAILY = 'daily',
+}
 
 type continueParams = {
   userId: string;
@@ -56,8 +62,9 @@ export default function roundOverview() {
     points: 1380,
     medalColor: null,
   }];
-  const sessionDetails = route.params.sessionDetails as continueParams;
+  const sessionDetails = route.params.params as continueParams;
   // const [ sessionDetails, setSessionDetails ] = useState({
+  //   bankedPoint: 4,
   //   userId: "787878787878",
   //   soloSessionId: "4545454545",
   // });
@@ -94,25 +101,29 @@ export default function roundOverview() {
     console.log("Quit Clicked");
     // navigation.navigate('HomeMain');
     const payload = {
-      soloSessionId: sessionDetails.sessionId,
+      sessionId: sessionDetails.sessionId,
+      sessionType: SessionType.SOLO,
     }
     quitSolo(payload)
-      .then((response)=>{
-        console.log("response continue : ",response);
-        navigation.navigate('HomeMain');
-      }).catch((err)=>{
-        console.log(err);
-      });
+    .then((response)=>{
+      console.log("response continue : ",response);
+      navigation.navigate('HomeMain');
+    }).catch((err)=>{
+      console.log(err);
+    });
   }
   function handleContinue(){
     console.log("Continue Clicked");
     const payload = {
-      soloSessionId: sessionDetails.sessionId,
+      sessionType: SessionType.SOLO,
+      sessionId: sessionDetails.sessionId,
     }
+    console.log("continue : ",payload);
+    
     continueSolo(payload)
       .then((response)=>{
         console.log("response continue : ",response);
-        navigation.navigate('Question',{ session: sessionDetails, sanitizedQuestion : response.questions })
+        navigation.navigate('Question',{ session: sessionDetails, sanitizedQuestion : response.data.questions })
       }).catch((err)=>{
         console.log(err);
       });
@@ -139,7 +150,8 @@ export default function roundOverview() {
             showGif ? 
             <View style={styles.gifContainer}>
               <Image
-                source={require('@/assets/images/Game_Win_GIF.gif')}
+                source={require('@/assets/images/icons8-coin.gif')}
+                // source={require('https://tenor.com/view/oytothe-world-coin-happy-hanukkah-raining-falling-gif-14463297')}
                 style={styles.gifImage}
                 resizeMode="contain"
               />
@@ -260,6 +272,7 @@ const makeStyles = (colors: ColorScheme) =>
     gifImage: {
       width: 120,
       height: 120,
+      borderRadius: "100%",
       marginBottom: 16,
     },
     loadingText: {

@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           }
           await getUser(payload).then((response)=>{
             console.log("response :- ",response);
-            setUser(response);
+            setUser(response.data);
             console.log("after setUser ", user);
             
           });

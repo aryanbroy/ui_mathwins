@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import {View,Text,TextInput,StyleSheet,TouchableOpacity,Pressable,StatusBar} from "react-native";
+import {View,Text,TextInput,StyleSheet,TouchableOpacity,Pressable,StatusBar, ScrollView} from "react-native";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -7,10 +7,10 @@ import * as WebBrowser from "expo-web-browser"
 import * as Google from "expo-auth-session/providers/google"
 import { useAuth } from "../context/authContext";
 import useAppTheme from "@/context/useAppTheme";
-import BackgroundTexture from "@/components/Texture/BackgroundTexture";
 import type { ColorScheme } from "@/context/useAppTheme";
 import { useNavigation } from "expo-router";
 import { HomeScreenNavigationProp } from "@/types/tabTypes";
+import BackgroundTextTexture from "@/components/Texture/BackgroundTextTexture";
 
 type UserData = {
     name?: string;
@@ -87,8 +87,8 @@ export default function LoginScreen() {
         style={styles.gradient}
       >
         <SafeAreaView style={styles.safe}>
-          <BackgroundTexture />
-          <StatusBar barStyle={colors.statusBarStyle} />
+          <BackgroundTextTexture></BackgroundTextTexture>
+          {/* <StatusBar barStyle={colors.statusBarStyle} /> */}
 
           <View style={styles.topSection}>
             <View style={styles.headerTextContainer}>
@@ -119,6 +119,12 @@ export default function LoginScreen() {
               start={{ x: 0, y: 0 }}
               end={{ x: 0, y: 1 }}
               style={styles.gradient2}
+            >
+            <ScrollView
+              style={styles.scroll}
+              bounces={false}
+              alwaysBounceVertical={false}
+              showsVerticalScrollIndicator={false}
             >
               <View style={styles.tabRow}>
                 <Pressable
@@ -177,6 +183,17 @@ export default function LoginScreen() {
                 <View style={styles.dividerLine} />
               </View>
 
+              <View style={styles.fieldGroup}>
+                <Text style={styles.label}>Enter Referal Code</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder="xxx xxx"
+                  placeholderTextColor={colors.textMuted}
+                  keyboardType="phone-pad"
+                  value={phone}
+                  onChangeText={setPhone}
+                />
+              </View>
               <TouchableOpacity
                 style={styles.googleButton}
                 onPress={handleGoogleSignIn}
@@ -186,6 +203,7 @@ export default function LoginScreen() {
                 </View>
                 <Text style={styles.googleText}>Continue with Google</Text>
               </TouchableOpacity>
+            </ScrollView>
             </LinearGradient>
           </View>
         </SafeAreaView>
@@ -199,18 +217,21 @@ const makeStyles = (colors: ColorScheme) =>
     gradient: {
       flex: 1,
     },
-    gradient2: {
-      flex: 1,
-      paddingHorizontal: 24,
-      paddingTop: 24,
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
-    },
     safe: {
       flex: 1,
     },
     topSection: {
+      height: "35%",
+      justifyContent: "center",
+    },
+    gradient2: {
       flex: 1,
+      paddingHorizontal: 20,
+      paddingTop: 24,
+      paddingBottom: 32,
+    },
+    scroll: {
+      paddingBottom: 40,
     },
     headerTextContainer: {
       flex: 1,
@@ -219,12 +240,12 @@ const makeStyles = (colors: ColorScheme) =>
     title: {
       fontSize: 32,
       fontWeight: "800",
-      marginBottom: 10,
       textAlign: "center",
       color: colors.textOnPrimary,
     },
     subtitle: {
       fontSize: 14,
+      marginBottom: 20,
       textAlign: "center",
       color: colors.textOnPrimary,
     },
@@ -258,23 +279,25 @@ const makeStyles = (colors: ColorScheme) =>
     },
 
     card: {
-      flex: 1.4,
+      flex: 1,
       shadowColor: colors.shadow,
       shadowOpacity: 0.12,
       shadowRadius: 10,
       elevation: 4,
+      overflow: "hidden",
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
     },
-
     tabRow: {
       flexDirection: "row",
-      marginBottom: 60,
+      marginBottom: 40,
+      // backgroundColor: "#1a1a1a"
     },
     tabButton: {
       flex: 1,
       paddingVertical: 12,
       borderRadius: 10,
       alignItems: "center",
-      marginRight: 12,
     },
     tabButtonActive: {
       backgroundColor: colors.primary,
@@ -289,7 +312,7 @@ const makeStyles = (colors: ColorScheme) =>
     },
 
     fieldGroup: {
-      marginBottom: 60,
+      marginBottom: 20,
     },
     label: {
       fontSize: 14,
@@ -349,7 +372,7 @@ const makeStyles = (colors: ColorScheme) =>
       shadowOpacity: 0.05,
       shadowRadius: 8,
       elevation: 2,
-      marginBottom: 16,
+      marginBottom: 60,
     },
     googleIcon: {
       width: 26,

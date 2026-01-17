@@ -17,7 +17,7 @@ export const loginUser = async (params: userDetailsParams) => {
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
-    throw new Error(msg);
+    throw new Error(msg.message);
   }
 };
 export const getUser = async (params: tokenParams) => {
@@ -28,6 +28,6 @@ export const getUser = async (params: tokenParams) => {
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
-    throw new Error(msg);
+    throw new Error(msg.message);
   }
 };

@@ -162,7 +162,9 @@ const makeStyles = (colors: ColorScheme) =>
       flex: 1,
     },
     gradient2: {
+      // width: '100%',
       width: '100%',
+      flex: 1,
       borderTopEndRadius: 10,
       borderTopLeftRadius: 10,
       paddingHorizontal: 10,
@@ -286,6 +288,7 @@ const makeStyles = (colors: ColorScheme) =>
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      gap: 10,
       backgroundColor: colors.card,
     },
     dailyLoginContent: {
@@ -314,6 +317,9 @@ const makeStyles = (colors: ColorScheme) =>
       minWidth: 90,
       alignItems: 'center',
       justifyContent: 'center',
+      // paddingHorizontal: 20,
+      // paddingVertical: 10,
+      // borderRadius: 10,
     },
     claimButtonText: {
       fontSize: 15,

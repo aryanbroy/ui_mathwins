@@ -6,10 +6,10 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 export default function BackgroundTextTexture() {
     const { width } = Dimensions.get("window");
     const d = `
-    M 0 170
-    C 90 260, 260 330, 400 260
-    C 540 180, 660 20, 820 0
-  `;
+        M 0 170
+        C 90 260, 260 330, 400 260
+        C 540 180, 660 20, 820 0
+    `;
 
     return (
         <View style={styles.page}>
@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
         width: "100%",
         position: "absolute",
         paddingHorizontal: 10,
-        opacity: 0.1,
+        opacity: 0.04,
     },
     header: {
         marginBottom: 2,
@@ -121,12 +121,12 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
         paddingBottom: 10,
-        backgroundColor: "#FFF"
+        // backgroundColor: "#FFF"
     },
     mainText: {
         fontSize: 50,
         fontWeight: 900,
-        color: "#000",
+        color: "#FFF",
         position: "relative",
     },
 });

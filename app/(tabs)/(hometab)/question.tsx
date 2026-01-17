@@ -24,9 +24,11 @@ import {
   finalSubmission as finalInstantSubmission,
 } from '@/lib/api/instantTournament';
 import ScoreSubmitScreen from '@/components/ScoreSubmitScreen';
+import ResultPopup from '@/components/QuestionScreen/ResultPopup';
 
 type sanitizedQuestionType = {
   id: string;
+  questionIndex: number;
   expression: string;
   kthDigit: number;
   level: number;
@@ -34,12 +36,13 @@ type sanitizedQuestionType = {
 };
 
 type continueParams = {
+  sessionType: SessionType;
   userId: string;
   sessionId: string;
   bankedPoint: number;
 };
 
-const keypadLayout = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [9]];
+const keypadLayout = [[1, 2, 3], [4, 5, 6], [7, 8, 9], [0]];
 
 function getOrdinalSuffix(n: number) {
   const s = ['th', 'st', 'nd', 'rd'];
@@ -101,6 +104,8 @@ export default function QuestionScreen() {
   const [screenState, setScreenState] = useState('playing');
   const [currentScore, setCurrentScore] = useState<number>(0);
 
+  const [showPopup, setShowPopup] = useState(false);
+
   const [isSubmittingSession, setIsSubmittingSession] =
     useState<boolean>(false);
   const questionStartRemainingRef = useRef<number>(0);
@@ -138,7 +143,7 @@ export default function QuestionScreen() {
   };
 
   // Animation
-  const blinkAnim = useRef(new Animated.Value(1)).current;
+  // const blinkAnim = useRef(new Animated.Value(1)).current;
 
   const n = sanitizedQuestion.kthDigit;
   const ordinal = n + getOrdinalSuffix(n);
@@ -162,7 +167,7 @@ export default function QuestionScreen() {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // EMPTY deps
+  }, []); 
 
   // Timer Functions
   // useEffect(() => {
@@ -252,6 +257,7 @@ export default function QuestionScreen() {
   };
 
   const stopTimer = () => {
+    console.log("timer stop");
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -273,46 +279,260 @@ export default function QuestionScreen() {
   };
 
   // Animation Functions
-  const startBlinking = () => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(blinkAnim, {
-          toValue: 0.3,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-        Animated.timing(blinkAnim, {
-          toValue: 1,
-          duration: 300,
-          useNativeDriver: true,
-        }),
-      ])
-    ).start();
-  };
+  const blinkAnims = useRef(
+    Array.from({ length: 10 }, () => new Animated.Value(1))
+  ).current;
 
-  const stopBlinking = () => {
-    blinkAnim.stopAnimation();
-    blinkAnim.setValue(1);
+  // const startBlinking = () => {
+  //   // Stop any existing animations
+  //   blinkAnims.forEach(anim => anim.stopAnimation());
+    
+  //   // Create random blink animations for each number
+  //   blinkAnims.forEach((anim, index) => {
+  //     // Random delay before starting (0-800ms)
+  //     const startDelay = Math.random() * 800;
+      
+  //     // Random blink duration (200-500ms)
+  //     const blinkDuration = 200 + Math.random() * 300;
+      
+  //     // Random pause between blinks (100-400ms)
+  //     const pauseDuration = 100 + Math.random() * 300;
+      
+  //     // Random minimum opacity (0.2-0.5)
+  //     const minOpacity = 0.2 + Math.random() * 0.3;
+      
+  //     setTimeout(() => {
+  //       Animated.loop(
+  //         Animated.sequence([
+  //           // Fade out
+  //           Animated.timing(anim, {
+  //             toValue: minOpacity,
+  //             duration: blinkDuration,
+  //             useNativeDriver: true,
+  //           }),
+  //           // Fade in
+  //           Animated.timing(anim, {
+  //             toValue: 1,
+  //             duration: blinkDuration,
+  //             useNativeDriver: true,
+  //           }),
+  //           // Pause
+  //           Animated.delay(pauseDuration),
+  //         ])
+  //       ).start();
+  //     }, startDelay);
+  //   });
+  // };
+
+const startBlinking = () => {
+  blinkAnims.forEach(anim => {
+    anim.stopAnimation();
+    anim.setValue(1);
+  });
+  
+  blinkAnims.forEach((anim, index) => {
+    const startDelay = Math.random() * 800;
+    const blinkDuration = 200 + Math.random() * 300;
+    const pauseDuration = 100 + Math.random() * 300;
+    const minOpacity = 0.2 + Math.random() * 0.3;
+    
+    setTimeout(() => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, {
+            toValue: minOpacity,
+            duration: blinkDuration,
+            useNativeDriver: true,
+          }),
+          Animated.timing(anim, {
+            toValue: 1,
+            duration: blinkDuration,
+            useNativeDriver: true,
+          }),
+          Animated.delay(pauseDuration),
+        ])
+      ).start();
+    }, startDelay);
+  });
+};
+
+const startSlotMachineEffect = () => {
+  blinkAnims.forEach(anim => anim.stopAnimation());
+  
+  blinkAnims.forEach((anim, index) => {
+    const startDelay = Math.random() * 1000;
+    
+    setTimeout(() => {
+      Animated.loop(
+        Animated.sequence([
+          // Quick fade to very low
+          Animated.timing(anim, {
+            toValue: 0.1,
+            duration: 80,
+            useNativeDriver: true,
+          }),
+          // Pop back up
+          Animated.timing(anim, {
+            toValue: 1,
+            duration: 80,
+            useNativeDriver: true,
+          }),
+          // Stay visible
+          Animated.delay(Math.random() * 200 + 100),
+          // Quick fade again
+          Animated.timing(anim, {
+            toValue: 0.3,
+            duration: 120,
+            useNativeDriver: true,
+          }),
+          // Pop back
+          Animated.timing(anim, {
+            toValue: 1,
+            duration: 120,
+            useNativeDriver: true,
+          }),
+          // Random longer pause
+          Animated.delay(Math.random() * 500 + 200),
+        ])
+      ).start();
+    }, startDelay);
+  });
+};
+
+const startWaveEffect = () => {
+  blinkAnims.forEach(anim => anim.stopAnimation());
+  
+  blinkAnims.forEach((anim, index) => {
+    // Stagger based on position
+    const delay = index * 100;
+    
+    setTimeout(() => {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(anim, {
+            toValue: 0.2,
+            duration: 250,
+            useNativeDriver: true,
+          }),
+          Animated.timing(anim, {
+            toValue: 1,
+            duration: 250,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    }, delay);
+  });
+};
+
+const scaleAnims = useRef(
+  Array.from({ length: 10 }, () => new Animated.Value(1))
+).current;
+const startPulseWave = () => {
+  blinkAnims.forEach(anim => anim.stopAnimation());
+  scaleAnims.forEach(anim => anim.stopAnimation());
+  
+  blinkAnims.forEach((opacityAnim, index) => {
+    const scaleAnim = scaleAnims[index];
+    const delay = Math.random() * 1000;
+    
+    setTimeout(() => {
+      Animated.loop(
+        Animated.parallel([
+          Animated.sequence([
+            Animated.timing(opacityAnim, {
+              toValue: 0.3,
+              duration: 600,
+              useNativeDriver: true,
+            }),
+            Animated.timing(opacityAnim, {
+              toValue: 1,
+              duration: 600,
+              useNativeDriver: true,
+            }),
+          ]),
+          Animated.sequence([
+            Animated.timing(scaleAnim, {
+              toValue: 1.2,
+              duration: 600,
+              useNativeDriver: true,
+            }),
+            Animated.timing(scaleAnim, {
+              toValue: 1,
+              duration: 600,
+              useNativeDriver: true,
+            }),
+          ]),
+        ])
+      ).start();
+    }, delay);
+  });
+};
+
+const startGlitchEffect = () => {
+  blinkAnims.forEach(anim => anim.stopAnimation());
+  
+  const glitchCycle = () => {
+    // Random number of glitches (2-5)
+    const glitchCount = 2 + Math.floor(Math.random() * 4);
+    
+    for (let i = 0; i < glitchCount; i++) {
+      setTimeout(() => {
+        // Pick 2-4 random numbers to glitch
+        const targets = [];
+        const count = 2 + Math.floor(Math.random() * 3);
+        
+        for (let j = 0; j < count; j++) {
+          targets.push(Math.floor(Math.random() * 10));
+        }
+        
+        targets.forEach(index => {
+          const anim = blinkAnims[index];
+          const intensity = 0.1 + Math.random() * 0.4;
+          
+          Animated.sequence([
+            Animated.timing(anim, {
+              toValue: intensity,
+              duration: 30,
+              useNativeDriver: true,
+            }),
+            Animated.timing(anim, {
+              toValue: 1,
+              duration: 30,
+              useNativeDriver: true,
+            }),
+          ]).start();
+        });
+      }, i * 80);
+    }
+    
+    setTimeout(glitchCycle, 300 + Math.random() * 500);
   };
+  
+  glitchCycle();
+};
+
+const stopBlinking = () => {
+  blinkAnims.forEach(anim => {
+    anim.stopAnimation();
+    anim.setValue(1);
+  });
+};
 
   const handleSelect = (value: number) => {
     if (!isChecking && !showResult && !disabledOptions.includes(value)) {
       setAnswer(value);
-      console.log('Selected answer:', value);
+      console.log('Selected answer:', value, " - answer : ", answer);
+      setTimeout(() => {
+        handleSubmit(value);
+      }, 300);
+    } else {
+      console.log("noo");
+      
     }
   };
 
-  // Submit Answer
-  // handleSubmitSolo
-  // handleSubmitDaily
-  // handleSubmitInsatnt
-  // if (params) {
-  //   handleSubmitSolo || handleSubmitDaily || handleSubmitInsatnt
-  // }
-
-  // handleSubmitSolo
-
-  const getApiFns = () => {
+  const getApiFns = (selectedAnswer: number) => {
     const timeTaken = getTimeTaken();
 
     switch (session.sessionType) {
@@ -322,7 +542,7 @@ export default function QuestionScreen() {
             submitQuestion({
               dailyTournamentSessionId: session.sessionId,
               questionId: sanitizedQuestion.id,
-              answer: answer!,
+              answer: selectedAnswer!,
               timeTaken,
             }),
         };
@@ -345,18 +565,19 @@ export default function QuestionScreen() {
             nextQuestion({
               soloSessionId: session.sessionId,
               questionId: sanitizedQuestion.id,
-              userAnswer: answer!,
+              userAnswer: selectedAnswer!,
+              sessionType: SessionType.SOLO,
               time: timeTaken,
             }),
         };
     }
   };
 
-  const handleSubmit = async () => {
-    if (answer === null) {
-      alert('Please select an answer');
-      return;
-    }
+  const handleSubmit = async (selectedAnswer: number) => {
+    // if (answer === null) {
+    //   alert('Please select an answer');
+    //   return;
+    // }
 
     if (
       session.sessionType === SessionType.DAILY ||
@@ -369,26 +590,31 @@ export default function QuestionScreen() {
 
     setIsChecking(true);
     setShowResult(false);
-    startBlinking();
+    // startBlinking();
+    // startSlotMachineEffect();
+    // startWaveEffect();
+    startPulseWave();
+    // startGlitchEffect();
 
     const timeTaken = getTimeTaken();
     console.log('Time taken (ms):', timeTaken);
 
     setLoading(true);
 
-    const { nextQuestionFn } = getApiFns();
+    const { nextQuestionFn } = getApiFns(selectedAnswer);
     console.log('submitting a question');
 
     nextQuestionFn()
       .then((response: any) => {
         stopBlinking();
         setIsChecking(false);
+        setCorrectAnswer(response.data.correctAnswer);
+        setShowResult(true);
         console.log('Response: ', response);
         console.log('answer: ', answer);
-        // console.log('correct answer: ', response.data.correctAnswer);
-        setShowResult(true);
+        setShowPopup(true);
 
-        if (response.success) {
+        if (response.data.success) {
           if (
             session.sessionType === SessionType.DAILY ||
             session.sessionType === SessionType.INSTANT
@@ -402,25 +628,28 @@ export default function QuestionScreen() {
               resumeDailyTimer();
             }, 1200);
           } else if (session.sessionType === SessionType.SOLO) {
-            setCorrectAnswer(response.correctAnswer);
             setTimeout(() => {
-              if (response.isRoundCompleted) {
-                setRound(response.roundNumber + 1);
+              setShowPopup(false);
+              if (response.data.isRoundCompleted) {
+                setRound(response.data.roundNumber + 1);
                 console.log('response :- ', response);
                 const params: continueParams = {
+                  sessionType: session.sessionType,
                   userId: sessionDetails?.userId as string,
                   sessionId: sessionDetails?.sessionId as string,
-                  bankedPoint: response?.bankedPoint as number,
+                  bankedPoint: response?.data.bankedPoint as number,
                 };
                 navigation.navigate('ad', { params });
               } else {
                 resetQuestion();
-                setSanitizedQuestion(response.nextQuestion);
+                setSanitizedQuestion(response.data.nextQuestion);
+                startTimer();
               }
             }, 1500);
           }
         } else {
           setTimeout(() => {
+            setShowPopup(false);
             navigation.navigate('HomeMain');
           }, 1500);
         }
@@ -536,7 +765,7 @@ export default function QuestionScreen() {
               <View style={styles.detailsBox}>
                 <View style={styles.questionMeta}>
                   <Text style={styles.questionNumber}>
-                    Q : <Text>{round}</Text>
+                    Q : <Text>{sanitizedQuestion.questionIndex}</Text>
                   </Text>
                   <Text style={styles.questionLevel}>
                     Level : <Text>{sanitizedQuestion.level}</Text>
@@ -586,13 +815,9 @@ export default function QuestionScreen() {
 
                         return (
                           <Animated.View
-                            key={colIndex}
                             style={{
-                              opacity: isChecking
-                                ? blinkAnim
-                                : isDisabled
-                                  ? 0.3
-                                  : 1,
+                              opacity: isChecking ? blinkAnims[value] : isDisabled ? 0.3 : 1,
+                              transform: [{ scale: isChecking ? scaleAnims[value] : 1 }],
                             }}
                           >
                             <TouchableOpacity
@@ -665,6 +890,7 @@ export default function QuestionScreen() {
                 </TouchableOpacity>
               </View>
 
+              {/* 
               <TouchableOpacity
                 style={[
                   styles.nextBtn,
@@ -682,8 +908,17 @@ export default function QuestionScreen() {
                     : showResult
                       ? 'Next Question...'
                       : 'Submit Answer'}
-                </Text>
+                </Text> 
               </TouchableOpacity>
+              */}
+              <ResultPopup
+                visible={showPopup}
+                isCorrect={answer === correctAnswer}
+                correctAnswer={correctAnswer ?? 0}
+                userAnswer={answer}
+                onClose={() => setShowPopup(false)}
+                colors={colors}
+              />
             </SafeAreaView>
           </LinearGradient>
         );
