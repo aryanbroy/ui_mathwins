@@ -167,7 +167,7 @@ export default function QuestionScreen() {
       if (intervalRef.current) clearInterval(intervalRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); 
+  }, []);
 
   // Timer Functions
   // useEffect(() => {
@@ -257,7 +257,7 @@ export default function QuestionScreen() {
   };
 
   const stopTimer = () => {
-    console.log("timer stop");
+    console.log('timer stop');
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
@@ -286,21 +286,21 @@ export default function QuestionScreen() {
   // const startBlinking = () => {
   //   // Stop any existing animations
   //   blinkAnims.forEach(anim => anim.stopAnimation());
-    
+
   //   // Create random blink animations for each number
   //   blinkAnims.forEach((anim, index) => {
   //     // Random delay before starting (0-800ms)
   //     const startDelay = Math.random() * 800;
-      
+
   //     // Random blink duration (200-500ms)
   //     const blinkDuration = 200 + Math.random() * 300;
-      
+
   //     // Random pause between blinks (100-400ms)
   //     const pauseDuration = 100 + Math.random() * 300;
-      
+
   //     // Random minimum opacity (0.2-0.5)
   //     const minOpacity = 0.2 + Math.random() * 0.3;
-      
+
   //     setTimeout(() => {
   //       Animated.loop(
   //         Animated.sequence([
@@ -324,211 +324,211 @@ export default function QuestionScreen() {
   //   });
   // };
 
-const startBlinking = () => {
-  blinkAnims.forEach(anim => {
-    anim.stopAnimation();
-    anim.setValue(1);
-  });
-  
-  blinkAnims.forEach((anim, index) => {
-    const startDelay = Math.random() * 800;
-    const blinkDuration = 200 + Math.random() * 300;
-    const pauseDuration = 100 + Math.random() * 300;
-    const minOpacity = 0.2 + Math.random() * 0.3;
-    
-    setTimeout(() => {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(anim, {
-            toValue: minOpacity,
-            duration: blinkDuration,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim, {
-            toValue: 1,
-            duration: blinkDuration,
-            useNativeDriver: true,
-          }),
-          Animated.delay(pauseDuration),
-        ])
-      ).start();
-    }, startDelay);
-  });
-};
+  const startBlinking = () => {
+    blinkAnims.forEach((anim) => {
+      anim.stopAnimation();
+      anim.setValue(1);
+    });
 
-const startSlotMachineEffect = () => {
-  blinkAnims.forEach(anim => anim.stopAnimation());
-  
-  blinkAnims.forEach((anim, index) => {
-    const startDelay = Math.random() * 1000;
-    
-    setTimeout(() => {
-      Animated.loop(
-        Animated.sequence([
-          // Quick fade to very low
-          Animated.timing(anim, {
-            toValue: 0.1,
-            duration: 80,
-            useNativeDriver: true,
-          }),
-          // Pop back up
-          Animated.timing(anim, {
-            toValue: 1,
-            duration: 80,
-            useNativeDriver: true,
-          }),
-          // Stay visible
-          Animated.delay(Math.random() * 200 + 100),
-          // Quick fade again
-          Animated.timing(anim, {
-            toValue: 0.3,
-            duration: 120,
-            useNativeDriver: true,
-          }),
-          // Pop back
-          Animated.timing(anim, {
-            toValue: 1,
-            duration: 120,
-            useNativeDriver: true,
-          }),
-          // Random longer pause
-          Animated.delay(Math.random() * 500 + 200),
-        ])
-      ).start();
-    }, startDelay);
-  });
-};
+    blinkAnims.forEach((anim, index) => {
+      const startDelay = Math.random() * 800;
+      const blinkDuration = 200 + Math.random() * 300;
+      const pauseDuration = 100 + Math.random() * 300;
+      const minOpacity = 0.2 + Math.random() * 0.3;
 
-const startWaveEffect = () => {
-  blinkAnims.forEach(anim => anim.stopAnimation());
-  
-  blinkAnims.forEach((anim, index) => {
-    // Stagger based on position
-    const delay = index * 100;
-    
-    setTimeout(() => {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(anim, {
-            toValue: 0.2,
-            duration: 250,
-            useNativeDriver: true,
-          }),
-          Animated.timing(anim, {
-            toValue: 1,
-            duration: 250,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-    }, delay);
-  });
-};
-
-const scaleAnims = useRef(
-  Array.from({ length: 10 }, () => new Animated.Value(1))
-).current;
-const startPulseWave = () => {
-  blinkAnims.forEach(anim => anim.stopAnimation());
-  scaleAnims.forEach(anim => anim.stopAnimation());
-  
-  blinkAnims.forEach((opacityAnim, index) => {
-    const scaleAnim = scaleAnims[index];
-    const delay = Math.random() * 1000;
-    
-    setTimeout(() => {
-      Animated.loop(
-        Animated.parallel([
-          Animated.sequence([
-            Animated.timing(opacityAnim, {
-              toValue: 0.3,
-              duration: 600,
-              useNativeDriver: true,
-            }),
-            Animated.timing(opacityAnim, {
-              toValue: 1,
-              duration: 600,
-              useNativeDriver: true,
-            }),
-          ]),
-          Animated.sequence([
-            Animated.timing(scaleAnim, {
-              toValue: 1.2,
-              duration: 600,
-              useNativeDriver: true,
-            }),
-            Animated.timing(scaleAnim, {
-              toValue: 1,
-              duration: 600,
-              useNativeDriver: true,
-            }),
-          ]),
-        ])
-      ).start();
-    }, delay);
-  });
-};
-
-const startGlitchEffect = () => {
-  blinkAnims.forEach(anim => anim.stopAnimation());
-  
-  const glitchCycle = () => {
-    // Random number of glitches (2-5)
-    const glitchCount = 2 + Math.floor(Math.random() * 4);
-    
-    for (let i = 0; i < glitchCount; i++) {
       setTimeout(() => {
-        // Pick 2-4 random numbers to glitch
-        const targets = [];
-        const count = 2 + Math.floor(Math.random() * 3);
-        
-        for (let j = 0; j < count; j++) {
-          targets.push(Math.floor(Math.random() * 10));
-        }
-        
-        targets.forEach(index => {
-          const anim = blinkAnims[index];
-          const intensity = 0.1 + Math.random() * 0.4;
-          
+        Animated.loop(
           Animated.sequence([
             Animated.timing(anim, {
-              toValue: intensity,
-              duration: 30,
+              toValue: minOpacity,
+              duration: blinkDuration,
               useNativeDriver: true,
             }),
             Animated.timing(anim, {
               toValue: 1,
-              duration: 30,
+              duration: blinkDuration,
               useNativeDriver: true,
             }),
-          ]).start();
-        });
-      }, i * 80);
-    }
-    
-    setTimeout(glitchCycle, 300 + Math.random() * 500);
+            Animated.delay(pauseDuration),
+          ])
+        ).start();
+      }, startDelay);
+    });
   };
-  
-  glitchCycle();
-};
 
-const stopBlinking = () => {
-  blinkAnims.forEach(anim => {
-    anim.stopAnimation();
-    anim.setValue(1);
-  });
-};
+  const startSlotMachineEffect = () => {
+    blinkAnims.forEach((anim) => anim.stopAnimation());
+
+    blinkAnims.forEach((anim, index) => {
+      const startDelay = Math.random() * 1000;
+
+      setTimeout(() => {
+        Animated.loop(
+          Animated.sequence([
+            // Quick fade to very low
+            Animated.timing(anim, {
+              toValue: 0.1,
+              duration: 80,
+              useNativeDriver: true,
+            }),
+            // Pop back up
+            Animated.timing(anim, {
+              toValue: 1,
+              duration: 80,
+              useNativeDriver: true,
+            }),
+            // Stay visible
+            Animated.delay(Math.random() * 200 + 100),
+            // Quick fade again
+            Animated.timing(anim, {
+              toValue: 0.3,
+              duration: 120,
+              useNativeDriver: true,
+            }),
+            // Pop back
+            Animated.timing(anim, {
+              toValue: 1,
+              duration: 120,
+              useNativeDriver: true,
+            }),
+            // Random longer pause
+            Animated.delay(Math.random() * 500 + 200),
+          ])
+        ).start();
+      }, startDelay);
+    });
+  };
+
+  const startWaveEffect = () => {
+    blinkAnims.forEach((anim) => anim.stopAnimation());
+
+    blinkAnims.forEach((anim, index) => {
+      // Stagger based on position
+      const delay = index * 100;
+
+      setTimeout(() => {
+        Animated.loop(
+          Animated.sequence([
+            Animated.timing(anim, {
+              toValue: 0.2,
+              duration: 250,
+              useNativeDriver: true,
+            }),
+            Animated.timing(anim, {
+              toValue: 1,
+              duration: 250,
+              useNativeDriver: true,
+            }),
+          ])
+        ).start();
+      }, delay);
+    });
+  };
+
+  const scaleAnims = useRef(
+    Array.from({ length: 10 }, () => new Animated.Value(1))
+  ).current;
+  const startPulseWave = () => {
+    blinkAnims.forEach((anim) => anim.stopAnimation());
+    scaleAnims.forEach((anim) => anim.stopAnimation());
+
+    blinkAnims.forEach((opacityAnim, index) => {
+      const scaleAnim = scaleAnims[index];
+      const delay = Math.random() * 1000;
+
+      setTimeout(() => {
+        Animated.loop(
+          Animated.parallel([
+            Animated.sequence([
+              Animated.timing(opacityAnim, {
+                toValue: 0.3,
+                duration: 600,
+                useNativeDriver: true,
+              }),
+              Animated.timing(opacityAnim, {
+                toValue: 1,
+                duration: 600,
+                useNativeDriver: true,
+              }),
+            ]),
+            Animated.sequence([
+              Animated.timing(scaleAnim, {
+                toValue: 1.2,
+                duration: 600,
+                useNativeDriver: true,
+              }),
+              Animated.timing(scaleAnim, {
+                toValue: 1,
+                duration: 600,
+                useNativeDriver: true,
+              }),
+            ]),
+          ])
+        ).start();
+      }, delay);
+    });
+  };
+
+  const startGlitchEffect = () => {
+    blinkAnims.forEach((anim) => anim.stopAnimation());
+
+    const glitchCycle = () => {
+      // Random number of glitches (2-5)
+      const glitchCount = 2 + Math.floor(Math.random() * 4);
+
+      for (let i = 0; i < glitchCount; i++) {
+        setTimeout(() => {
+          // Pick 2-4 random numbers to glitch
+          const targets = [];
+          const count = 2 + Math.floor(Math.random() * 3);
+
+          for (let j = 0; j < count; j++) {
+            targets.push(Math.floor(Math.random() * 10));
+          }
+
+          targets.forEach((index) => {
+            const anim = blinkAnims[index];
+            const intensity = 0.1 + Math.random() * 0.4;
+
+            Animated.sequence([
+              Animated.timing(anim, {
+                toValue: intensity,
+                duration: 30,
+                useNativeDriver: true,
+              }),
+              Animated.timing(anim, {
+                toValue: 1,
+                duration: 30,
+                useNativeDriver: true,
+              }),
+            ]).start();
+          });
+        }, i * 80);
+      }
+
+      setTimeout(glitchCycle, 300 + Math.random() * 500);
+    };
+
+    glitchCycle();
+  };
+
+  const stopBlinking = () => {
+    blinkAnims.forEach((anim) => {
+      anim.stopAnimation();
+      anim.setValue(1);
+    });
+  };
 
   const handleSelect = (value: number) => {
+    console.log('Value: ', value);
     if (!isChecking && !showResult && !disabledOptions.includes(value)) {
       setAnswer(value);
-      console.log('Selected answer:', value, " - answer : ", answer);
+      console.log('Selected answer:', value, ' - answer : ', answer);
       setTimeout(() => {
         handleSubmit(value);
       }, 300);
     } else {
-      console.log("noo");
-      
+      console.log('noo');
     }
   };
 
@@ -553,7 +553,7 @@ const stopBlinking = () => {
             submitInstantQuestion(
               session.sessionId,
               sanitizedQuestion.id,
-              answer!,
+              selectedAnswer!,
               timeTaken
             ),
         };
@@ -608,13 +608,21 @@ const stopBlinking = () => {
       .then((response: any) => {
         stopBlinking();
         setIsChecking(false);
-        setCorrectAnswer(response.data.correctAnswer);
+
+        const responseCorrectAnswer = response.data.correctAnswer;
+        setCorrectAnswer(responseCorrectAnswer);
         setShowResult(true);
+
         console.log('Response: ', response);
         console.log('answer: ', answer);
         setShowPopup(true);
 
-        if (response.data.success) {
+        // setTimeout(() => {
+        //   setShowPopup(true);
+        // }, 100);
+
+        if (response.success) {
+          // previously response.data.success: later today
           if (
             session.sessionType === SessionType.DAILY ||
             session.sessionType === SessionType.INSTANT
@@ -622,6 +630,7 @@ const stopBlinking = () => {
             setCurrentScore(response.data.currentScore);
             setCorrectAnswer(response.data.correctAnswer);
             setTimeout(() => {
+              setShowPopup(false);
               resetQuestion();
               setSanitizedQuestion(response.data.nextQuestion);
               questionStartRemainingRef.current = remainingMs;
@@ -804,7 +813,7 @@ const stopBlinking = () => {
                 <View style={styles.optionsContainer}>
                   {keypadLayout.map((row, rowIndex) => (
                     <View key={rowIndex} style={styles.row}>
-                      {row.map((value, colIndex) => {
+                      {row.map((value) => {
                         const isDisabled = disabledOptions.includes(value);
                         const isSelected = answer === value;
                         const isCorrect = showResult && value === correctAnswer;
@@ -815,9 +824,16 @@ const stopBlinking = () => {
 
                         return (
                           <Animated.View
+                            key={value}
                             style={{
-                              opacity: isChecking ? blinkAnims[value] : isDisabled ? 0.3 : 1,
-                              transform: [{ scale: isChecking ? scaleAnims[value] : 1 }],
+                              opacity: isChecking
+                                ? blinkAnims[value]
+                                : isDisabled
+                                  ? 0.3
+                                  : 1,
+                              transform: [
+                                { scale: isChecking ? scaleAnims[value] : 1 },
+                              ],
                             }}
                           >
                             <TouchableOpacity
@@ -912,6 +928,7 @@ const stopBlinking = () => {
               </TouchableOpacity>
               */}
               <ResultPopup
+                key={sanitizedQuestion.id}
                 visible={showPopup}
                 isCorrect={answer === correctAnswer}
                 correctAnswer={correctAnswer ?? 0}

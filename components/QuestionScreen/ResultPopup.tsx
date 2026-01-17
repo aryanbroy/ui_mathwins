@@ -101,10 +101,7 @@ const ResultPopup: React.FC<ResultPopupProps> = ({
           style={[
             styles.modalContainer,
             {
-              transform: [
-                { scale: scaleAnim },
-                { translateY: slideAnim },
-              ],
+              transform: [{ scale: scaleAnim }, { translateY: slideAnim }],
             },
           ]}
         >
@@ -117,9 +114,7 @@ const ResultPopup: React.FC<ResultPopupProps> = ({
               },
             ]}
           >
-            <Text style={styles.iconText}>
-              {isCorrect ? '✓' : '✗'}
-            </Text>
+            <Text style={styles.iconText}>{isCorrect ? '✓' : '✗'}</Text>
           </View>
 
           {/* Result Message */}
@@ -128,16 +123,14 @@ const ResultPopup: React.FC<ResultPopupProps> = ({
           </Text>
 
           {/* Emoji */}
-          <Text style={styles.emoji}>
-            {isCorrect ? '🎉' : '😢'}
-          </Text>
+          <Text style={styles.emoji}>{isCorrect ? '🎉' : '😢'}</Text>
 
           {/* Answer Details */}
           <View style={styles.answerContainer}>
             {!isCorrect && (
               <>
                 <View style={styles.answerRow}>
-                  <Text style={[styles.answerLabel, { color: "#000" }]}>
+                  <Text style={[styles.answerLabel, { color: '#000' }]}>
                     Your Answer:
                   </Text>
                   <View style={[styles.answerBadge, styles.wrongBadge]}>
@@ -147,7 +140,7 @@ const ResultPopup: React.FC<ResultPopupProps> = ({
               </>
             )}
             <View style={styles.answerRow}>
-              <Text style={[styles.answerLabel, { color: "#000" }]}>
+              <Text style={[styles.answerLabel, { color: '#000' }]}>
                 {isCorrect ? 'Your Answer:' : 'Correct Answer:'}
               </Text>
               <View style={[styles.answerBadge, styles.correctBadge]}>
@@ -257,3 +250,4 @@ const styles = StyleSheet.create({
 });
 
 export default ResultPopup;
+
