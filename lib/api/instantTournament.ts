@@ -8,10 +8,18 @@ import {
 } from '@/types/api/instant';
 import { api } from './client';
 import { ApiHandledError, parseApiError } from './parseApiError';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const joinOrCreateTournament = async () => {
   try {
-    const res = await api.post('api/instant/join_or_create');
+    const token = (await AsyncStorage.getItem('token')) as string;
+    const res = await api({
+      method: 'post',
+      url: 'api/instant/join_or_create',
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      },
+    });
     const resData: joinOrCreateResponse = res.data;
     const data = resData.data;
     return data;
@@ -24,11 +32,15 @@ export const joinOrCreateTournament = async () => {
 
 export const fetchTournamentPlayers = async (tournamentId: string) => {
   try {
+    const token = (await AsyncStorage.getItem('token')) as string;
     const res = await api({
       method: 'post',
       url: 'api/instant/players',
       data: {
         tournamentId: tournamentId,
+      },
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
       },
     });
     const resData: fetchPlayersResponse = res.data;
@@ -43,11 +55,15 @@ export const fetchTournamentPlayers = async (tournamentId: string) => {
 
 export const startInstantSession = async (roomId: string) => {
   try {
+    const token = (await AsyncStorage.getItem('token')) as string;
     const res = await api({
       method: 'post',
       url: 'api/instant/start_session',
       data: {
         roomId,
+      },
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
       },
     });
     const resData: startSessionResponse = res.data;
@@ -67,6 +83,7 @@ export const submitQuestion = async (
   timeTakenMs: number
 ) => {
   try {
+    const token = (await AsyncStorage.getItem('token')) as string;
     const res = await api({
       method: 'post',
       url: 'api/instant/submit_question',
@@ -75,6 +92,9 @@ export const submitQuestion = async (
         questionId,
         answer,
         timeTakenMs,
+      },
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
       },
     });
     const resData: submitQuestionResponse = res.data;
@@ -88,11 +108,15 @@ export const submitQuestion = async (
 
 export const finalSubmission = async (sessionId: string) => {
   try {
+    const token = (await AsyncStorage.getItem('token')) as string;
     const res = await api({
       method: 'post',
       url: 'api/instant/submit_final',
       data: {
         sessionId,
+      },
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
       },
     });
     const resData: finalSubmissionResponse = res.data;
@@ -106,9 +130,13 @@ export const finalSubmission = async (sessionId: string) => {
 
 export const fetchPastTournaments = async () => {
   try {
+    const token = (await AsyncStorage.getItem('token')) as string;
     const res = await api({
       method: 'GET',
       url: 'api/instant/participated_tournaments',
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      },
     });
     const resData: PastTournaments = res.data;
     const data = resData.data;
