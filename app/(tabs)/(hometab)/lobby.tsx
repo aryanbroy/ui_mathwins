@@ -162,7 +162,7 @@ export default function SoloScreen() {
         style={styles.grediantBg}
       >
         <View style={styles.adArea1}>
-          ad here
+          <Text>ad here</Text>
         </View>
         <View style={styles.container}>
           <LinearGradient
@@ -195,7 +195,7 @@ export default function SoloScreen() {
         </View> */}
         </View>
         <View style={styles.adArea2}>
-          ad here
+          <Text>ad here</Text>
         </View>
       </LinearGradient>
     </SafeAreaView>
@@ -223,6 +223,7 @@ const makeStyles = (colors: ColorScheme) =>
     container: {
     },
     grediant: {
+      height: 500,
       margin: 20,
       borderRadius: 20,
     },

@@ -58,7 +58,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [userToken]);
 
   const login = async (user: UserData) => {
-    // console.log("authContext : user = ",user);
+    console.log("authContext : user = ",user);
     
     try {
       if (!user.name || !user.email) {
@@ -69,14 +69,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         email: user.email,
         picture: user.picture,
       }
-      await loginUser(payload).then((response)=>{
-        console.log("response :- ",response);
+      loginUser(payload).then(async (response)=>{
+        console.log("response loginUser :- ",response);
         // const newUser = {...user, userId: .id}
-        AsyncStorage.setItem("token", JSON.stringify(response.data));
+        await AsyncStorage.setItem("token", JSON.stringify(response.data)).then(()=>{console.log("done !!")}).catch(()=>{console.log("err");});
         setUserToken(response.data);
+      }).catch((err)=>{console.log("error :- ",err);
       });
     } catch (e) {
-      console.log("Error saving token to AsyncStorage:", e);
+      console.log("c", e);
     }
   };
 

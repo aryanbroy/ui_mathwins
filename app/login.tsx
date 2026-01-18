@@ -28,10 +28,9 @@ export default function LoginScreen() {
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   
   const [request, response, promptAsync] = Google.useAuthRequest({
-      androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
-      iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID, 
-      webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
-      // useProxy: true,
+    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID, 
+    androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
   })
 
   const handleGoogleSignIn = async () => {
@@ -44,18 +43,24 @@ export default function LoginScreen() {
   };
 
   React.useEffect(() => {
-    console.log(response);
+    console.log("responce :- ",response);
     handleSignInWithGoogle();
   }, [response]);
   async function handleSignInWithGoogle() {
     if (response?.type === "success") {
       const token = response.authentication?.accessToken;
       if (token) {
+        console.log("token :- ",token);
+        
         const user = await getUserInfo(token);
         if (user) {
           // Tell the authContext that we are logged in
-          // console.log("login : ", token, " - - ", user);
-          await login(user);
+          console.log("login : ", token, " - - ", user);
+          await login(user).then((res)=>{
+            console.log("responceFromlogin :- ",res);
+          }
+          );
+          
           // after this, app/_layout.tsx will see `user` and switch to (tabs)
         }
       }
@@ -70,8 +75,8 @@ export default function LoginScreen() {
       });
       
       const user = await res.json();
-      console.log("user given data:", user);
-      navigation.navigate('HomeMain');
+      console.log("user given data :- ", user);
+      // navigation.navigate('HomeMain');
       return user; // return to handleSignInWithGoogle
     } catch (error) {
       console.log("Error fetching user info", error);
