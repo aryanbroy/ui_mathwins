@@ -297,6 +297,11 @@ const makeStyles = (colors: ColorScheme) =>
       fontSize: 16,
       fontWeight: "700",
       color: colors.textSecondary,
+      borderWidth: 4,
+      borderColor: colors.textSecondary,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 10,
       marginBottom: 20,
     },
     screenContainer: {
