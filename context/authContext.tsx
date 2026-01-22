@@ -6,11 +6,13 @@ type UserData = {
     name?: string;
     email?: string;
     picture?: string;
+    referralCode: String;
 };
 type ClientUserData = {
     username?: string;
     email?: string;
     picture?: string;
+    referralCode: String;
 };
 type AuthContextType = {
   user: ClientUserData | null;
@@ -68,6 +70,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         username: user.name,
         email: user.email,
         picture: user.picture,
+        referralCode: user.referralCode
       }
       loginUser(payload).then(async (response)=>{
         console.log("response loginUser :- ",response);

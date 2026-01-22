@@ -621,7 +621,11 @@ export default function QuestionScreen() {
         //   setShowPopup(true);
         // }, 100);
 
-        if (response.success) {
+        // Avoid double checking for session.sessionType === SessionType.?
+        let check = session.sessionType === SessionType.SOLO ? response.data.success : response.success ;
+
+        // if (response.data.success) {
+        if (check) {
           // previously response.data.success: later today
           if (
             session.sessionType === SessionType.DAILY ||

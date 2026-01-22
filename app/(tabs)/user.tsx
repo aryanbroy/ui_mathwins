@@ -17,6 +17,8 @@ export default function UserProfileScreen() {
   console.log("user : ",user);
   
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [soundEffect, setSoundEffect] = useState(true);
+  const [haptics, setHaptics] = useState(true);
 
   const { isDarkMode, toggleDarkMode, colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
@@ -53,13 +55,14 @@ export default function UserProfileScreen() {
               <View style={styles.screenContainer}>
                 <Text style={styles.nameText}>{user?.username || "User"}</Text>
                 <Text style={styles.emailText}>{user?.email}</Text>
+                <Text style={styles.referralText}>{user?.referralCode}</Text>
               </View> : 
               <View style={styles.screenContainer}>
                 <TouchableOpacity
                 onPress={loginHandle}
                 style={styles.startBtn} 
                 >
-                  <Text style={styles.btnText} >LOGIN</Text>
+                  <Text style={styles.btnText}>LOGIN</Text>
                 </TouchableOpacity>
               </View>
             }
@@ -117,8 +120,8 @@ export default function UserProfileScreen() {
                 </View>
 
                 <Switch
-                  value={notificationsEnabled}
-                  onValueChange={setNotificationsEnabled}
+                  value={soundEffect}
+                  onValueChange={setSoundEffect}
                   trackColor={{
                     false: colors.controls.switchTrackOff,
                     true: colors.controls.switchTrackOn,
@@ -139,8 +142,8 @@ export default function UserProfileScreen() {
                 </View>
 
                 <Switch
-                  value={notificationsEnabled}
-                  onValueChange={setNotificationsEnabled}
+                  value={haptics}
+                  onValueChange={setHaptics}
                   trackColor={{
                     false: colors.controls.switchTrackOff,
                     true: colors.controls.switchTrackOn,
@@ -288,6 +291,12 @@ const makeStyles = (colors: ColorScheme) =>
       fontWeight: "300",
       color: colors.textSecondary,
       opacity: 0.9,
+      marginBottom: 20,
+    },
+    referralText: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.textSecondary,
       marginBottom: 20,
     },
     screenContainer: {

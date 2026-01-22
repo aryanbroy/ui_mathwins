@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 
 function RootNavigator() {
   const { user, loading } = useAuth();
-  console.log(user);
+  console.log("user in _layout main : - ",user);
 
   if (loading) {
     return (
