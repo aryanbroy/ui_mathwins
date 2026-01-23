@@ -11,14 +11,14 @@ import { HomeScreenNavigationProp } from '@/types/tabTypes';
 
 export default function UserProfileScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const { userToken, user, logout } = useAuth();
+  const { userToken, user, logout ,soundEffect, haptics, toggleSound, toggleHaptics } = useAuth();
   // const decoded = Jwt.verify(userToken, 'super-secret-key-change-this');
   console.log("userT : ",userToken);
   console.log("user : ",user);
   
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [soundEffect, setSoundEffect] = useState(true);
-  const [haptics, setHaptics] = useState(true);
+  const [soundEffectToggle, setSoundEffect] = useState(soundEffect);
+  const [hapticsToggle, setHaptics] = useState(haptics);
 
   const { isDarkMode, toggleDarkMode, colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
@@ -121,7 +121,7 @@ export default function UserProfileScreen() {
 
                 <Switch
                   value={soundEffect}
-                  onValueChange={setSoundEffect}
+                  onValueChange={toggleSound}
                   trackColor={{
                     false: colors.controls.switchTrackOff,
                     true: colors.controls.switchTrackOn,
@@ -143,7 +143,7 @@ export default function UserProfileScreen() {
 
                 <Switch
                   value={haptics}
-                  onValueChange={setHaptics}
+                  onValueChange={toggleHaptics}
                   trackColor={{
                     false: colors.controls.switchTrackOff,
                     true: colors.controls.switchTrackOn,

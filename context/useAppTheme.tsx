@@ -225,7 +225,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     await AsyncStorage.setItem("darkMode", JSON.stringify(newMode));
   };
 
-  const colors = isDarkMode ? lightColors : darkColors;
+  const colors = isDarkMode ? darkColors : lightColors;
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleDarkMode, colors }}>

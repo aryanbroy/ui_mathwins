@@ -25,6 +25,7 @@ import {
 } from '@/lib/api/instantTournament';
 import ScoreSubmitScreen from '@/components/ScoreSubmitScreen';
 import ResultPopup from '@/components/QuestionScreen/ResultPopup';
+import { useFeedback } from '@/context/useFeedback';
 
 type sanitizedQuestionType = {
   id: string;
@@ -71,6 +72,7 @@ export default function QuestionScreen() {
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   const route = useRoute<RouteProp<{ params: QuestionRouteParams }>>();
+  const { playFeedback } = useFeedback();
 
   // Question and Session State
   const [sanitizedQuestion, setSanitizedQuestion] = useState(
@@ -578,7 +580,7 @@ export default function QuestionScreen() {
     //   alert('Please select an answer');
     //   return;
     // }
-
+    await playFeedback('submit');
     if (
       session.sessionType === SessionType.DAILY ||
       session.sessionType === SessionType.INSTANT
@@ -603,65 +605,70 @@ export default function QuestionScreen() {
 
     const { nextQuestionFn } = getApiFns(selectedAnswer);
     console.log('submitting a question');
-
+    
     nextQuestionFn()
-      .then((response: any) => {
-        stopBlinking();
-        setIsChecking(false);
-
-        const responseCorrectAnswer = response.data.correctAnswer;
-        setCorrectAnswer(responseCorrectAnswer);
-        setShowResult(true);
-
-        console.log('Response: ', response);
-        console.log('answer: ', answer);
-        setShowPopup(true);
-
-        // setTimeout(() => {
+    .then(async (response: any) => {
+      stopBlinking();
+      setIsChecking(false);
+      
+      const responseCorrectAnswer = response.data.correctAnswer;
+      setCorrectAnswer(responseCorrectAnswer);
+      setShowResult(true);
+      
+      console.log('Response: ', response);
+      console.log('answer: ', answer);
+      setShowPopup(true);
+      
+      // setTimeout(() => {
         //   setShowPopup(true);
         // }, 100);
-
+        
         // Avoid double checking for session.sessionType === SessionType.?
         let check = session.sessionType === SessionType.SOLO ? response.data.success : response.success ;
-
+        
+        if(check){
+          await playFeedback('correct');
+        } else {
+          await playFeedback('wrong');
+        }
         // if (response.data.success) {
         if (check) {
           // previously response.data.success: later today
           if (
-            session.sessionType === SessionType.DAILY ||
-            session.sessionType === SessionType.INSTANT
-          ) {
-            setCurrentScore(response.data.currentScore);
-            setCorrectAnswer(response.data.correctAnswer);
-            setTimeout(() => {
-              setShowPopup(false);
+          session.sessionType === SessionType.DAILY ||
+          session.sessionType === SessionType.INSTANT
+        ) {
+          setCurrentScore(response.data.currentScore);
+          setCorrectAnswer(response.data.correctAnswer);
+          setTimeout(() => {
+            setShowPopup(false);
+            resetQuestion();
+            setSanitizedQuestion(response.data.nextQuestion);
+            questionStartRemainingRef.current = remainingMs;
+            resumeDailyTimer();
+          }, 1200);
+        } else if (session.sessionType === SessionType.SOLO) {
+          setTimeout(() => {
+            setShowPopup(false);
+            if (response.data.isRoundCompleted) {
+              setRound(response.data.roundNumber + 1);
+              console.log('response :- ', response);
+              const params: continueParams = {
+                sessionType: session.sessionType,
+                userId: sessionDetails?.userId as string,
+                sessionId: sessionDetails?.sessionId as string,
+                bankedPoint: response?.data.bankedPoint as number,
+              };
+              navigation.navigate('ad', { params });
+            } else {
               resetQuestion();
               setSanitizedQuestion(response.data.nextQuestion);
-              questionStartRemainingRef.current = remainingMs;
-              resumeDailyTimer();
-            }, 1200);
-          } else if (session.sessionType === SessionType.SOLO) {
-            setTimeout(() => {
-              setShowPopup(false);
-              if (response.data.isRoundCompleted) {
-                setRound(response.data.roundNumber + 1);
-                console.log('response :- ', response);
-                const params: continueParams = {
-                  sessionType: session.sessionType,
-                  userId: sessionDetails?.userId as string,
-                  sessionId: sessionDetails?.sessionId as string,
-                  bankedPoint: response?.data.bankedPoint as number,
-                };
-                navigation.navigate('ad', { params });
-              } else {
-                resetQuestion();
-                setSanitizedQuestion(response.data.nextQuestion);
-                startTimer();
-              }
-            }, 1500);
-          }
+              startTimer();
+            }
+          }, 1500);
+        }
         } else {
-          setTimeout(() => {
+          setTimeout(async () => {
             setShowPopup(false);
             navigation.navigate('HomeMain');
           }, 1500);

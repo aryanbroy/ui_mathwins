@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -46,7 +46,7 @@ export default function SoloScreen() {
   const [totalAttempt, setTotalAttempt] = useState(0);
   const [remainingAttempt, setRemainingAttempt] = useState(0);
   const [loading, setLoading] = useState(true);
-  const { user } = useAuth();
+  const { user, soundEffect, haptics } = useAuth();
   const route = useRoute<RouteProp<{ params: RouteParams }>>();
 
   const [err, setErr] = useState<ErrObject | null>(null);
@@ -191,8 +191,7 @@ export default function SoloScreen() {
           </LinearGradient>
           {/* <View style={styles.bannerAd}>
           <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
-
-        </View> */}
+          </View> */}
         </View>
         <View style={styles.adArea2}>
           <Text>ad here</Text>

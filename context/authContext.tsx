@@ -7,12 +7,20 @@ type UserData = {
     email?: string;
     picture?: string;
     referralCode: String;
+    soundEffect: boolean;
+    haptics: boolean;
+    toggleSound: ()=>void;
+    toggleHaptics: ()=>void;
 };
 type ClientUserData = {
     username?: string;
     email?: string;
     picture?: string;
     referralCode: String;
+    soundEffect: boolean;
+    haptics: boolean;
+    toggleSound: ()=>void;
+    toggleHaptics: ()=>void;
 };
 type AuthContextType = {
   user: ClientUserData | null;
@@ -21,6 +29,10 @@ type AuthContextType = {
   logout: () => Promise<void>;
   updateProfile: (profile: UserData) => Promise<void>;
   loading: boolean;
+  soundEffect: boolean;
+  haptics: boolean;
+  toggleSound: ()=>void;
+  toggleHaptics: ()=>void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -28,6 +40,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<ClientUserData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sound, setSound] = useState(true);
+  const [haptics, setHaptics] = useState(true);
   const [ userToken, setUserToken ] = useState("");
   useEffect(() => {
     const restoreUser = async () => {
@@ -102,8 +116,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const toggleSound = ()=>{
+    setSound(!sound);
+  }
+  const toggleHaptics = ()=>{
+    setSound(!haptics);
+  }
+
   return (
-    <AuthContext.Provider value={{ user, userToken, login, logout, loading, updateProfile }}>
+    <AuthContext.Provider value={{ user, userToken, login, logout, loading, updateProfile, soundEffect: sound, toggleSound,  haptics, toggleHaptics }}>
       {children}
     </AuthContext.Provider>
   );
