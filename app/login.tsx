@@ -1,33 +1,42 @@
-import React, { useState } from "react";
-import {View,Text,TextInput,StyleSheet,TouchableOpacity,Pressable,StatusBar, ScrollView} from "react-native";
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  Pressable,
+  StatusBar,
+  ScrollView,
+} from 'react-native';
 import AntDesign from '@expo/vector-icons/AntDesign';
-import { LinearGradient } from "expo-linear-gradient";
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import * as WebBrowser from "expo-web-browser"
-import * as Google from "expo-auth-session/providers/google"
-import { useAuth } from "../context/authContext";
-import useAppTheme from "@/context/useAppTheme";
-import type { ColorScheme } from "@/context/useAppTheme";
-import { useNavigation } from "expo-router";
-import { HomeScreenNavigationProp } from "@/types/tabTypes";
-import BackgroundTextTexture from "@/components/Texture/BackgroundTextTexture";
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import { useAuth } from '../context/authContext';
+import useAppTheme from '@/context/useAppTheme';
+import type { ColorScheme } from '@/context/useAppTheme';
+import { useNavigation } from 'expo-router';
+import { HomeScreenNavigationProp } from '@/types/tabTypes';
+import BackgroundTextTexture from '@/components/Texture/BackgroundTextTexture';
 
 type UserData = {
-    name?: string;
-    email?: string;
-    picture?: string;
+  name?: string;
+  email?: string;
+  picture?: string;
 };
 WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const [selectedTab, setSelectedTab] = useState<"login" | "signup">("login");
-  const [phone, setPhone] = useState("");
+  const [selectedTab, setSelectedTab] = useState<'login' | 'signup'>('login');
+  const [phone, setPhone] = useState('');
   const { login } = useAuth();
   const [referral, setReferral] = useState("");
   const { colors } = useAppTheme(); 
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
-  
+
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID, 
     androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
@@ -39,7 +48,7 @@ export default function LoginScreen() {
       await promptAsync();
       // response will update asynchronously and trigger the effect above
     } catch (e) {
-      console.log("Error starting Google login:", e);
+      console.log('Error starting Google login:', e);
     }
   };
 
@@ -69,22 +78,22 @@ export default function LoginScreen() {
           // after this, app/_layout.tsx will see `user` and switch to (tabs)
         }
       }
-    } else if (response?.type === "error") {
-      console.log("Google login error:", response.error);
+    } else if (response?.type === 'error') {
+      console.log('Google login error:', response.error);
     }
   }
   const getUserInfo = async (token: string) => {
     try {
-      const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       const user = await res.json();
       console.log("user given data :- ", user);
       // navigation.navigate('HomeMain');
       return user; // return to handleSignInWithGoogle
     } catch (error) {
-      console.log("Error fetching user info", error);
+      console.log('Error fetching user info', error);
       return null;
     }
   };
@@ -100,23 +109,24 @@ export default function LoginScreen() {
           <BackgroundTextTexture></BackgroundTextTexture>
           <StatusBar barStyle={colors.statusBarStyle} />
 
-          <View style={styles.topSection}>
-            <View style={styles.headerTextContainer}>
-              <Text style={styles.title}>Get Started now</Text>
-              <Text style={styles.subtitle}>
-                Create an account or log in to explore about our app
-              </Text>
-            </View>
-
+        <View style={styles.topSection}>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.title}>Get Started now</Text>
+            <Text style={styles.subtitle}>
+              Create an account or log in to explore about our app
+            </Text>
           </View>
 
-          <View style={styles.card}>
-            <LinearGradient
-              colors={colors.gradients.surface}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 0, y: 1 }}
-              style={styles.gradient2}
-            >
+          </View>
+        </View>
+
+        <View style={styles.card}>
+          <LinearGradient
+            colors={colors.gradients.surface}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 0, y: 1 }}
+            style={styles.gradient2}
+          >
             <ScrollView
               style={styles.scroll}
               bounces={false}
@@ -127,14 +137,14 @@ export default function LoginScreen() {
                 <Pressable
                   style={[
                     styles.tabButton,
-                    selectedTab === "login" && styles.tabButtonActive,
+                    selectedTab === 'login' && styles.tabButtonActive,
                   ]}
-                  onPress={() => setSelectedTab("login")}
+                  onPress={() => setSelectedTab('login')}
                 >
                   <Text
                     style={[
                       styles.tabText,
-                      selectedTab === "login" && styles.tabTextActive,
+                      selectedTab === 'login' && styles.tabTextActive,
                     ]}
                   >
                     Log In
@@ -143,14 +153,14 @@ export default function LoginScreen() {
                 {/* <Pressable
                   style={[
                     styles.tabButton,
-                    selectedTab === "signup" && styles.tabButtonActive,
+                    selectedTab === 'signup' && styles.tabButtonActive,
                   ]}
-                  onPress={() => setSelectedTab("signup")}
+                  onPress={() => setSelectedTab('signup')}
                 >
                   <Text
                     style={[
                       styles.tabText,
-                      selectedTab === "signup" && styles.tabTextActive,
+                      selectedTab === 'signup' && styles.tabTextActive,
                     ]}
                   >
                     Sign Up
@@ -204,10 +214,10 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </View>
             </ScrollView>
-            </LinearGradient>
-          </View>
-        </SafeAreaView>
-      </LinearGradient>
+          </LinearGradient>
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
@@ -221,8 +231,8 @@ const makeStyles = (colors: ColorScheme) =>
       flex: 1,
     },
     topSection: {
-      height: "35%",
-      justifyContent: "center",
+      height: '35%',
+      justifyContent: 'center',
     },
     gradient2: {
       flex: 1,
@@ -235,22 +245,22 @@ const makeStyles = (colors: ColorScheme) =>
     },
     headerTextContainer: {
       flex: 1,
-      justifyContent: "center",
+      justifyContent: 'center',
     },
     title: {
       fontSize: 32,
-      fontWeight: "800",
-      textAlign: "center",
+      fontWeight: '800',
+      textAlign: 'center',
       color: colors.textOnPrimary,
     },
     subtitle: {
       fontSize: 14,
       marginBottom: 20,
-      textAlign: "center",
+      textAlign: 'center',
       color: colors.textOnPrimary,
     },
     themeToggleContainer: {
-      position: "absolute",
+      position: 'absolute',
       top: 20,
       right: 24,
     },
@@ -259,8 +269,8 @@ const makeStyles = (colors: ColorScheme) =>
       height: 32,
       borderRadius: 16,
       backgroundColor: colors.surface,
-      justifyContent: "center",
-      alignItems: "flex-end",
+      justifyContent: 'center',
+      alignItems: 'flex-end',
       paddingHorizontal: 5,
     },
     themeToggleDark: {
@@ -268,8 +278,8 @@ const makeStyles = (colors: ColorScheme) =>
       height: 32,
       borderRadius: 16,
       backgroundColor: colors.surface,
-      justifyContent: "center",
-      alignItems: "flex-start",
+      justifyContent: 'center',
+      alignItems: 'flex-start',
       paddingHorizontal: 5,
     },
     themeIcon: {
@@ -284,12 +294,12 @@ const makeStyles = (colors: ColorScheme) =>
       shadowOpacity: 0.12,
       shadowRadius: 10,
       elevation: 4,
-      overflow: "hidden",
+      overflow: 'hidden',
       borderTopLeftRadius: 20,
       borderTopRightRadius: 20,
     },
     tabRow: {
-      flexDirection: "row",
+      flexDirection: 'row',
       marginBottom: 40,
       // backgroundColor: "#1a1a1a"
     },
@@ -297,14 +307,14 @@ const makeStyles = (colors: ColorScheme) =>
       flex: 1,
       paddingVertical: 12,
       borderRadius: 10,
-      alignItems: "center",
+      alignItems: 'center',
     },
     tabButtonActive: {
       backgroundColor: colors.primary,
     },
     tabText: {
       fontSize: 16,
-      fontWeight: "600",
+      fontWeight: '600',
       color: colors.textMuted,
     },
     tabTextActive: {
@@ -336,18 +346,18 @@ const makeStyles = (colors: ColorScheme) =>
       backgroundColor: colors.primary,
       borderRadius: 10,
       paddingVertical: 14,
-      alignItems: "center",
+      alignItems: 'center',
       marginBottom: 24,
     },
     primaryButtonText: {
       color: colors.textOnPrimary,
       fontSize: 16,
-      fontWeight: "600",
+      fontWeight: '600',
     },
 
     dividerRow: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       marginBottom: 24,
     },
     dividerLine: {
@@ -362,9 +372,9 @@ const makeStyles = (colors: ColorScheme) =>
     },
 
     googleButton: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
       borderWidth: 1,
       borderRadius: 10,
       paddingVertical: 12,
@@ -383,25 +393,25 @@ const makeStyles = (colors: ColorScheme) =>
       // backgroundColor: "#FFFFFF",
       // borderWidth: 1,
       // borderColor: "#E0E0E0",
-      alignItems: "center",
-      justifyContent: "center",
+      alignItems: 'center',
+      justifyContent: 'center',
       marginRight: 12,
     },
     googleText: {
       fontSize: 15,
-      fontWeight: "500",
+      fontWeight: '500',
       color: colors.text,
     },
     secondaryButton: {
       borderRadius: 24,
       paddingVertical: 12,
-      alignItems: "center",
+      alignItems: 'center',
       borderWidth: 1,
       borderColor: colors.border,
     },
     secondaryButtonText: {
       fontSize: 15,
-      fontWeight: "500",
+      fontWeight: '500',
       color: colors.text,
     },
   });

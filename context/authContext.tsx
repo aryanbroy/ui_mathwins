@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getUser, loginUser } from "@/lib/api/user";
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getUser, loginUser } from '@/lib/api/user';
 
 type UserData = {
     name?: string;
@@ -47,25 +47,24 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const restoreUser = async () => {
       try {
         // console.log("authCOntext called");
-        
-        const token = await AsyncStorage.getItem("token");
+
+        const token = await AsyncStorage.getItem('token');
         // console.log("token : ",token);
         if (token) {
           setUserToken(JSON.parse(token));
           // console.log("token : ",token);
-          
+
           const payload = {
             token: JSON.parse(token),
-          }
-          await getUser(payload).then((response)=>{
-            console.log("response :- ",response);
-            setUser(response.data);
-            console.log("after setUser ", user);
-            
+          };
+          await getUser(payload).then((response) => {
+            console.log('response :- ', response);
+            setUser(response);
+            console.log('after setUser ', user);
           });
         }
       } catch (e) {
-        console.log("Error loading token from AsyncStorage:", e);
+        console.log('Error loading token from AsyncStorage:', e);
       } finally {
         setLoading(false);
       }
@@ -78,7 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     
     try {
       if (!user.name || !user.email) {
-        throw new Error("User name or email missing");
+        throw new Error('User name or email missing');
       }
       const payload = {
         username: user.name,
@@ -100,19 +99,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await AsyncStorage.removeItem("token");
+      await AsyncStorage.removeItem('token');
       setUser(null);
     } catch (e) {
-      console.log("Error removing token from AsyncStorage:", e);
+      console.log('Error removing token from AsyncStorage:', e);
     }
   };
 
   const updateProfile = async (profile: UserData) => {
     try {
-      await AsyncStorage.setItem("@profile", JSON.stringify(profile));
+      await AsyncStorage.setItem('@profile', JSON.stringify(profile));
       setUser(profile);
     } catch (e) {
-      console.log("[Auth] profile update error", e);
+      console.log('[Auth] profile update error', e);
     }
   };
 
@@ -132,6 +131,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error("useAuth must be used inside AuthProvider");
+  if (!ctx) throw new Error('useAuth must be used inside AuthProvider');
   return ctx;
 };
