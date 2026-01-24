@@ -3,14 +3,24 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUser, loginUser } from '@/lib/api/user';
 
 type UserData = {
-  name?: string;
-  email?: string;
-  picture?: string;
+    name?: string;
+    email?: string;
+    picture?: string;
+    referralCode: String;
+    soundEffect: boolean;
+    haptics: boolean;
+    toggleSound: ()=>void;
+    toggleHaptics: ()=>void;
 };
 type ClientUserData = {
-  username?: string;
-  email?: string;
-  picture?: string;
+    username?: string;
+    email?: string;
+    picture?: string;
+    referralCode: String;
+    soundEffect: boolean;
+    haptics: boolean;
+    toggleSound: ()=>void;
+    toggleHaptics: ()=>void;
 };
 type AuthContextType = {
   user: ClientUserData | null;
@@ -19,6 +29,10 @@ type AuthContextType = {
   logout: () => Promise<void>;
   updateProfile: (profile: UserData) => Promise<void>;
   loading: boolean;
+  soundEffect: boolean;
+  haptics: boolean;
+  toggleSound: ()=>void;
+  toggleHaptics: ()=>void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,7 +40,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<ClientUserData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [userToken, setUserToken] = useState('');
+  const [sound, setSound] = useState(true);
+  const [haptics, setHaptics] = useState(true);
+  const [ userToken, setUserToken ] = useState("");
   useEffect(() => {
     const restoreUser = async () => {
       try {
@@ -57,8 +73,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [userToken]);
 
   const login = async (user: UserData) => {
-    // console.log("authContext : user = ",user);
-
+    console.log("authContext : user = ",user);
+    
     try {
       if (!user.name || !user.email) {
         throw new Error('User name or email missing');
@@ -67,15 +83,17 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         username: user.name,
         email: user.email,
         picture: user.picture,
-      };
-      await loginUser(payload).then((response) => {
-        console.log('response :- ', response);
+        referralCode: user.referralCode
+      }
+      loginUser(payload).then(async (response)=>{
+        console.log("response loginUser :- ",response);
         // const newUser = {...user, userId: .id}
-        AsyncStorage.setItem('token', JSON.stringify(response.data));
+        await AsyncStorage.setItem("token", JSON.stringify(response.data)).then(()=>{console.log("done !!")}).catch(()=>{console.log("err");});
         setUserToken(response.data);
+      }).catch((err)=>{console.log("error :- ",err);
       });
     } catch (e) {
-      console.log('Error saving token to AsyncStorage:', e);
+      console.log("c", e);
     }
   };
 
@@ -97,10 +115,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const toggleSound = ()=>{
+    setSound(!sound);
+  }
+  const toggleHaptics = ()=>{
+    setSound(!haptics);
+  }
+
   return (
-    <AuthContext.Provider
-      value={{ user, userToken, login, logout, loading, updateProfile }}
-    >
+    <AuthContext.Provider value={{ user, userToken, login, logout, loading, updateProfile, soundEffect: sound, toggleSound,  haptics, toggleHaptics }}>
       {children}
     </AuthContext.Provider>
   );

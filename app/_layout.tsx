@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 
 function RootNavigator() {
   const { user, loading } = useAuth();
-  console.log(user);
+  console.log("user in _layout main : - ",user);
 
   if (loading) {
     return (
@@ -32,7 +32,7 @@ function RootNavigator() {
         {/* <Stack.Screen name="edit-profile" /> */}
         {/* <Stack.Screen name="adScreen" /> */}
         {/* <Stack.Screen name="rewardHistory" /> */}
-        <Stack.Screen name="errorScreen" />
+        {/* <Stack.Screen name="errorScreen" /> */}
         {/* <Stack.Screen name="rewardHistory" /> */}
       </Stack>
     </ThemeProvider>

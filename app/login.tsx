@@ -33,15 +33,15 @@ export default function LoginScreen() {
   const [selectedTab, setSelectedTab] = useState<'login' | 'signup'>('login');
   const [phone, setPhone] = useState('');
   const { login } = useAuth();
-  const { toggleDarkMode, isDarkMode, colors } = useAppTheme();
+  const [referral, setReferral] = useState("");
+  const { colors } = useAppTheme(); 
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
 
   const [request, response, promptAsync] = Google.useAuthRequest({
+    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID, 
     androidClientId: process.env.EXPO_PUBLIC_ANDROID_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID,
     webClientId: process.env.EXPO_PUBLIC_WEB_CLIENT_ID,
-    // useProxy: true,
-  });
+  })
 
   const handleGoogleSignIn = async () => {
     try {
@@ -53,18 +53,28 @@ export default function LoginScreen() {
   };
 
   React.useEffect(() => {
-    console.log(response);
+    console.log("responce :- ",response);
     handleSignInWithGoogle();
   }, [response]);
   async function handleSignInWithGoogle() {
-    if (response?.type === 'success') {
+    console.log("googleCalled");
+    
+    if (response?.type === "success") {
       const token = response.authentication?.accessToken;
       if (token) {
+        console.log("token :- ",token);
+        
         const user = await getUserInfo(token);
+        // user.referalCode = referal;
         if (user) {
           // Tell the authContext that we are logged in
-          // console.log("login : ", token, " - - ", user);
-          await login(user);
+          const newToken = {...user, referralCode: referral};
+          console.log("login : ", token, " - - ", newToken);
+          await login(newToken).then((res)=>{
+            console.log("responceFromlogin :- ",res);
+          }
+          );
+          
           // after this, app/_layout.tsx will see `user` and switch to (tabs)
         }
       }
@@ -79,8 +89,8 @@ export default function LoginScreen() {
       });
 
       const user = await res.json();
-      console.log('user given data:', user);
-      navigation.navigate('HomeMain');
+      console.log("user given data :- ", user);
+      // navigation.navigate('HomeMain');
       return user; // return to handleSignInWithGoogle
     } catch (error) {
       console.log('Error fetching user info', error);
@@ -89,15 +99,15 @@ export default function LoginScreen() {
   };
 
   return (
-    <LinearGradient
-      colors={colors.gradients.background}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.gradient}
-    >
-      <SafeAreaView style={styles.safe}>
-        <BackgroundTextTexture></BackgroundTextTexture>
-        {/* <StatusBar barStyle={colors.statusBarStyle} /> */}
+      <LinearGradient
+        colors={colors.gradients.background}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.gradient}
+      >
+        <SafeAreaView style={styles.safe}>
+          <BackgroundTextTexture></BackgroundTextTexture>
+          <StatusBar barStyle={colors.statusBarStyle} />
 
         <View style={styles.topSection}>
           <View style={styles.headerTextContainer}>
@@ -107,18 +117,6 @@ export default function LoginScreen() {
             </Text>
           </View>
 
-          <View style={styles.themeToggleContainer}>
-            <TouchableOpacity onPress={toggleDarkMode}>
-              {isDarkMode ? (
-                <View style={styles.themeToggleDark}>
-                  <Text style={styles.themeIcon}>🌙</Text>
-                </View>
-              ) : (
-                <View style={styles.themeToggleLight}>
-                  <Text style={styles.themeIcon}>☀️</Text>
-                </View>
-              )}
-            </TouchableOpacity>
           </View>
         </View>
 
@@ -152,7 +150,7 @@ export default function LoginScreen() {
                     Log In
                   </Text>
                 </Pressable>
-                <Pressable
+                {/* <Pressable
                   style={[
                     styles.tabButton,
                     selectedTab === 'signup' && styles.tabButtonActive,
@@ -167,10 +165,13 @@ export default function LoginScreen() {
                   >
                     Sign Up
                   </Text>
-                </Pressable>
+                </Pressable> */}
               </View>
 
-              <View style={styles.fieldGroup}>
+              <View 
+                style={styles.fieldGroup}
+                pointerEvents={'none'} 
+              >
                 <Text style={styles.label}>Enter phone number</Text>
                 <TextInput
                   style={styles.input}
@@ -180,38 +181,38 @@ export default function LoginScreen() {
                   value={phone}
                   onChangeText={setPhone}
                 />
+                <TouchableOpacity disabled={true} style={styles.primaryButton}>
+                  <Text style={styles.primaryButtonText}>Send OTP</Text>
+                </TouchableOpacity>
               </View>
 
-              <TouchableOpacity style={styles.primaryButton}>
-                <Text style={styles.primaryButtonText}>Send OTP</Text>
-              </TouchableOpacity>
 
               <View style={styles.dividerRow}>
                 <View style={styles.dividerLine} />
                 <Text style={styles.dividerText}>Or</Text>
                 <View style={styles.dividerLine} />
-              </View>
+              </View> 
 
-              <View style={styles.fieldGroup}>
+              <View>
                 <Text style={styles.label}>Enter Referal Code</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="xxx xxx"
                   placeholderTextColor={colors.textMuted}
-                  keyboardType="phone-pad"
-                  value={phone}
-                  onChangeText={setPhone}
+                  keyboardType="default"
+                  value={referral}
+                  onChangeText={setReferral}
                 />
+                <TouchableOpacity
+                  style={styles.googleButton}
+                  onPress={handleGoogleSignIn}
+                >
+                  <View style={styles.googleIcon}>
+                    <AntDesign name="google" size={24} color={`${colors.text}`} />
+                  </View>
+                  <Text style={styles.googleText}>Continue with Google</Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity
-                style={styles.googleButton}
-                onPress={handleGoogleSignIn}
-              >
-                <View style={styles.googleIcon}>
-                  <AntDesign name="google" size={24} color={`${colors.text}`} />
-                </View>
-                <Text style={styles.googleText}>Continue with Google</Text>
-              </TouchableOpacity>
             </ScrollView>
           </LinearGradient>
         </View>
@@ -322,6 +323,7 @@ const makeStyles = (colors: ColorScheme) =>
 
     fieldGroup: {
       marginBottom: 20,
+      opacity: 0.5,
     },
     label: {
       fontSize: 14,
@@ -337,6 +339,7 @@ const makeStyles = (colors: ColorScheme) =>
       fontSize: 16,
       backgroundColor: colors.backgrounds.input,
       color: colors.text,
+      marginBottom: 20,
     },
 
     primaryButton: {

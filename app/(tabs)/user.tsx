@@ -11,12 +11,14 @@ import { HomeScreenNavigationProp } from '@/types/tabTypes';
 
 export default function UserProfileScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const { userToken, user, logout } = useAuth();
+  const { userToken, user, logout ,soundEffect, haptics, toggleSound, toggleHaptics } = useAuth();
   // const decoded = Jwt.verify(userToken, 'super-secret-key-change-this');
   console.log("userT : ",userToken);
   console.log("user : ",user);
   
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [soundEffectToggle, setSoundEffect] = useState(soundEffect);
+  const [hapticsToggle, setHaptics] = useState(haptics);
 
   const { isDarkMode, toggleDarkMode, colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
@@ -53,13 +55,14 @@ export default function UserProfileScreen() {
               <View style={styles.screenContainer}>
                 <Text style={styles.nameText}>{user?.username || "User"}</Text>
                 <Text style={styles.emailText}>{user?.email}</Text>
+                <Text style={styles.referralText}>{user?.referralCode}</Text>
               </View> : 
               <View style={styles.screenContainer}>
                 <TouchableOpacity
                 onPress={loginHandle}
                 style={styles.startBtn} 
                 >
-                  <Text style={styles.btnText} >LOGIN</Text>
+                  <Text style={styles.btnText}>LOGIN</Text>
                 </TouchableOpacity>
               </View>
             }
@@ -117,8 +120,8 @@ export default function UserProfileScreen() {
                 </View>
 
                 <Switch
-                  value={notificationsEnabled}
-                  onValueChange={setNotificationsEnabled}
+                  value={soundEffect}
+                  onValueChange={toggleSound}
                   trackColor={{
                     false: colors.controls.switchTrackOff,
                     true: colors.controls.switchTrackOn,
@@ -139,8 +142,8 @@ export default function UserProfileScreen() {
                 </View>
 
                 <Switch
-                  value={notificationsEnabled}
-                  onValueChange={setNotificationsEnabled}
+                  value={haptics}
+                  onValueChange={toggleHaptics}
                   trackColor={{
                     false: colors.controls.switchTrackOff,
                     true: colors.controls.switchTrackOn,
@@ -288,6 +291,17 @@ const makeStyles = (colors: ColorScheme) =>
       fontWeight: "300",
       color: colors.textSecondary,
       opacity: 0.9,
+      marginBottom: 20,
+    },
+    referralText: {
+      fontSize: 16,
+      fontWeight: "700",
+      color: colors.textSecondary,
+      borderWidth: 4,
+      borderColor: colors.textSecondary,
+      paddingHorizontal: 10,
+      paddingVertical: 5,
+      borderRadius: 10,
       marginBottom: 20,
     },
     screenContainer: {
