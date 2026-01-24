@@ -17,10 +17,7 @@ type ClientUserData = {
     email?: string;
     picture?: string;
     referralCode: String;
-    soundEffect: boolean;
-    haptics: boolean;
-    toggleSound: ()=>void;
-    toggleHaptics: ()=>void;
+    userId: string;
 };
 type AuthContextType = {
   user: ClientUserData | null;
@@ -59,7 +56,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           };
           await getUser(payload).then((response) => {
             console.log('response :- ', response);
-            setUser(response);
+            setUser(response.data);
             console.log('after setUser ', user);
           });
         }
@@ -107,12 +104,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const updateProfile = async (profile: UserData) => {
-    try {
-      await AsyncStorage.setItem('@profile', JSON.stringify(profile));
-      setUser(profile);
-    } catch (e) {
-      console.log('[Auth] profile update error', e);
-    }
+    // try {
+    //   await AsyncStorage.setItem('@profile', JSON.stringify(profile));
+    //   setUser(profile);
+    // } catch (e) {
+    //   console.log('[Auth] profile update error', e);
+    // }
   };
 
   const toggleSound = ()=>{

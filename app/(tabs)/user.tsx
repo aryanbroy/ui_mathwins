@@ -51,9 +51,9 @@ export default function UserProfileScreen() {
             {
               user ?
               <View style={styles.screenContainer}>
-                <Text style={styles.nameText}>{user?.data?.username || "User"}</Text>
-                <Text style={styles.emailText}>{user?.data?.email}</Text>
-                <Text style={styles.referralText}>{user?.data?.referralCode}</Text>
+                <Text style={styles.nameText}>{user?.username || "User"}</Text>
+                <Text style={styles.emailText}>{user?.email}</Text>
+                <Text style={styles.referralText}>{user?.referralCode}</Text>
               </View> : 
               <View style={styles.screenContainer}>
                 <TouchableOpacity
