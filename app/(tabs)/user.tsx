@@ -17,8 +17,6 @@ export default function UserProfileScreen() {
   console.log("user : ",user);
   
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [soundEffectToggle, setSoundEffect] = useState(soundEffect);
-  const [hapticsToggle, setHaptics] = useState(haptics);
 
   const { isDarkMode, toggleDarkMode, colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
@@ -53,9 +51,9 @@ export default function UserProfileScreen() {
             {
               user ?
               <View style={styles.screenContainer}>
-                <Text style={styles.nameText}>{user?.username || "User"}</Text>
-                <Text style={styles.emailText}>{user?.email}</Text>
-                <Text style={styles.referralText}>{user?.referralCode}</Text>
+                <Text style={styles.nameText}>{user?.data?.username || "User"}</Text>
+                <Text style={styles.emailText}>{user?.data?.email}</Text>
+                <Text style={styles.referralText}>{user?.data?.referralCode}</Text>
               </View> : 
               <View style={styles.screenContainer}>
                 <TouchableOpacity

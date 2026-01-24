@@ -116,8 +116,6 @@ export default function LoginScreen() {
               Create an account or log in to explore about our app
             </Text>
           </View>
-
-          </View>
         </View>
 
         <View style={styles.card}>

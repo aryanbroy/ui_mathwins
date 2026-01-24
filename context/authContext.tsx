@@ -119,7 +119,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setSound(!sound);
   }
   const toggleHaptics = ()=>{
-    setSound(!haptics);
+    setHaptics(!haptics);
   }
 
   return (
