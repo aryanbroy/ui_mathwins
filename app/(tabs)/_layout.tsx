@@ -50,7 +50,7 @@ function TabNavigator() {
       />
 
       <Tab.Screen
-        name="rewards"
+        name="Rewards"
         component={Rewards}
         options={{
           title: 'Rewards',

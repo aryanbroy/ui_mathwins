@@ -78,14 +78,6 @@ export default function Index() {
         <View style={styles.topSection}>
           <BackgroundTexture />
           <Header />
-          <View style={styles.progressBarContainer}>
-            <View
-              style={[
-                styles.progressBarFill,
-                { width: `${(300 / 2000) * 100}%` },
-              ]}
-            />
-          </View>
           <TournamentCards />
         </View>
 
@@ -129,18 +121,6 @@ const makeStyles = (colors: ColorScheme) =>
       width: '100%',
       paddingHorizontal: 20,
       paddingBottom: 20,
-    },
-    progressBarContainer: {
-      height: 10,
-      backgroundColor: '#E5E7EB',
-      borderRadius: 10,
-      overflow: 'hidden',
-      marginBottom: 20,
-    },
-    progressBarFill: {
-      height: '100%',
-      backgroundColor: '#DC2626',
-      borderRadius: 10,
     },
     progressText: {
       paddingBottom: 20,

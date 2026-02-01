@@ -41,20 +41,6 @@ export default function EditProfileScreen() {
             style={styles.header}
         >
             <SafeAreaView style={styles.safe}>
-            {/* Theme Toggle */}
-            <View style={styles.themeToggleContainer}>
-                <TouchableOpacity onPress={toggleDarkMode}>
-                {isDarkMode ? (
-                    <View style={styles.themeToggleDark}>
-                        <Text style={styles.themeIcon}>🌙</Text>
-                    </View>
-                ) : (
-                    <View style={styles.themeToggleLight}>
-                        <Text style={styles.themeIcon}>☀️</Text>
-                    </View>
-                )}
-                </TouchableOpacity>
-            </View>
 
             {/* Title */}
             <Text style={styles.title}>Select Your Avatar</Text>
@@ -270,8 +256,8 @@ const makeStyles = (colors: ColorScheme) =>
         centerAvatar: {
             width: 130,
             height: 130,
-            padding: 10,
-            borderRadius: 65,
+            padding: 5,
+            borderRadius: 100,
             backgroundColor: '#FFF',
             justifyContent: 'center',
             alignItems: 'center',

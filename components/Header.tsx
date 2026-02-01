@@ -13,28 +13,39 @@ export default function Header() {
     navigation.navigate('user');
     console.log('Clicked Profile');
   }
+  const coins = user?.coins || 0;
 
   return (
-    <View style={styles.content}>
-      <View style={styles.leftSection}>
-        <View style={styles.welcomeContainer}>
-          <Text style={styles.welcomeText}>Welcome</Text>
-          <Text style={styles.username}>
-            {user?.username || "User"}
-          </Text>
-        </View>
+    <View>
+      <View style={styles.content}>
+        <View style={styles.leftSection}>
+          <View style={styles.welcomeContainer}>
+            <Text style={styles.welcomeText}>Welcome</Text>
+            <Text style={styles.username}>
+              {user?.username || "User"}
+            </Text>
+          </View>
 
-        <View style={styles.coinContainer}>
-          <Text style={styles.coinEmoji}>🪙</Text>
-          <Text style={styles.coinText}>0 / 2,000 coins</Text>
-        </View>
+          <View style={styles.coinContainer}>
+            <Text style={styles.coinEmoji}>🪙</Text>
+            <Text style={styles.coinText}>{coins} / 2,000 coins</Text>
+          </View>
+          </View>
+
+        <TouchableOpacity onPress={profileClick} style={styles.avatarContainer}>
+          <View style={styles.avatarBorder}>
+            <Image source={{ uri: user?.picture }} style={styles.avatar} />
+          </View>
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity onPress={profileClick} style={styles.avatarContainer}>
-        <View style={styles.avatarBorder}>
-          <Image source={{ uri: user?.picture }} style={styles.avatar} />
-        </View>
-      </TouchableOpacity>
+      <View style={styles.progressBarContainer}>
+        <View
+          style={[
+            styles.progressBarFill,
+            { width: `${(coins / 2000) * 100}%` },
+          ]}
+        />
+      </View>
     </View>
   );
 }
@@ -47,7 +58,18 @@ const makeStyles = (colors: ColorScheme) =>
       justifyContent: 'space-between',
       alignItems: 'center',
     },
-
+    progressBarContainer: {
+      height: 10,
+      backgroundColor: '#E5E7EB',
+      borderRadius: 10,
+      overflow: 'hidden',
+      marginBottom: 20,
+    },
+    progressBarFill: {
+      height: '100%',
+      backgroundColor: '#DC2626',
+      borderRadius: 10,
+    },
     leftSection: {
       flex: 1,
       marginRight: 15,

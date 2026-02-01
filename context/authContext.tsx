@@ -18,7 +18,9 @@ type ClientUserData = {
     picture?: string;
     referralCode: String;
     userId: string;
-};
+    coins: number;
+    isAdmin: boolean;
+  };
 type AuthContextType = {
   user: ClientUserData | null;
   userToken: string;

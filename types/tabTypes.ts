@@ -14,6 +14,12 @@ type continueParams = {
     sessionId: string;
   };
 };
+type errorType = {
+  params: {
+    errorCode: number;
+    errorMessage: string;
+  }
+}
 export type HomeTabStackParamList = {
   HomeMain: undefined;
   Daily: undefined;
@@ -25,6 +31,11 @@ export type HomeTabStackParamList = {
   Instant: undefined;
   login: undefined;
   editProfile: undefined;
+  editConfig: undefined;
+  errorScreen: errorType;
+  privacyPolicy: undefined;
+  termsAndCondition: undefined;
+  contactUs: undefined;
 };
 
 export type HomeScreenNavigationProp =

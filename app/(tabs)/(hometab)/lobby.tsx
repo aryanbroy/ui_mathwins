@@ -36,6 +36,8 @@ export enum SessionType {
 }
 
 type RouteParams = {
+  userId: string;
+  sessionId: string;
   sessionType: SessionType;
 };
 
@@ -46,7 +48,7 @@ export default function SoloScreen() {
   const [totalAttempt, setTotalAttempt] = useState(0);
   const [remainingAttempt, setRemainingAttempt] = useState(0);
   const [loading, setLoading] = useState(true);
-  const { user, soundEffect, haptics } = useAuth();
+  const { user } = useAuth();
   const route = useRoute<RouteProp<{ params: RouteParams }>>();
 
   const [err, setErr] = useState<ErrObject | null>(null);
@@ -74,7 +76,7 @@ export default function SoloScreen() {
           await getSoloAtempts().then((res) => {
             console.log(res);
             setTotalAttempt(res?.data?.totalDailyAttempts);
-            setRemainingAttempt(res?.data.remainingAttempts);
+            setRemainingAttempt(res?.data?.remainingAttempts);
             setLoading(false);
           });
           break;
@@ -82,6 +84,17 @@ export default function SoloScreen() {
     }
     getRemainingAttemp();
   }, [route.params]);
+    
+  async function getExtraAttempt(){
+    console.log("Show ad for extra attempt");
+    
+    const params = {
+      sessionType: 'lobby',
+      userId: route.params.userId as string,
+      sessionId: route.params.sessionId as string
+    };
+    navigation.navigate('ad',{params})
+  }
 
   async function startDailyGame() {
     setLoading(true);
@@ -114,7 +127,8 @@ export default function SoloScreen() {
     }
   }
 
-  async function createSoloSession() {
+
+  async function createSession() {
     setLoading(true);
     // await soloStart({ userId: user.userId }
     console.log('user :- ', user);
@@ -144,7 +158,7 @@ export default function SoloScreen() {
         await startDailyGame();
         break;
       case SessionType.SOLO:
-        await createSoloSession();
+        await createSession();
         break;
       case SessionType.INSTANT:
         console.log('start instant game');
@@ -179,12 +193,17 @@ export default function SoloScreen() {
               <TouchableOpacity
                 disabled={loading}
                 style={loading ? styles.startBtnDiabled :  styles.startBtn}
-                onPress={createSoloSession}
+                onPress={remainingAttempt > 0 ? startGame : getExtraAttempt}
               >
                 {
                   loading ? 
                   <Text style={styles.startBtnText}>. . .</Text> :
                   <Text style={styles.startBtnText}>Start game</Text>
+                }
+                {
+                  remainingAttempt<=0 ? 
+                  <Text style={styles.adText}>ad</Text> :
+                  <></>
                 }
               </TouchableOpacity>
             </View>
@@ -276,6 +295,16 @@ const makeStyles = (colors: ColorScheme) =>
       marginBottom: 10,
       borderWidth: 1,
       borderColor: "#FFFFFF"
+    },
+    adText: {
+      position: "absolute",
+      right: 0,
+      top: 0,
+      paddingHorizontal: 15,
+      paddingVertical: 5,
+      borderRadius: 10,
+      color: colors.text,
+      backgroundColor: colors.border,
     },
     startBtnText: {
       color: colors.textSecondary,

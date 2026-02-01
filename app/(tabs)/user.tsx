@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { View, Text, StyleSheet, Switch, TouchableOpacity, StatusBar, ScrollView, Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Feather, Ionicons, MaterialIcons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import { Feather, Ionicons, MaterialIcons, Entypo, MaterialCommunityIcons, FontAwesome  } from "@expo/vector-icons";
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
@@ -28,6 +28,10 @@ export default function UserProfileScreen() {
   function handleEditProfile(){
     console.log("Edit-Profile");
     navigation.navigate('editProfile');
+  }
+  function handleEditConfig(){
+    console.log("Edit-Config");
+    navigation.navigate('editConfig');
   }
   return (
     <ScrollView
@@ -193,7 +197,12 @@ export default function UserProfileScreen() {
               </TouchableOpacity>
 
               {/* Privacy Policy */}
-              <TouchableOpacity style={styles.row}>
+              <TouchableOpacity 
+              style={styles.row}
+              onPress={()=>{
+                navigation.navigate('privacyPolicy');
+              }}
+              >
                 <View style={styles.rowLeft}>
                   <Feather name="lock" size={22} style={styles.rowIcon} />
                   <Text style={styles.rowLabel}>Privacy Policy</Text>
@@ -202,7 +211,12 @@ export default function UserProfileScreen() {
               </TouchableOpacity>
 
               {/* Terms */}
-              <TouchableOpacity style={styles.row}>
+              <TouchableOpacity 
+              style={styles.row}
+              onPress={()=>{
+                navigation.navigate('termsAndCondition');
+              }}
+              >
                 <View style={styles.rowLeft}>
                   <MaterialIcons
                     name="description"
@@ -215,13 +229,30 @@ export default function UserProfileScreen() {
               </TouchableOpacity>
 
               {/* Contact */}
-              <TouchableOpacity style={styles.row}>
+              <TouchableOpacity 
+              style={styles.row}
+              onPress={()=>{
+                navigation.navigate('contactUs');
+              }}
+              >
                 <View style={styles.rowLeft}>
                   <Feather name="mail" size={22} style={styles.rowIcon} />
                   <Text style={styles.rowLabel}>Contact Us</Text>
                 </View>
                 <Entypo name="chevron-right" size={18} color={colors.textMuted} />
               </TouchableOpacity>
+
+              {/* for admin only */}
+              {
+                user?.isAdmin ? 
+                <TouchableOpacity style={styles.row} onPress={handleEditConfig}>
+                  <View style={styles.rowLeft}>
+                    <FontAwesome name="edit" size={22} style={styles.rowIcon} />
+                    <Text style={styles.rowLabel}>Change Config</Text>
+                  </View>
+                </TouchableOpacity> :
+                <></>
+              }
 
               {/* Logout */}
               <TouchableOpacity style={styles.row} onPress={logout}>
