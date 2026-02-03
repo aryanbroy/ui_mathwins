@@ -8,14 +8,14 @@ export default function Rewards(){
   const {user} = useAuth();
   return (
       <View style={{ flex: 1 }}>
-        {/* {user?.isAdmin ?
+        {user?.isAdmin ?
         <AdminRewardScreen /> :
         <UserRewardScreen />
-        } */}
-        {user?.isAdmin ?
+        }
+        {/* {user?.isAdmin ?
           <UserRewardScreen /> :
           <AdminRewardScreen />
-        }
+        } */}
       </View>
     )
 }

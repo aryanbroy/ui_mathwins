@@ -12,10 +12,12 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
+  Platform
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useAuth } from '@/context/authContext';
+import AdBanner from '../Ads/Banner';
 
 export default function UserRewardScreen() {
   const [today, setToday] = useState(5);
@@ -47,12 +49,6 @@ export default function UserRewardScreen() {
   };
 
   return (
-    // <LinearGradient
-    //   colors={colors.gradients.surface}
-    //   start={{ x: 0, y: 0 }}
-    //   end={{ x: 0, y: 1 }}
-    //   style={styles.gradient}
-    // >
       <ScrollView
         bounces={false}
         alwaysBounceVertical={false}
@@ -61,9 +57,7 @@ export default function UserRewardScreen() {
         contentContainerStyle={styles.scrollContent}
       >
         <SafeAreaView style={styles.safe}>
-          <View style={styles.adArea1}>
-            <Text>ad here</Text>
-          </View>
+          <AdBanner/>
           <View style={styles.screen}>
             <Text style={styles.headerTitle}>YOUR REWARDS</Text>
             <Text style={styles.headerSubtitle}>
@@ -75,7 +69,7 @@ export default function UserRewardScreen() {
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
             style={styles.gradient2}
-          >
+            >
             <View style={styles.box}>
               <View style={styles.streakCard}>
                 <View style={styles.streakContent}>
@@ -95,7 +89,7 @@ export default function UserRewardScreen() {
                               day === today && styles.streakDayActive,
                               day === today + 1 && styles.streakDayNext,
                             ]}
-                          >
+                            >
                             <Text style={[styles.streakDayText]}>{day}</Text>
                           </View>
                           {day < 7 && <View style={styles.streakConnector} />}
@@ -113,7 +107,7 @@ export default function UserRewardScreen() {
                 <TouchableOpacity
                   style={styles.claimButton}
                   onPress={claimBtnPress}
-                >
+                  >
                   {isClaimBtnLoading ? (
                     <ActivityIndicator />
                   ) : (
@@ -128,7 +122,7 @@ export default function UserRewardScreen() {
                       styles.progressBarFill,
                       { width: `${(coins / maxCoins) * 100}%` },
                     ]}
-                  />
+                    />
                 </View>
                 <View style={styles.coinsInfo}>
                   <Text style={styles.coinIcon}>🪙</Text>
@@ -149,9 +143,7 @@ export default function UserRewardScreen() {
               </TouchableOpacity>
             </View>
           </LinearGradient>
-          <View style={styles.adArea2}>
-            <Text>ad here</Text>
-          </View>
+          <AdBanner/>
         </SafeAreaView>
       </ScrollView>
     // </LinearGradient>
@@ -197,7 +189,7 @@ const makeStyles = (colors: ColorScheme) =>
       fontWeight: 900,
       color: '#FFF',
       textAlign: 'center',
-      marginTop: 20,
+      marginTop: 40,
     },
     headerSubtitle: {
       fontSize: 12,

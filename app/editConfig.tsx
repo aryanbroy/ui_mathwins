@@ -30,7 +30,8 @@ export default function AdminPanelScreen() {
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [note, setNote] = useState(""); 
+  const [note, setNote] = useState("");
+  const [isDailyActive, setIsDailyActive] = useState(true);
 
   useEffect(() => {
     async function getCurrentConfig() {
@@ -87,6 +88,7 @@ export default function AdminPanelScreen() {
     return !Number.isInteger(value);
   };
   const [numberDrafts, setNumberDrafts] = useState<Record<string, string>>({});
+
   const renderConfig = (
     obj: Record<string, any>,
     basePath: string[]
@@ -233,6 +235,10 @@ export default function AdminPanelScreen() {
     (key) => !HIDDEN_TOP_LEVEL_KEYS.has(key)
   );
 
+  function handleActivateDaily(){
+    console.log("Created");
+    setIsDailyActive(!isDailyActive);
+  }
   async function handleSave(){
     console.log("NOTE :- ",note);
     if (!config || !selectedKey) return;
@@ -260,11 +266,38 @@ export default function AdminPanelScreen() {
       setSaving(false);
     }
   }
+  const today = new Date();
+  const formalDate = today.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
   return (
     <ScrollView style={styles.container}>
         <SafeAreaView style={styles.safe}>
         <Text style={styles.title}>Hi Admin!</Text>
         <Text style={styles.subtitle}>Welcome back to your panel.</Text>
+        <View style={styles.dailyTourBox}>
+          <View>
+            <Text style={styles.dailyTourMainText}>Create Daily Tournament</Text>
+            <Text style={styles.dailyTourSecondaryText}>Date : {formalDate}</Text>
+          </View>
+          <TouchableOpacity
+          style={isDailyActive ? styles.dailyTourButton : styles.dailyTourButtonDisabled}
+          disabled={!isDailyActive}
+          onPress={handleActivateDaily}>
+            <Text 
+            style={
+              isDailyActive ? 
+              styles.dailyTourButtonText : 
+              {
+                color:"#FFFFFF70",
+              }}
+            >
+              CREATE
+            </Text>
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           style={styles.dropdown}
@@ -349,6 +382,42 @@ const styles = StyleSheet.create({
     color: "#aaa",
     fontSize: 16,
     marginBottom: 30,
+  },
+  dailyTourBox: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingVertical: 20,
+    // paddingHorizontal: 10,
+    // borderWidth: 1,
+    // borderColor: "#FFF"
+  },
+  dailyTourMainText: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "700",
+  },
+  dailyTourSecondaryText: {
+    color: "#b8b8b8",
+    fontSize: 15,
+  },
+  dailyTourButton: {
+    backgroundColor: "#FFF",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    borderRadius: 10,
+  },
+  dailyTourButtonDisabled: {
+    backgroundColor: "#ffffff40",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 10,
+    borderRadius: 10,
+  },
+  dailyTourButtonText: {
+    fontWeight: "800",
   },
   dropdown: {
     borderWidth: 2,

@@ -16,6 +16,8 @@ const medalBg: Record<string, string> = {
 };
 
 export default function LeaderboardCard({ rank, name, points }: Props) {
+  console.log(rank," ",name," ",points);
+  
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
 

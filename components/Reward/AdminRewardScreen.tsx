@@ -52,7 +52,7 @@ export default function AdminRewardScreen() {
       </View>
       <TextInput
         style={styles.input}
-        placeholder="https://www.amazon.com"
+        placeholder="https://www.website.com"
         placeholderTextColor={colors.textMuted}
         keyboardType="default"
         value={link}

@@ -9,6 +9,7 @@ import { continueSolo } from '@/lib/api/soloTournament';
 import { quitSolo } from '@/lib/api/soloTournament';
 import LeaderboardCard from '@/components/Home/LeaderboardCard';
 import { parseApiError } from '@/lib/api/parseApiError';
+import AdBanner from '@/components/Ads/Banner';
 
 export enum SessionType {
   SOLO = 'solo',
@@ -92,7 +93,7 @@ export default function roundOverview() {
           useNativeDriver: true,
         }),
       ]).start();
-    }, 2500);
+    }, 4000);
 
     return () => clearTimeout(gifTimer);
   }, []);
@@ -136,13 +137,11 @@ export default function roundOverview() {
     end={{ x: 0, y: 1 }}
     style={styles.container}>
     <SafeAreaView style={styles.safe}>
-      <View style={styles.adArea1}>
-        ad here
-      </View>
+      <AdBanner/>
       <View style={styles.box}>
         <View style={styles.leaderBoardBox}>
           {dummyUsers.map((u) => (
-            <LeaderboardCard key={`all-${u.rank}`} {...u} />
+            <LeaderboardCard key={u.rank} {...u} />
           ))}
         </View>
         <View style={styles.scoreContainer}>
@@ -191,7 +190,7 @@ export default function roundOverview() {
         </View>
       </View>
       <View style={styles.adArea2}>
-        ad here
+        <Text>ad Here</Text>
       </View>
     </SafeAreaView>
     </LinearGradient>
@@ -239,7 +238,7 @@ const makeStyles = (colors: ColorScheme) =>
       backgroundColor: colors.secondary,
       paddingVertical: 14,
       paddingHorizontal: 20 ,
-      borderRadius: 12,
+      borderRadius: 10,
     },
     btnText: {
       color: colors.surface,
@@ -272,7 +271,7 @@ const makeStyles = (colors: ColorScheme) =>
     gifImage: {
       width: 120,
       height: 120,
-      borderRadius: "100%",
+      borderRadius: 100,
       marginBottom: 16,
     },
     loadingText: {

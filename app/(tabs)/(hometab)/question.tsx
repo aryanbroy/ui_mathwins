@@ -28,6 +28,8 @@ import ResultPopup from '@/components/QuestionScreen/ResultPopup';
 import { useFeedback } from '@/context/useFeedback';
 import adscreen from './adScreen';
 import Error404Screen from '@/app/errorScreen';
+import { useRewardedAd } from '@/components/Ads/Rewarded';
+import { useInterstitialAd } from '@/components/Ads/InterstitialAd';
 
 type sanitizedQuestionType = {
   id: string;
@@ -740,13 +742,14 @@ export default function QuestionScreen() {
             if (response.data.isRoundCompleted) {
               setRound(response.data.roundNumber + 1);
               console.log('response :- ', response);
+              showAd();
               const params: continueParams = {
                 sessionType: session.sessionType,
                 userId: sessionDetails?.userId as string,
                 sessionId: sessionDetails?.sessionId as string,
                 bankedPoint: response?.data.bankedPoint as number,
               };
-              navigation.navigate('ad', { params });
+              navigation.navigate('roundOverview',{params});
             } else {
               resetQuestion();
               resetTimer();
@@ -791,16 +794,20 @@ export default function QuestionScreen() {
     }
   };
 
+  const { showAd } = useInterstitialAd(() => {
+    console.log("DONE");
+  });
+
   // Lifeline: 50-50
+  const handleFiftyfiftySubmitWithAd = () => {
+    showAd();
+    handleFiftyfiftySubmit();
+  }
   const handleFiftyfiftySubmit = () => {
     if (!isFiftyFiftyAvailable || isChecking || showResult) {
       pauseTimer();
-      setShowAdPopup(true);
-      setTimeout(() => {
-        setShowAdPopup(false);
-        resumeTimer();
-      }, 3000);
     }
+    resumeTimer();
     setLoading(true);
     const payload = {
       sessionType: session.sessionType,
@@ -826,16 +833,16 @@ export default function QuestionScreen() {
   };
 
   // Lifeline: +30 Seconds
+  const handleThirtyPlusSubmitWithAd = () => {
+    showAd();
+    handleThirtyPlusSubmit();
+  }
   const handleThirtyPlusSubmit = () => {
     if (!isThirtySecAvailable || isChecking || showResult) {
       pauseTimer();
-      setShowAdPopup(true);
-      setTimeout(() => {
-        setShowAdPopup(false);
-        resumeTimer();
-      }, 3000);
     }
-
+    
+    resumeTimer();
     if (session.sessionType === SessionType.SOLO) {
       addTime(30000);
     } else if (
@@ -850,16 +857,16 @@ export default function QuestionScreen() {
   };
 
   // Lifeline: Level Down
+  const handleLevelDownWithAd = () => {
+    showAd();
+    handleLevelDownSubmit();
+  }
   const handleLevelDownSubmit = () => {
     if (!isLevelDownAvailable || isChecking || showResult){
       pauseTimer();
-      setShowAdPopup(true);
-      setTimeout(() => {
-        setShowAdPopup(false);
-        resumeTimer();
-      }, 3000);
     }
-
+    
+    resumeTimer();
     setLoading(true);
     const payload = {
       sessionType: session.sessionType,
@@ -1000,7 +1007,7 @@ export default function QuestionScreen() {
                 <TouchableOpacity
                   style={styles.lifelineBtn}
                   disabled={isChecking || showResult}
-                  onPress={handleFiftyfiftySubmit}
+                  onPress={isFiftyFiftyAvailable ? handleFiftyfiftySubmit : handleFiftyfiftySubmitWithAd}
                 >
                   <Text style={styles.lifelineBtnText}>50-50</Text>
                   {
@@ -1012,7 +1019,7 @@ export default function QuestionScreen() {
                 <TouchableOpacity
                   style={styles.lifelineBtn}
                   disabled={isChecking || showResult}
-                  onPress={handleThirtyPlusSubmit}
+                  onPress={isThirtySecAvailable ? handleThirtyPlusSubmit : handleThirtyPlusSubmitWithAd}
                 >
                   <Text style={styles.lifelineBtnText}>+30 Sec</Text>
                   {
@@ -1024,7 +1031,7 @@ export default function QuestionScreen() {
                 <TouchableOpacity
                   style={styles.lifelineBtn}
                   disabled={isChecking || showResult}
-                  onPress={handleLevelDownSubmit}
+                  onPress={isLevelDownAvailable ? handleLevelDownSubmit : handleLevelDownWithAd}
                 >
                   <Text style={styles.lifelineBtnText}>Level Down</Text>
                   {

@@ -2,11 +2,10 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
-  StatusBar,
   Image,
+  Alert,
   ScrollView,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -14,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { useAuth } from '@/context/authContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as DocumentPicker from "expo-document-picker";
 
 export default function EditProfileScreen() {
   const { user } = useAuth();
@@ -22,14 +22,46 @@ export default function EditProfileScreen() {
   const [isConfirmed, setIsConfirmed] = useState(false);
   const {toggleDarkMode, isDarkMode, colors } = useAppTheme(); 
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
+  const [imageUri, setImageUri] = useState<string | null>(null);
+
+  const MAX_SIZE_MB = 2;
+  const ALLOWED_TYPES = ["image/jpeg", "image/jpg", "image/png"];
+
+const pickImage = async () => {
+    const result = await DocumentPicker.getDocumentAsync({
+      type: "image/*",
+      copyToCacheDirectory: true,
+      multiple: false,
+    });
+
+    if (result.canceled) return;
+
+    const file = result.assets[0];
+
+    // Validate MIME type
+    if (!ALLOWED_TYPES.includes(file.mimeType!)) {
+      Alert.alert("Invalid format", "Only JPG and PNG allowed");
+      return;
+    }
+
+    // Validate size
+    const sizeInMB = (file.size!) / (1024 * 1024);
+    if (sizeInMB > MAX_SIZE_MB) {
+      Alert.alert("File too large", `Max ${MAX_SIZE_MB}MB allowed`);
+      return;
+    }
+    console.log("UPLOADED : ",file.uri);
+    
+    setImageUri(file.uri);
+  };
 
   const avatars = [
-    { id: 1, emoji: '🧑‍🎤', bg: '#C4B5FD' },
-    { id: 2, emoji: '🐨', bg: '#FDB777' },
-    { id: 3, emoji: '👦', bg: '#FCA5A5' },
-    { id: 4, emoji: '🥽', bg: '#C084FC' },
-    { id: 5, emoji: '👨‍💼', bg: '#FDB777' },
-    { id: 6, emoji: '👧', bg: '#E9D5FF' },
+    { id: 1, emoji: 'https://lh3.googleusercontent.com/gg/AMW1TPqw-iuew4Iah88V0jnJa0XrdNwncdzGC6OE8X_XVx4i2vzZCDDuqnnspm9coUMlXmb7p_rfwh4zyZ5ehRNLZLNlIujFUZBOh1FfVtPiGhpb0wPyLhT_1WKEteTraeZjb1nB5wvl9nv0NgiQPQ2m3EDTwZCTcymltLJykoUXqAf3nA80jbHN=s1024-rj-mp2', bg: '#C4B5FD' },
+    { id: 2, emoji: 'https://thumbs.dreamstime.com/b/male-portrait-curly-hair-doodle-style-male-portrait-curly-hair-doodle-style-man-head-front-view-272920935.jpg', bg: '#FDB777' },
+    { id: 3, emoji: 'https://static.vecteezy.com/system/resources/thumbnails/008/297/351/small/man-face-with-beard-and-eyeglasses-in-doodle-style-colorful-avatar-of-smiling-man-vector.jpg', bg: '#FCA5A5' },
+    { id: 4, emoji: 'https://thumbs.dreamstime.com/b/male-portrait-curly-hair-doodle-style-male-portrait-curly-hair-doodle-style-man-head-front-view-272920935.jpg', bg: '#C084FC' },
+    { id: 5, emoji: 'https://static.vecteezy.com/system/resources/thumbnails/008/297/351/small/man-face-with-beard-and-eyeglasses-in-doodle-style-colorful-avatar-of-smiling-man-vector.jpg', bg: '#FDB777' },
+    { id: 6, emoji: 'https://thumbs.dreamstime.com/b/happy-nerd-boy-doodle-face-child-smiling-411317659.jpg', bg: '#E9D5FF' },
   ];
 
   return (
@@ -70,7 +102,7 @@ export default function EditProfileScreen() {
                         ]}
                         onPress={() => setSelectedAvatar(avatar.id)}
                     >
-                        <Text style={styles.avatarEmoji}>{avatar.emoji}</Text>
+                        <Image source={{ uri: avatar.emoji }} style={styles.avatarImage} />
                     </TouchableOpacity>
                     ))}
                 </View>
@@ -78,7 +110,7 @@ export default function EditProfileScreen() {
                 {/* Center Avatar */}
                 <View style={styles.centerAvatarContainer}>
                     <View style={styles.centerAvatar}>
-                    <Image source={{ uri: user?.picture }} style={styles.avatarImage} />
+                    <Image source={{ uri: imageUri ? imageUri : user?.picture }} style={styles.avatarImage} />
                     </View>
                     <TouchableOpacity style={styles.refreshButton}>
                         <Ionicons name="refresh" size={30} color="#FFF" />
@@ -97,22 +129,23 @@ export default function EditProfileScreen() {
                         ]}
                         onPress={() => setSelectedAvatar(avatar.id)}
                     >
-                        <Text style={styles.avatarEmoji}>{avatar.emoji}</Text>
+                        <Image source={{ uri: avatar.emoji }} style={styles.avatarImage} />
+                        {/* <Text style={styles.avatarEmoji}>{avatar.emoji}</Text> */}
                     </TouchableOpacity>
                     ))}
                 </View>
                 </View>
 
                 {/* Upload Button */}
-                <TouchableOpacity style={styles.uploadButton}>
+                <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
                 <Text style={styles.uploadText}>Upload</Text>
                 <View style={styles.plusIcon}>
-                    <Ionicons name="add" size={20} color="white" />
+                    <Ionicons name="add" size={20} color={colors.text}/>
                 </View>
                 </TouchableOpacity>
 
                 {/* Username Input */}
-                <View style={styles.inputContainer}>
+                {/* <View style={styles.inputContainer}>
                 <Text style={styles.inputLabel}>Enter your preferred username</Text>
                 <TextInput
                     style={styles.input}
@@ -121,10 +154,10 @@ export default function EditProfileScreen() {
                     value={username}
                     onChangeText={setUsername}
                 />
-                </View>
+                </View> */}
 
                 {/* Confirm Checkbox */}
-                <TouchableOpacity
+                {/* <TouchableOpacity
                 style={styles.checkboxContainer}
                 onPress={() => setIsConfirmed(!isConfirmed)}
                 >
@@ -132,11 +165,11 @@ export default function EditProfileScreen() {
                     {isConfirmed && <Ionicons name="checkmark" size={20} color="#FFF" />}
                 </View>
                 <Text style={styles.checkboxLabel}>Confirm Submission</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
 
                 {/* Let's Play Button */}
                 <TouchableOpacity style={styles.playButton}>
-                <Text style={styles.playButtonText}>Submit</Text>
+                <Text style={styles.playButtonText}>SUBMIT</Text>
                 </TouchableOpacity>
             </View>
             </LinearGradient>
@@ -234,10 +267,10 @@ const makeStyles = (colors: ColorScheme) =>
         avatarCircle: {
             width: 80,
             height: 80,
-            borderRadius: 40,
+            borderRadius: 100,
             justifyContent: 'center',
             alignItems: 'center',
-            borderWidth: 3,
+            borderWidth: 5,
             opacity: 0.8,
             borderColor: 'transparent',
         },
@@ -279,22 +312,22 @@ const makeStyles = (colors: ColorScheme) =>
         uploadButton: {
             flexDirection: 'row',
             alignItems: 'center',
-            backgroundColor: colors.primary,
+            gap: 20,
+            backgroundColor: colors.textMuted,
             paddingVertical: 14,
-            paddingHorizontal: 50,
+            paddingHorizontal: 20,
             borderRadius: 12,
             marginBottom: 30,
-            gap: 10,
         },
         uploadText: {
-            color: 'white',
+            color: colors.text,
             fontSize: 20,
             fontWeight: '600',
         },
         plusIcon: {
             // backgroundColor: 'rgba(255,255,255,0.3)',
             borderWidth: 2,
-            borderColor: '#FFF',
+            borderColor: colors.text,
             borderRadius: 100,
             padding: 2,
         },
@@ -343,13 +376,15 @@ const makeStyles = (colors: ColorScheme) =>
         },
         playButton: {
             backgroundColor: colors.primary,
-            paddingVertical: 16,
-            paddingHorizontal: 100,
+            paddingVertical: 14,
+            width: "100%",
+            justifyContent: "center",
+            alignItems: "center",
             borderRadius: 12,
         },
         playButtonText: {
-            color: 'white',
+            color: '#FFF',
             fontSize: 20,
-            fontWeight: '600',
+            fontWeight: '800',
         },
     });
