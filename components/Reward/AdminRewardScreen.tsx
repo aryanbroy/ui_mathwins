@@ -12,14 +12,15 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import useAppTheme, { ColorScheme } from "@/context/useAppTheme";
 import { LinearGradient } from "expo-linear-gradient";
+import NativeAdCard from "../Ads/nativeAdCard";
 
 type userDataType = {
   id: string; 
   name: string; 
   points: number; 
 }
-
-const DATA:userDataType[] = Array.from({ length: 56 }).map((_, i) => ({
+const length = 51;
+const DATA:userDataType[] = Array.from({ length }).map((_, i) => ({
   id: String(i),
   name: "AbhilashXMathwins",
   points: Math.floor(Math.random()*10000),
@@ -29,8 +30,20 @@ export default function AdminRewardScreen() {
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   const [link, setLink] = useState();
-  
-  const renderItem = ({ item }:any) => (
+  const AD_FREQUENCY = 3;
+
+  const renderItem = ({ item, index }: any) => {
+    return (
+      <>
+        {index !== 0 && index % AD_FREQUENCY === 0 && (
+          <NativeAdCard />
+        )}
+
+        {renderUserCard({ item })}
+      </>
+    );
+  };
+  const renderUserCard  = ({ item }:any) => (
     <View style={styles.cardContainer}>
       <View style={styles.card}>
         <View style={styles.leftSection}>

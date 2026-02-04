@@ -1,12 +1,13 @@
 import { useAuth } from '@/context/authContext';
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, TouchableOpacity, StatusBar, ScrollView, Image } from "react-native";
+import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Image } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather, Ionicons, MaterialIcons, Entypo, MaterialCommunityIcons, FontAwesome  } from "@expo/vector-icons";
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
+import * as Clipboard from 'expo-clipboard';
 
 
 export default function UserProfileScreen() {
@@ -21,6 +22,11 @@ export default function UserProfileScreen() {
   const { isDarkMode, toggleDarkMode, colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
 
+  const copyReferral = async () => {
+    if (!user?.referralCode) return;
+
+    await Clipboard.setStringAsync(user.referralCode);
+  };
   function loginHandle(){
     console.log("login");
     navigation.navigate('login');
@@ -57,7 +63,19 @@ export default function UserProfileScreen() {
               <View style={styles.screenContainer}>
                 <Text style={styles.nameText}>{user?.username || "User"}</Text>
                 <Text style={styles.emailText}>{user?.email}</Text>
-                <Text style={styles.referralText}>{user?.referralCode}</Text>
+
+                <View style={styles.referralRow}>
+                  <Text style={styles.referralText}>
+                    {user?.referralCode}
+                  </Text>
+
+                  <TouchableOpacity
+                    style={styles.copyButton}
+                    onPress={copyReferral}
+                  >
+                    <Feather name="copy" size={14} color={colors.text} />
+                  </TouchableOpacity>
+                </View>
               </View> : 
               <View style={styles.screenContainer}>
                 <TouchableOpacity
@@ -320,18 +338,34 @@ const makeStyles = (colors: ColorScheme) =>
       fontWeight: "300",
       color: colors.textSecondary,
       opacity: 0.9,
-      marginBottom: 20,
+    },
+    referralRow: {
+      flexDirection: "row",
+      gap: 10,
+      marginVertical: 20,
+    },
+    copyButton: {
+      backgroundColor: colors.bg,
+      paddingHorizontal: 10,
+      paddingVertical: 6,
+      borderRadius: 6,
+      alignItems: 'center',
+      justifyContent:'center',
+    },
+    copyButtonText: {
+      color: '#fff',
+      fontSize: 12,
+      fontWeight: '800',
     },
     referralText: {
       fontSize: 16,
       fontWeight: "700",
       color: colors.textSecondary,
-      borderWidth: 4,
+      borderWidth: 1,
       borderColor: colors.textSecondary,
       paddingHorizontal: 10,
       paddingVertical: 5,
       borderRadius: 10,
-      marginBottom: 20,
     },
     screenContainer: {
       width: "100%",

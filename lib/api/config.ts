@@ -7,7 +7,7 @@ export const getConfig = async () => {
     
     // const res = await api.post('api/admin/gameConfig', params);
     const token = (await AsyncStorage.getItem('token')) as string;
-    const res = await api.post('api/admin/gameConfig', {}, {
+    const res = await api.post('api/game/gameConfig', {}, {
       headers: {
         Authorization: `Bearer ${JSON.parse(token)}`,
       },

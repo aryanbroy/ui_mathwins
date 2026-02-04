@@ -4,6 +4,7 @@ import { ActivityIndicator, View, AppState, Platform } from 'react-native';
 import { ThemeProvider } from '@/context/useAppTheme';
 import { useEffect, useRef } from 'react';
 import { loadAppOpenAd, showAppOpenAd } from '@/components/Ads/appOpen';
+import { ConfigProvider } from '@/context/useConfig';
 
 function RootNavigator() {
   const { user, loading } = useAuth();
@@ -56,9 +57,11 @@ export default function RootLayout() {
     return () => subscription.remove();
   }, []);
   return (
-    <AuthProvider>
-      <RootNavigator />
-    </AuthProvider>
+    <ConfigProvider>
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
+    </ConfigProvider>
   );
 }
 

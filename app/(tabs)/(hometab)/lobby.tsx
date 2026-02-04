@@ -23,6 +23,7 @@ import {
 import { ErrObject } from '@/lib/api/parseApiError';
 import { useInterstitialAd } from '@/components/Ads/InterstitialAd'; 
 import AdBanner from '@/components/Ads/Banner';
+import { useConfig } from '@/context/useConfig';
 
 export type SessionInfo = {
   userId: string;
@@ -58,10 +59,11 @@ export default function SoloScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
-  const [totalAttempt, setTotalAttempt] = useState(0);
   const [remainingAttempt, setRemainingAttempt] = useState(0);
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
+  const config = useConfig();
+  const [totalAttempt, setTotalAttempt] = useState(config.single_player.daily_free_attempts);
   const route = useRoute<RouteProp<{ params: RouteParams }>>();
 
   const { showAd } = useInterstitialAd();
@@ -69,6 +71,8 @@ export default function SoloScreen() {
   const [err, setErr] = useState<ErrObject | null>(null);
 
   useEffect(() => {
+    console.log("CONFIG : ",config.single_player.daily_free_attempts);
+    
     const { sessionType } = route.params;
     console.log('Session type: ', route.params.sessionType);
     async function getRemainingAttemp(): Promise<any> {
