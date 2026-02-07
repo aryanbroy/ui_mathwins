@@ -122,7 +122,6 @@ export default function QuestionScreen() {
   const intervalRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const pausedTimeRef = useRef<number>(INITIAL_TIME);
-  
 
   const [isSubmittingSession, setIsSubmittingSession] =
     useState<boolean>(false);
@@ -136,7 +135,7 @@ export default function QuestionScreen() {
       const res = await finalSubmission({ sessionId: session.sessionId });
       const data = res.data;
       console.log(data);
-      navigation.navigate('HomeMain');
+      navigation.navigate('homeMain');
     } catch (err: any) {
       // handle error handle
       console.log(err);
@@ -151,7 +150,7 @@ export default function QuestionScreen() {
     try {
       const submissionRes = await finalInstantSubmission(session.sessionId);
       console.log('Submitted instant session: ', submissionRes);
-      navigation.navigate('HomeMain');
+      navigation.navigate('homeMain');
     } catch (err: any) {
       // setErrMsg(err?.message ?? 'Failed to load start game');
       console.log(err);
@@ -162,12 +161,12 @@ export default function QuestionScreen() {
 
   // Animation
   // const blinkAnim = useRef(new Animated.Value(1)).current;
-  if(!sanitizedQuestion){
+  if (!sanitizedQuestion) {
     const payload = {
       errorCode: 500,
-      errorMessage: "Couldn't found Questions to Display"
-    }
-    navigation.navigate('errorScreen',{params: payload});
+      errorMessage: "Couldn't found Questions to Display",
+    };
+    navigation.navigate('errorScreen', { params: payload });
   }
 
   const n = sanitizedQuestion.kthDigit;
@@ -353,7 +352,7 @@ export default function QuestionScreen() {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     const milliseconds = Math.floor((ms % 1000) / 10);
-    
+
     return `${minutes.toString().padStart(2, '0')}:${seconds
       .toString()
       .padStart(2, '0')}.${milliseconds.toString().padStart(2, '0')}`;
@@ -727,40 +726,41 @@ export default function QuestionScreen() {
         if (check) {
           // previously response.data.success: later today
           if (
-          session.sessionType === SessionType.DAILY ||
-          session.sessionType === SessionType.INSTANT
-        ) {
-          setCurrentScore(response.data.currentScore);
-          setCorrectAnswer(response.data.correctAnswer);
-          setTimeout(() => {
-            setShowPopup(false);
-            resetQuestion();
-            setSanitizedQuestion(response.data.nextQuestion);
-            questionStartRemainingRef.current = remainingMs;
-            resumeDailyTimer();
-          }, 1200);
-        } else if (session.sessionType === SessionType.SOLO) {
-          setTimeout(() => {
-            setShowPopup(false);
-            if (response.data.isRoundCompleted) {
-              setRound(response.data.roundNumber + 1);
-              console.log('response :- ', response);
-              showAd();
-              const params: continueParams = {
-                sessionType: session.sessionType,
-                userId: sessionDetails?.userId as string,
-                sessionId: sessionDetails?.sessionId as string,
-                bankedPoint: response?.data.bankedPoint as number,
-              };
-              navigation.navigate('roundOverview',{params});
-            } else {
+            session.sessionType === SessionType.DAILY ||
+            session.sessionType === SessionType.INSTANT
+          ) {
+            setCurrentScore(response.data.currentScore);
+            setCorrectAnswer(response.data.correctAnswer);
+            setTimeout(() => {
+              setShowPopup(false);
               resetQuestion();
-              resetTimer();
-              setIsChecking(false);
-              setShowResult(false);
               setSanitizedQuestion(response.data.nextQuestion);
               questionStartRemainingRef.current = remainingMs;
               resumeDailyTimer();
+            }, 1200);
+          } else if (session.sessionType === SessionType.SOLO) {
+            setTimeout(() => {
+              setShowPopup(false);
+              if (response.data.isRoundCompleted) {
+                setRound(response.data.roundNumber + 1);
+                console.log('response :- ', response);
+                showAd();
+                const params: continueParams = {
+                  sessionType: session.sessionType,
+                  userId: sessionDetails?.userId as string,
+                  sessionId: sessionDetails?.sessionId as string,
+                  bankedPoint: response?.data.bankedPoint as number,
+                };
+                navigation.navigate('roundOverview', { params });
+              } else {
+                resetQuestion();
+                resetTimer();
+                setIsChecking(false);
+                setShowResult(false);
+                setSanitizedQuestion(response.data.nextQuestion);
+                questionStartRemainingRef.current = remainingMs;
+                resumeDailyTimer();
+              }
             }, 1200);
           } else if (session.sessionType === SessionType.SOLO) {
             setTimeout(() => {
@@ -785,7 +785,7 @@ export default function QuestionScreen() {
         } else {
           setTimeout(async () => {
             setShowPopup(false);
-            navigation.navigate('HomeMain');
+            navigation.navigate('homeMain');
           }, 1500);
         }
       })
@@ -797,9 +797,9 @@ export default function QuestionScreen() {
         // alert('');
         const payload = {
           errorCode: 500,
-          errorMessage: 'Error submitting answer. Please try again.'
-        }
-        navigation.navigate('errorScreen', {params: payload});
+          errorMessage: 'Error submitting answer. Please try again.',
+        };
+        navigation.navigate('errorScreen', { params: payload });
       })
       .finally(() => {
         setLoading(false);
@@ -817,14 +817,14 @@ export default function QuestionScreen() {
   };
 
   const { showAd } = useInterstitialAd(() => {
-    console.log("DONE");
+    console.log('DONE');
   });
 
   // Lifeline: 50-50
   const handleFiftyfiftySubmitWithAd = () => {
     showAd();
     handleFiftyfiftySubmit();
-  }
+  };
   const handleFiftyfiftySubmit = () => {
     if (!isFiftyFiftyAvailable || isChecking || showResult) {
       pauseTimer();
@@ -858,12 +858,12 @@ export default function QuestionScreen() {
   const handleThirtyPlusSubmitWithAd = () => {
     showAd();
     handleThirtyPlusSubmit();
-  }
+  };
   const handleThirtyPlusSubmit = () => {
     if (!isThirtySecAvailable || isChecking || showResult) {
       pauseTimer();
     }
-    
+
     resumeTimer();
     if (session.sessionType === SessionType.SOLO) {
       addTime(30000);
@@ -882,12 +882,12 @@ export default function QuestionScreen() {
   const handleLevelDownWithAd = () => {
     showAd();
     handleLevelDownSubmit();
-  }
+  };
   const handleLevelDownSubmit = () => {
-    if (!isLevelDownAvailable || isChecking || showResult){
+    if (!isLevelDownAvailable || isChecking || showResult) {
       pauseTimer();
     }
-    
+
     resumeTimer();
     setLoading(true);
     const payload = {
@@ -946,7 +946,9 @@ export default function QuestionScreen() {
                     color={colors.text}
                   />
                   {session.sessionType === SessionType.SOLO ? (
-                    <Text style={styles.time}>{formattedTime(remainingTime)}</Text>
+                    <Text style={styles.time}>
+                      {formattedTime(remainingTime)}
+                    </Text>
                   ) : (
                     <Text style={styles.time}>{formatTime(remainingMs)}</Text>
                   )}
@@ -1029,38 +1031,50 @@ export default function QuestionScreen() {
                 <TouchableOpacity
                   style={styles.lifelineBtn}
                   disabled={isChecking || showResult}
-                  onPress={isFiftyFiftyAvailable ? handleFiftyfiftySubmit : handleFiftyfiftySubmitWithAd}
+                  onPress={
+                    isFiftyFiftyAvailable
+                      ? handleFiftyfiftySubmit
+                      : handleFiftyfiftySubmitWithAd
+                  }
                 >
                   <Text style={styles.lifelineBtnText}>50-50</Text>
-                  {
-                    !isFiftyFiftyAvailable ? 
-                    <Text style={styles.adText}>ad</Text> :
+                  {!isFiftyFiftyAvailable ? (
+                    <Text style={styles.adText}>ad</Text>
+                  ) : (
                     <></>
-                  }
+                  )}
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.lifelineBtn}
                   disabled={isChecking || showResult}
-                  onPress={isThirtySecAvailable ? handleThirtyPlusSubmit : handleThirtyPlusSubmitWithAd}
+                  onPress={
+                    isThirtySecAvailable
+                      ? handleThirtyPlusSubmit
+                      : handleThirtyPlusSubmitWithAd
+                  }
                 >
                   <Text style={styles.lifelineBtnText}>+30 Sec</Text>
-                  {
-                    !isThirtySecAvailable ? 
-                    <Text style={styles.adText}>ad</Text> :
+                  {!isThirtySecAvailable ? (
+                    <Text style={styles.adText}>ad</Text>
+                  ) : (
                     <></>
-                  }
+                  )}
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.lifelineBtn}
                   disabled={isChecking || showResult}
-                  onPress={isLevelDownAvailable ? handleLevelDownSubmit : handleLevelDownWithAd}
+                  onPress={
+                    isLevelDownAvailable
+                      ? handleLevelDownSubmit
+                      : handleLevelDownWithAd
+                  }
                 >
                   <Text style={styles.lifelineBtnText}>Level Down</Text>
-                  {
-                    !isLevelDownAvailable ?
-                    <Text style={styles.adText}>ad</Text> :
+                  {!isLevelDownAvailable ? (
+                    <Text style={styles.adText}>ad</Text>
+                  ) : (
                     <></>
-                  }
+                  )}
                 </TouchableOpacity>
               </View>
 
@@ -1094,12 +1108,11 @@ export default function QuestionScreen() {
                 onClose={() => setShowPopup(false)}
                 colors={colors}
               />
-              {
-                showAdPopup ? 
-                <View style={styles.adScreen}>ad here</View> :
+              {showAdPopup ? (
+                <View style={styles.adScreen}>ad here</View>
+              ) : (
                 <></>
-
-              }
+              )}
             </SafeAreaView>
           </LinearGradient>
         );
@@ -1268,24 +1281,24 @@ const makeStyles = (colors: ColorScheme) =>
       justifyContent: 'center',
     },
     adText: {
-      position: "absolute",
+      position: 'absolute',
       right: 0,
       top: 0,
       paddingHorizontal: 10,
       paddingVertical: 3,
       borderRadius: 10,
-      fontSize:10,
+      fontSize: 10,
       color: colors.text,
       backgroundColor: colors.border,
     },
     adScreen: {
-      position: "absolute",
-      width: "100%",
-      height: "100%",
-      backgroundColor: "rgba(0, 0, 0, 0.8)",
-      alignItems: "center",
-      justifyContent: "center",
-      color: "#fff",
+      position: 'absolute',
+      width: '100%',
+      height: '100%',
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: '#fff',
       opacity: 50,
     },
     lifelineBtnText: {
