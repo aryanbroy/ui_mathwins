@@ -18,6 +18,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useAuth } from '@/context/authContext';
 import AdBanner from '../Ads/Banner';
+import { navigate } from 'expo-router/build/global-state/routing';
 
 export default function UserRewardScreen() {
   const [today, setToday] = useState(5);
@@ -130,13 +131,17 @@ export default function UserRewardScreen() {
                     {coins} / {maxCoins} COINS
                   </Text>
                 </View>
-                <TouchableOpacity style={styles.redeemButton}>
+                <TouchableOpacity style={styles.redeemButton} >
                   <Text style={styles.redeemButtonText}>
                     REDEEM YOUR REWARDS
                   </Text>
                 </TouchableOpacity>
               </View>
-              <TouchableOpacity style={styles.historyButton}>
+              <TouchableOpacity 
+              style={styles.historyButton}
+              onPress={()=>{
+                navigation.navigate('rewardHistoryScreen');
+              }}>
                 <Text style={styles.historyButtonText}>
                   View Reward history
                 </Text>
@@ -231,7 +236,7 @@ const makeStyles = (colors: ColorScheme) =>
       alignItems: 'flex-end',
     },
     streakTitle: {
-      fontSize: 14,
+      fontSize: 12,
       fontWeight: '600',
       color: colors.text,
       marginBottom: 16,

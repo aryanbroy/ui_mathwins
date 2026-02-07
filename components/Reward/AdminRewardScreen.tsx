@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   FlatList,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import useAppTheme, { ColorScheme } from "@/context/useAppTheme";
@@ -35,10 +36,16 @@ export default function AdminRewardScreen() {
   const AD_FREQUENCY = 3;
 
   function handleApproveButton(){
-     setIsLoading(true);
-     console.log("handleApproveButton"); 
+    if(!link){
+      Alert.alert('Link is required');
+    }
+    setIsLoading(true);
+    console.log("handleApproveButton"); 
   }
   function handleRejecctButton(){
+    if(!link){
+      Alert.alert('NOTE is required');
+    }
     setIsLoading(true);
     console.log("handleRejecctButton");
   }

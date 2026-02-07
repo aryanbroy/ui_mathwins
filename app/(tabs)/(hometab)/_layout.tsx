@@ -16,6 +16,7 @@ import PrivacyPolicy from '@/app/privacyPolicy';
 import TermsAndCondition from '@/app/termsAndCondition';
 import Contactus from '@/app/contactUs';
 import OtpScreen from '@/app/otpScreen';
+import RewardHistoryScreen from '../../rewardHistory';
 
 const Stack = createNativeStackNavigator<HomeTabStackParamList>();
 
@@ -99,6 +100,11 @@ export default function HomeTabLayout() {
       <Stack.Screen
         name="otpScreen"
         component={OtpScreen}
+        options={{ title: 'OtpScreen' }}
+      />
+      <Stack.Screen
+        name="rewardHistoryScreen"
+        component={RewardHistoryScreen}
         options={{ title: 'OtpScreen' }}
       />
     </Stack.Navigator>

@@ -68,7 +68,7 @@ export default function UserProfileScreen() {
                 style={styles.avatarImage}
               />
             </View>
-            {user ? (
+            {user ?
               <View style={styles.screenContainer}>
                 <Text style={styles.nameText}>{user?.username || 'User'}</Text>
                 <Text style={styles.emailText}>{user?.email}</Text>
@@ -91,7 +91,7 @@ export default function UserProfileScreen() {
                   <Text style={styles.btnText}>LOGIN</Text>
                 </TouchableOpacity>
               </View>
-            )}
+            }
 
             <TouchableOpacity
               onPress={handleEditProfile}
