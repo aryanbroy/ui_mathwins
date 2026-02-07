@@ -64,10 +64,12 @@ export default function SoloScreen() {
       switch (sessionType) {
         case SessionType.DAILY:
           await getDailyAttempts().then((res) => {
+            console.log('daily attempts response: ', res);
             const attempts = res.data.dailyAttemptCount;
             console.log('Attempts: ', attempts);
             setTotalAttempt(300);
             setRemainingAttempt(300 - attempts);
+            setLoading(false);
           });
           break;
         case SessionType.SOLO:
@@ -141,9 +143,11 @@ export default function SoloScreen() {
     console.log(`Start game for ${sessionType} tournament`);
     switch (sessionType) {
       case SessionType.DAILY:
+        console.log('starting daily session...');
         await startDailyGame();
         break;
       case SessionType.SOLO:
+        console.log('start solo session');
         await createSoloSession();
         break;
       case SessionType.INSTANT:
@@ -174,18 +178,19 @@ export default function SoloScreen() {
             <View style={styles.box}>
               <Image source={{ uri: user?.picture }} style={styles.avatar} />
               <Text style={styles.attemptsText}>
-                Solo tournament attempts left : {remainingAttempt} /{' '}{totalAttempt}
+                Solo tournament attempts left : {remainingAttempt} /{' '}
+                {totalAttempt}
               </Text>
               <TouchableOpacity
                 disabled={loading}
-                style={loading ? styles.startBtnDiabled :  styles.startBtn}
-                onPress={createSoloSession}
+                style={loading ? styles.startBtnDiabled : styles.startBtn}
+                onPress={startGame}
               >
-                {
-                  loading ? 
-                  <Text style={styles.startBtnText}>. . .</Text> :
+                {loading ? (
+                  <Text style={styles.startBtnText}>. . .</Text>
+                ) : (
                   <Text style={styles.startBtnText}>Start game</Text>
-                }
+                )}
               </TouchableOpacity>
             </View>
           </LinearGradient>
@@ -209,25 +214,23 @@ const makeStyles = (colors: ColorScheme) =>
     },
     adArea1: {
       marginBottom: 10,
-      backgroundColor: "#a1a1a1",
-      width: "100%",
+      backgroundColor: '#a1a1a1',
+      width: '100%',
       height: 50,
     },
     adArea2: {
       marginTop: 10,
-      backgroundColor: "#a1a1a1",
-      width: "100%",
+      backgroundColor: '#a1a1a1',
+      width: '100%',
       height: 200,
     },
-    container: {
-    },
+    container: {},
     grediant: {
       height: 500,
       margin: 20,
       borderRadius: 20,
     },
     grediantBg: {
-
       // flex: 1,
       // alignItems: "center",
       // justifyContent: "space-between"
@@ -264,7 +267,7 @@ const makeStyles = (colors: ColorScheme) =>
       justifyContent: 'center',
       marginBottom: 10,
       borderWidth: 1,
-      borderColor: "#FFFFFF"
+      borderColor: '#FFFFFF',
     },
     startBtnDiabled: {
       width: '100%',
@@ -275,7 +278,7 @@ const makeStyles = (colors: ColorScheme) =>
       justifyContent: 'center',
       marginBottom: 10,
       borderWidth: 1,
-      borderColor: "#FFFFFF"
+      borderColor: '#FFFFFF',
     },
     startBtnText: {
       color: colors.textSecondary,

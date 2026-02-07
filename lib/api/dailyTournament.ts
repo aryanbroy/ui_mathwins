@@ -7,10 +7,18 @@ import {
 } from '@/types/api/daily';
 import { api } from './client';
 import { ApiHandledError, parseApiError } from './parseApiError';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const getDailyAttempts = async () => {
   try {
-    const res = await api.get('api/daily/attempts');
+    const token = (await AsyncStorage.getItem('token')) as string;
+    const res = await api({
+      method: 'get',
+      url: 'api/daily/attempts',
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      },
+    });
     return res.data;
   } catch (err) {
     const { status, message } = parseApiError(err);
@@ -20,7 +28,14 @@ export const getDailyAttempts = async () => {
 
 export const getDailyTournamentDetails = async () => {
   try {
-    const res = await api.get('api/daily/start');
+    const token = (await AsyncStorage.getItem('token')) as string;
+    const res = await api({
+      method: 'get',
+      url: 'api/daily/start',
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      },
+    });
     console.log(res.data);
     return res.data;
   } catch (err) {
@@ -32,7 +47,14 @@ export const getDailyTournamentDetails = async () => {
 export const createDailySession =
   async (): Promise<createDailySessionResponse> => {
     try {
-      const res = await api.post('api/daily/session/create');
+      const token = (await AsyncStorage.getItem('token')) as string;
+      const res = await api({
+        method: 'post',
+        url: 'api/daily/session/create',
+        headers: {
+          Authorization: `Bearer ${JSON.parse(token)}`,
+        },
+      });
       const resData: createDailySessionResponse = res.data;
       return resData;
     } catch (err) {
@@ -48,6 +70,7 @@ export const submitQuestion = async ({
   timeTaken,
 }: SubmitQuestionProp) => {
   try {
+    const token = (await AsyncStorage.getItem('token')) as string;
     const res = await api({
       method: 'patch',
       url: 'api/daily/session/submit_question',
@@ -56,6 +79,9 @@ export const submitQuestion = async ({
         questionId,
         answer,
         timeTaken,
+      },
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
       },
     });
     const resData: submitQuestionSessionResponse = res.data;
@@ -69,11 +95,15 @@ export const submitQuestion = async ({
 
 export const finalSubmission = async ({ sessionId }: { sessionId: string }) => {
   try {
+    const token = (await AsyncStorage.getItem('token')) as string;
     const res = await api({
       method: 'post',
       url: 'api/daily/session/submit_final',
       data: {
         sessionId,
+      },
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
       },
     });
     const resData: FinalSubmissionResponse = res.data;
@@ -89,11 +119,15 @@ export const finalSubmission = async ({ sessionId }: { sessionId: string }) => {
 export const fetchDailyLeaderboard = async (page: number) => {
   try {
     console.log('get request to fetch daily leaderboard...');
+    const token = (await AsyncStorage.getItem('token')) as string;
     const res = await api({
       method: 'get',
       url: 'api/daily/leaderboard',
       params: {
         page: page,
+      },
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
       },
     });
     console.log(res);

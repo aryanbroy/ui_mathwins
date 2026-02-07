@@ -1,32 +1,54 @@
 import { useAuth } from '@/context/authContext';
-import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, TouchableOpacity, StatusBar, ScrollView, Image } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Feather, Ionicons, MaterialIcons, Entypo, MaterialCommunityIcons } from "@expo/vector-icons";
+import React, { useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Switch,
+  TouchableOpacity,
+  StatusBar,
+  ScrollView,
+  Image,
+} from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import {
+  Feather,
+  Ionicons,
+  MaterialIcons,
+  Entypo,
+  MaterialCommunityIcons,
+} from '@expo/vector-icons';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 
-
 export default function UserProfileScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const { userToken, user, logout ,soundEffect, haptics, toggleSound, toggleHaptics } = useAuth();
+  const {
+    userToken,
+    user,
+    logout,
+    soundEffect,
+    haptics,
+    toggleSound,
+    toggleHaptics,
+  } = useAuth();
   // const decoded = Jwt.verify(userToken, 'super-secret-key-change-this');
-  console.log("userT : ",userToken);
-  console.log("user : ",user);
-  
+  console.log('userT : ', userToken);
+  console.log('user : ', user);
+
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   const { isDarkMode, toggleDarkMode, colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
 
-  function loginHandle(){
-    console.log("login");
+  function loginHandle() {
+    console.log('login');
     navigation.navigate('login');
   }
-  function handleEditProfile(){
-    console.log("Edit-Profile");
+  function handleEditProfile() {
+    console.log('Edit-Profile');
     navigation.navigate('editProfile');
   }
   return (
@@ -46,28 +68,29 @@ export default function UserProfileScreen() {
         >
           <View style={styles.header}>
             <View style={styles.avatarWrapper}>
-              <Image source={{ uri: user?.picture }} style={styles.avatarImage} />
+              <Image
+                source={{ uri: user?.picture }}
+                style={styles.avatarImage}
+              />
             </View>
-            {
-              user ?
+            {user ? (
               <View style={styles.screenContainer}>
-                <Text style={styles.nameText}>{user?.username || "User"}</Text>
+                <Text style={styles.nameText}>{user?.username || 'User'}</Text>
                 <Text style={styles.emailText}>{user?.email}</Text>
                 <Text style={styles.referralText}>{user?.referralCode}</Text>
-              </View> : 
+              </View>
+            ) : (
               <View style={styles.screenContainer}>
-                <TouchableOpacity
-                onPress={loginHandle}
-                style={styles.startBtn} 
-                >
+                <TouchableOpacity onPress={loginHandle} style={styles.startBtn}>
                   <Text style={styles.btnText}>LOGIN</Text>
                 </TouchableOpacity>
               </View>
-            }
+            )}
 
-            <TouchableOpacity 
-            onPress={handleEditProfile}
-            style={styles.editProfileButton}>
+            <TouchableOpacity
+              onPress={handleEditProfile}
+              style={styles.editProfileButton}
+            >
               <View style={styles.editIconWrapper}>
                 <MaterialCommunityIcons
                   name="account-edit"
@@ -87,7 +110,6 @@ export default function UserProfileScreen() {
             style={styles.gradientPanel}
           >
             <View style={styles.card}>
-
               {/* Notifications */}
               <View style={styles.row}>
                 <View style={styles.rowLeft}>
@@ -108,7 +130,6 @@ export default function UserProfileScreen() {
                   }
                 />
               </View>
-
 
               {/* Sound Effect */}
               <View style={styles.row}>
@@ -131,7 +152,7 @@ export default function UserProfileScreen() {
                   }
                 />
               </View>
-              
+
               {/* Haptics */}
               <View style={styles.row}>
                 <View style={styles.rowLeft}>
@@ -153,7 +174,7 @@ export default function UserProfileScreen() {
                   }
                 />
               </View>
-              
+
               {/* Dark Mode */}
               <View style={styles.row}>
                 <View style={styles.rowLeft}>
@@ -164,7 +185,7 @@ export default function UserProfileScreen() {
                 <TouchableOpacity onPress={toggleDarkMode}>
                   <View style={styles.togglePill}>
                     <Feather
-                      name={isDarkMode ? "moon" : "sun"}
+                      name={isDarkMode ? 'moon' : 'sun'}
                       size={16}
                       color={colors.text}
                     />
@@ -178,7 +199,7 @@ export default function UserProfileScreen() {
                   <Ionicons
                     name="star"
                     size={22}
-                    style={[styles.rowIcon, { color: "#FFC107" }]}
+                    style={[styles.rowIcon, { color: '#FFC107' }]}
                   />
                   <Text style={styles.rowLabel}>Rate App</Text>
                 </View>
@@ -198,7 +219,11 @@ export default function UserProfileScreen() {
                   <Feather name="lock" size={22} style={styles.rowIcon} />
                   <Text style={styles.rowLabel}>Privacy Policy</Text>
                 </View>
-                <Entypo name="chevron-right" size={18} color={colors.textMuted} />
+                <Entypo
+                  name="chevron-right"
+                  size={18}
+                  color={colors.textMuted}
+                />
               </TouchableOpacity>
 
               {/* Terms */}
@@ -211,7 +236,11 @@ export default function UserProfileScreen() {
                   />
                   <Text style={styles.rowLabel}>Terms & Conditions</Text>
                 </View>
-                <Entypo name="chevron-right" size={18} color={colors.textMuted} />
+                <Entypo
+                  name="chevron-right"
+                  size={18}
+                  color={colors.textMuted}
+                />
               </TouchableOpacity>
 
               {/* Contact */}
@@ -220,13 +249,21 @@ export default function UserProfileScreen() {
                   <Feather name="mail" size={22} style={styles.rowIcon} />
                   <Text style={styles.rowLabel}>Contact Us</Text>
                 </View>
-                <Entypo name="chevron-right" size={18} color={colors.textMuted} />
+                <Entypo
+                  name="chevron-right"
+                  size={18}
+                  color={colors.textMuted}
+                />
               </TouchableOpacity>
 
               {/* Logout */}
               <TouchableOpacity style={styles.row} onPress={logout}>
                 <View style={styles.rowLeft}>
-                  <MaterialIcons name="logout" size={22} style={styles.rowIcon} />
+                  <MaterialIcons
+                    name="logout"
+                    size={22}
+                    style={styles.rowIcon}
+                  />
                   <Text style={styles.rowLabel}>Logout</Text>
                 </View>
               </TouchableOpacity>
@@ -252,7 +289,7 @@ const makeStyles = (colors: ColorScheme) =>
     },
 
     header: {
-      alignItems: "center",
+      alignItems: 'center',
     },
 
     avatarWrapper: {
@@ -261,10 +298,10 @@ const makeStyles = (colors: ColorScheme) =>
       borderRadius: 100,
       borderWidth: 3,
       borderColor: colors.border,
-      overflow: "hidden",
+      overflow: 'hidden',
       backgroundColor: colors.surface,
-      justifyContent: "center",
-      alignItems: "center",
+      justifyContent: 'center',
+      alignItems: 'center',
       marginBottom: 16,
       shadowColor: colors.shadow,
       shadowOpacity: 0.15,
@@ -274,26 +311,26 @@ const makeStyles = (colors: ColorScheme) =>
     },
 
     avatarImage: {
-      width: "100%",
-      height: "100%",
+      width: '100%',
+      height: '100%',
     },
 
     nameText: {
       fontSize: 24,
-      fontWeight: "800",
+      fontWeight: '800',
       color: colors.textSecondary,
       marginBottom: 1,
     },
     emailText: {
       fontSize: 16,
-      fontWeight: "300",
+      fontWeight: '300',
       color: colors.textSecondary,
       opacity: 0.9,
       marginBottom: 20,
     },
     referralText: {
       fontSize: 16,
-      fontWeight: "700",
+      fontWeight: '700',
       color: colors.textSecondary,
       borderWidth: 4,
       borderColor: colors.textSecondary,
@@ -303,13 +340,13 @@ const makeStyles = (colors: ColorScheme) =>
       marginBottom: 20,
     },
     screenContainer: {
-      width: "100%",
+      width: '100%',
       paddingHorizontal: 20,
       alignItems: 'center',
       justifyContent: 'center',
     },
     startBtn: {
-      width: "100%",
+      width: '100%',
       backgroundColor: colors.secondary,
       marginVertical: 20,
       paddingVertical: 12,
@@ -326,26 +363,26 @@ const makeStyles = (colors: ColorScheme) =>
       color: colors.text,
     },
     editProfileButton: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       paddingHorizontal: 16,
       paddingVertical: 10,
       borderRadius: 100,
       marginBottom: 40,
-      backgroundColor: "rgba(255,255,255,0.15)",
+      backgroundColor: 'rgba(255,255,255,0.15)',
     },
     editIconWrapper: {
       width: 30,
       height: 30,
       borderRadius: 100,
       backgroundColor: colors.surface,
-      justifyContent: "center",
-      alignItems: "center",
+      justifyContent: 'center',
+      alignItems: 'center',
       marginRight: 8,
     },
     editProfileText: {
       color: colors.textOnPrimary,
-      fontWeight: "600",
+      fontWeight: '600',
     },
 
     gradientPanel: {
@@ -356,7 +393,7 @@ const makeStyles = (colors: ColorScheme) =>
     },
 
     card: {
-      width: "100%",
+      width: '100%',
       paddingHorizontal: 16,
     },
 
@@ -366,15 +403,15 @@ const makeStyles = (colors: ColorScheme) =>
       paddingVertical: 15,
       paddingHorizontal: 16,
       marginVertical: 6,
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       borderBottomWidth: StyleSheet.hairlineWidth,
       borderBottomColor: colors.border,
     },
 
     rowLeft: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       flex: 1,
     },
 
@@ -385,7 +422,7 @@ const makeStyles = (colors: ColorScheme) =>
 
     rowLabel: {
       fontSize: 16,
-      fontWeight: "500",
+      fontWeight: '500',
       color: colors.text,
     },
 
@@ -394,7 +431,8 @@ const makeStyles = (colors: ColorScheme) =>
       height: 26,
       borderRadius: 13,
       backgroundColor: colors.backgrounds.input,
-      justifyContent: "center",
-      alignItems: "center",
+      justifyContent: 'center',
+      alignItems: 'center',
     },
   });
+
