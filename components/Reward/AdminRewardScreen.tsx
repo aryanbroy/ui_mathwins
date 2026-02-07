@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import useAppTheme, { ColorScheme } from "@/context/useAppTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import NativeAdCard from "../Ads/nativeAdCard";
+import Entypo from "@expo/vector-icons/Entypo";
 
 type userDataType = {
   id: string; 
@@ -30,7 +31,17 @@ export default function AdminRewardScreen() {
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   const [link, setLink] = useState();
+  const [isLoading, setIsLoading] = useState(false);
   const AD_FREQUENCY = 3;
+
+  function handleApproveButton(){
+     setIsLoading(true);
+     console.log("handleApproveButton"); 
+  }
+  function handleRejecctButton(){
+    setIsLoading(true);
+    console.log("handleRejecctButton");
+  }
 
   const renderItem = ({ item, index }: any) => {
     return (
@@ -59,13 +70,24 @@ export default function AdminRewardScreen() {
             <Text style={styles.points}>{item.points}</Text>
           </View>
         </View>
-        <TouchableOpacity style={styles.sendButton}>
-          <Text style={styles.sendButtonText}>Send Reward</Text>
-        </TouchableOpacity>
+        <View style={styles.check}>
+          <TouchableOpacity 
+          style={styles.sendButtonWrong}
+          disabled={isLoading}
+          onPress={handleRejecctButton}>
+            <Entypo name="cross" size={22} color="#FFF" />
+          </TouchableOpacity>
+          <TouchableOpacity 
+          style={styles.sendButtonCorrect}
+          disabled={isLoading}
+          onPress={handleApproveButton}>
+            <Entypo name="check" size={20} color="#FFF" />
+          </TouchableOpacity>
+        </View>
       </View>
       <TextInput
         style={styles.input}
-        placeholder="https://www.website.com"
+        placeholder="COUPON CODE | NOTE"
         placeholderTextColor={colors.textMuted}
         keyboardType="default"
         value={link}
@@ -175,8 +197,18 @@ const makeStyles = (colors: ColorScheme) =>
       fontWeight: '900',
       color: '#000',
     },
-    sendButton: {
+    check: {
+      flexDirection: "row",
+      gap: 10,
+    },
+    sendButtonWrong: {
       backgroundColor: colors.secondary,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
+      borderRadius: 5,
+    },
+    sendButtonCorrect: {
+      backgroundColor: colors.success,
       paddingHorizontal: 20,
       paddingVertical: 10,
       borderRadius: 5,

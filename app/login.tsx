@@ -20,6 +20,8 @@ import type { ColorScheme } from '@/context/useAppTheme';
 import { useNavigation } from 'expo-router';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import BackgroundTextTexture from '@/components/Texture/BackgroundTextTexture';
+import ReferralCodeInput from '@/components/ReferalCodeInput';
+import CountryPicker, {CountryCode} from 'react-native-country-picker-modal';
 
 type UserData = {
   name?: string;
@@ -30,12 +32,25 @@ WebBrowser.maybeCompleteAuthSession();
 
 export default function LoginScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
-  const [selectedTab, setSelectedTab] = useState<'login' | 'signup'>('login');
+  const [countryCode, setCountryCode] = useState<CountryCode>('IN');
+  const [callingCode, setCallingCode] = useState('91');
   const [phone, setPhone] = useState('');
   const { login } = useAuth();
-  const [referral, setReferral] = useState("");
+  // const [referral, setReferral] = useState("");
   const { colors } = useAppTheme(); 
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
+  const [referralCode, setReferralCode] = useState('');
+
+  const getPlaceholder = () => {
+    const map: any = {
+      IN: '10 digits',
+      US: '10 digits',
+      UK: '10–11 digits',
+      AE: '9 digits',
+    };
+
+    return map[countryCode] || 'Phone number';
+  };
 
   const [request, response, promptAsync] = Google.useAuthRequest({
     iosClientId: process.env.EXPO_PUBLIC_IOS_CLIENT_ID, 
@@ -68,7 +83,7 @@ export default function LoginScreen() {
         // user.referalCode = referal;
         if (user) {
           // Tell the authContext that we are logged in
-          const newToken = {...user, referralCode: referral};
+          const newToken = {...user, referralCode: referralCode};
           console.log("login : ", token, " - - ", newToken);
           await login(newToken).then((res)=>{
             console.log("responceFromlogin :- ",res);
@@ -107,7 +122,7 @@ export default function LoginScreen() {
       >
         <SafeAreaView style={styles.safe}>
           <BackgroundTextTexture></BackgroundTextTexture>
-          <StatusBar barStyle={colors.statusBarStyle} />
+          {/* <StatusBar/> */}
 
         <View style={styles.topSection}>
           <View style={styles.headerTextContainer}>
@@ -135,14 +150,13 @@ export default function LoginScreen() {
                 <Pressable
                   style={[
                     styles.tabButton,
-                    selectedTab === 'login' && styles.tabButtonActive,
+                    styles.tabButtonActive,
                   ]}
-                  onPress={() => setSelectedTab('login')}
                 >
                   <Text
                     style={[
                       styles.tabText,
-                      selectedTab === 'login' && styles.tabTextActive,
+                      styles.tabTextActive,
                     ]}
                   >
                     Log In
@@ -165,21 +179,58 @@ export default function LoginScreen() {
                   </Text>
                 </Pressable> */}
               </View>
-
+              <View style={styles.referalBox}>
+                <Text style={styles.label}>Enter Referal Code</Text>
+                <ReferralCodeInput
+                  onChange={(code) => {
+                    setReferralCode(code);
+                    console.log('Final code:', code);
+                  }}
+                />
+              </View>
               <View 
                 style={styles.fieldGroup}
-                pointerEvents={'none'} 
+                // pointerEvents={'none'} 
               >
                 <Text style={styles.label}>Enter phone number</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="+91 xxxx-xxx-xxx"
-                  placeholderTextColor={colors.textMuted}
-                  keyboardType="phone-pad"
-                  value={phone}
-                  onChangeText={setPhone}
-                />
-                <TouchableOpacity disabled={true} style={styles.primaryButton}>
+                <View style={[styles.phoneRow, { borderColor: colors.border }]}>
+                  <CountryPicker
+                    countryCode={countryCode}
+                    withCallingCode
+                    withFlag
+                    withFilter
+                    withModal
+                    onSelect={(country) => {
+                      setCountryCode(country.cca2);
+                      setCallingCode(country.callingCode[0]);
+                    }}
+                  />
+                  <View style={styles.divider} />
+
+                  <TextInput
+                    style={styles.phoneInput}
+                    keyboardType="phone-pad"
+                    placeholder={getPlaceholder()}
+                    placeholderTextColor={colors.textMuted}
+                    value={phone}
+                    maxLength={12}
+                    onChangeText={(t) =>
+                      setPhone(t.replace(/[^0-9]/g, ''))
+                    }
+                  />
+                </View>
+                <TouchableOpacity
+                  style={styles.primaryButton}
+                  onPress={() => {
+                    const fullPhone = `+${callingCode}${phone}`;
+
+                    console.log('FULL PHONE →', fullPhone);
+
+                    navigation.navigate('otpScreen', {
+                      phone: fullPhone,
+                    });
+                  }}
+                >
                   <Text style={styles.primaryButtonText}>Send OTP</Text>
                 </TouchableOpacity>
               </View>
@@ -192,15 +243,6 @@ export default function LoginScreen() {
               </View> 
 
               <View>
-                <Text style={styles.label}>Enter Referal Code</Text>
-                <TextInput
-                  style={styles.input}
-                  placeholder="xxx xxx"
-                  placeholderTextColor={colors.textMuted}
-                  keyboardType="default"
-                  value={referral}
-                  onChangeText={setReferral}
-                />
                 <TouchableOpacity
                   style={styles.googleButton}
                   onPress={handleGoogleSignIn}
@@ -229,7 +271,7 @@ const makeStyles = (colors: ColorScheme) =>
       flex: 1,
     },
     topSection: {
-      height: '35%',
+      height: '25%',
       justifyContent: 'center',
     },
     gradient2: {
@@ -318,10 +360,31 @@ const makeStyles = (colors: ColorScheme) =>
     tabTextActive: {
       color: colors.textOnPrimary,
     },
-
-    fieldGroup: {
+    referalBox: {
       marginBottom: 20,
-      opacity: 0.5,
+    },
+    fieldGroup: {
+      marginVertical: 10,
+      // opacity: 0.5,
+    },
+    phoneRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 1,
+      borderRadius: 10,
+      paddingHorizontal: 10,
+      height: 52,
+      marginBottom: 16,
+    },
+    divider: {
+      width: 1,
+      height: '60%',
+      backgroundColor: '#ccc',
+      marginHorizontal: 10,
+    },
+    phoneInput: {
+      flex: 1,
+      fontSize: 16,
     },
     label: {
       fontSize: 14,
@@ -356,12 +419,12 @@ const makeStyles = (colors: ColorScheme) =>
     dividerRow: {
       flexDirection: 'row',
       alignItems: 'center',
-      marginBottom: 24,
+      marginBottom: 10,
     },
     dividerLine: {
       flex: 1,
       height: StyleSheet.hairlineWidth,
-      backgroundColor: colors.divider,
+      backgroundColor: colors.textMuted,
     },
     dividerText: {
       marginHorizontal: 12,

@@ -14,6 +14,9 @@ type continueParams = {
     sessionId: string;
   };
 };
+type otpParams = {
+    phone: string;
+};
 type errorType = {
   params: {
     errorCode: number;
@@ -21,7 +24,7 @@ type errorType = {
   }
 }
 export type HomeTabStackParamList = {
-  HomeMain: undefined;
+  homeMain: undefined;
   Daily: undefined;
   lobby: { sessionType: SessionType };
   Question: sanitizedQuestion;
@@ -36,6 +39,7 @@ export type HomeTabStackParamList = {
   privacyPolicy: undefined;
   termsAndCondition: undefined;
   contactUs: undefined;
+  otpScreen: otpParams;
 };
 
 export type HomeScreenNavigationProp =

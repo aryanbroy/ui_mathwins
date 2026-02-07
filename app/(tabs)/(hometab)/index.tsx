@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
+import AdBanner from '@/components/Ads/Banner';
 
 export const dummyUsers = [
   {
@@ -80,7 +81,7 @@ export default function Index() {
           <Header />
           <TournamentCards />
         </View>
-
+        <AdBanner/>
         <LinearGradient
           colors={colors.gradients.surface}
           start={{ x: 0, y: 0 }}
@@ -120,20 +121,15 @@ const makeStyles = (colors: ColorScheme) =>
     topSection: {
       width: '100%',
       paddingHorizontal: 20,
-      paddingBottom: 20,
-    },
-    progressText: {
-      paddingBottom: 20,
-      color: colors.textOnPrimary,
-      fontSize: 14,
-      fontWeight: '500',
+      paddingBottom: 10,
     },
     bottomGradient: {
       width: '100%',
       borderTopRightRadius: 20,
       borderTopLeftRadius: 20,
       overflow: 'hidden',
-      paddingVertical: 20,
+      paddingTop: 10,
+      paddingBottom: 20,
       paddingHorizontal: 16,
     },
   });

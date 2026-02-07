@@ -214,7 +214,7 @@ export default function SoloScreen() {
           </LinearGradient>
         </View>
       </LinearGradient>
-      <AdBanner/>
+      c
     </SafeAreaView>
   );
 }

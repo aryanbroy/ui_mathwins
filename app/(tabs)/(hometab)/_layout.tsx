@@ -15,6 +15,7 @@ import ErrorScreen from '@/app/errorScreen';
 import PrivacyPolicy from '@/app/privacyPolicy';
 import TermsAndCondition from '@/app/termsAndCondition';
 import Contactus from '@/app/contactUs';
+import OtpScreen from '@/app/otpScreen';
 
 const Stack = createNativeStackNavigator<HomeTabStackParamList>();
 
@@ -26,7 +27,7 @@ export default function HomeTabLayout() {
       }}
     >
       <Stack.Screen
-        name="HomeMain"
+        name="homeMain"
         component={Index}
         options={{ headerShown: false }}
       />
@@ -94,6 +95,11 @@ export default function HomeTabLayout() {
         name="contactUs"
         component={Contactus}
         options={{ title: 'Contact Us' }}
+      />
+      <Stack.Screen
+        name="otpScreen"
+        component={OtpScreen}
+        options={{ title: 'OtpScreen' }}
       />
     </Stack.Navigator>
   );
