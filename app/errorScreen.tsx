@@ -6,7 +6,7 @@ import { useNavigation } from '@react-navigation/native';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 
-export default function Error404Screen() {
+export default function ErrorScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);

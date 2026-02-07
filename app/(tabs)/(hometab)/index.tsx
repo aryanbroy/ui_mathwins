@@ -8,6 +8,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
+import AdBanner from '@/components/Ads/Banner';
 
 export const dummyUsers = [
   {
@@ -78,17 +79,9 @@ export default function Index() {
         <View style={styles.topSection}>
           <BackgroundTexture />
           <Header />
-          <View style={styles.progressBarContainer}>
-            <View
-              style={[
-                styles.progressBarFill,
-                { width: `${(300 / 2000) * 100}%` },
-              ]}
-            />
-          </View>
           <TournamentCards />
         </View>
-
+        <AdBanner/>
         <LinearGradient
           colors={colors.gradients.surface}
           start={{ x: 0, y: 0 }}
@@ -128,32 +121,15 @@ const makeStyles = (colors: ColorScheme) =>
     topSection: {
       width: '100%',
       paddingHorizontal: 20,
-      paddingBottom: 20,
-    },
-    progressBarContainer: {
-      height: 10,
-      backgroundColor: '#E5E7EB',
-      borderRadius: 10,
-      overflow: 'hidden',
-      marginBottom: 20,
-    },
-    progressBarFill: {
-      height: '100%',
-      backgroundColor: '#DC2626',
-      borderRadius: 10,
-    },
-    progressText: {
-      paddingBottom: 20,
-      color: colors.textOnPrimary,
-      fontSize: 14,
-      fontWeight: '500',
+      paddingBottom: 10,
     },
     bottomGradient: {
       width: '100%',
       borderTopRightRadius: 20,
       borderTopLeftRadius: 20,
       overflow: 'hidden',
-      paddingVertical: 20,
+      paddingTop: 10,
+      paddingBottom: 20,
       paddingHorizontal: 16,
     },
   });

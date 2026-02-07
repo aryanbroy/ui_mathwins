@@ -10,7 +10,12 @@ import roundOverview from './roundOverview';
 import LoginScreen from '@/app/login';
 import lobbyScreen from './lobby';
 import adScreen from './adScreen';
-import EditProfileScreen from '@/app/edit-profile';
+import EditProfileScreen from '@/app/editProfile';
+import ErrorScreen from '@/app/errorScreen';
+import PrivacyPolicy from '@/app/privacyPolicy';
+import TermsAndCondition from '@/app/termsAndCondition';
+import Contactus from '@/app/contactUs';
+import OtpScreen from '@/app/otpScreen';
 
 const Stack = createNativeStackNavigator<HomeTabStackParamList>();
 
@@ -22,7 +27,7 @@ export default function HomeTabLayout() {
       }}
     >
       <Stack.Screen
-        name="HomeMain"
+        name="homeMain"
         component={Index}
         options={{ headerShown: false }}
       />
@@ -70,6 +75,31 @@ export default function HomeTabLayout() {
         name="Instant"
         component={InstantLobby}
         options={{ title: 'InstantLobby' }}
+      />
+      <Stack.Screen
+        name="errorScreen"
+        component={ErrorScreen}
+        options={{ title: 'ErrorScreen' }}
+      />
+      <Stack.Screen
+        name="privacyPolicy"
+        component={PrivacyPolicy}
+        options={{ title: 'PrivacyPolicy' }}
+      />
+      <Stack.Screen
+        name="termsAndCondition"
+        component={TermsAndCondition}
+        options={{ title: 'T&C' }}
+      />
+      <Stack.Screen
+        name="contactUs"
+        component={Contactus}
+        options={{ title: 'Contact Us' }}
+      />
+      <Stack.Screen
+        name="otpScreen"
+        component={OtpScreen}
+        options={{ title: 'OtpScreen' }}
       />
     </Stack.Navigator>
   );

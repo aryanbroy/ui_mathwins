@@ -24,13 +24,13 @@ export const useFeedback = () => {
     const loadSounds = async () => {
         try {
         const { sound: correctSound } = await Audio.Sound.createAsync(
-            require('../assets/sounds/great-success-384935.mp3')
+            require('../assets/sounds/greatSuccess.mp3')
         );
         const { sound: wrongSound } = await Audio.Sound.createAsync(
-            require('../assets/sounds/sound-effect-system-error-sound-117733.mp3')
+            require('../assets/sounds/errorSound.mp3')
         );
         const { sound: submitSound } = await Audio.Sound.createAsync(
-            require('../assets/sounds/demo.mp3')
+            require('../assets/sounds/notification.mp3')
         );
 
         setSounds({

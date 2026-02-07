@@ -1,13 +1,13 @@
 import { Stack } from 'expo-router';
 import { useAuth, AuthProvider } from '../context/authContext';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, AppState, Platform } from 'react-native';
 import { ThemeProvider } from '@/context/useAppTheme';
-import { useEffect } from 'react';
-// import mobileAds, { MaxAdContentRating } from 'react-native-google-mobile-ads';
+import { useEffect, useRef } from 'react';
+import { loadAppOpenAd, showAppOpenAd } from '@/components/Ads/appOpen';
+import { ConfigProvider } from '@/context/useConfig';
 
 function RootNavigator() {
   const { user, loading } = useAuth();
-  console.log("user in _layout main : - ",user);
 
   if (loading) {
     return (
@@ -22,46 +22,46 @@ function RootNavigator() {
       <Stack screenOptions={{ headerShown: false }}>
         {user ? (
           <Stack.Screen name="(tabs)" />
-          // <Stack.Screen name="edit-profile" />
         ) : (
           <Stack.Screen name="login" />
         )}
-        {/**/}
-        {/* <Stack.Screen name="login" /> */}
-        {/* <Stack.Screen name="(tabs)" /> */}
-        {/* <Stack.Screen name="edit-profile" /> */}
-        {/* <Stack.Screen name="adScreen" /> */}
-        {/* <Stack.Screen name="rewardHistory" /> */}
-        {/* <Stack.Screen name="errorScreen" /> */}
-        {/* <Stack.Screen name="rewardHistory" /> */}
       </Stack>
     </ThemeProvider>
   );
 }
 
 export default function RootLayout() {
-  // useEffect(()=>{
-  //   mobileAds()
-  //     .setRequestConfiguration({
-  //       maxAdContentRating: MaxAdContentRating.PG,
-  //       tagForChildDirectedTreatment: true,
-  //       tagForUnderAgeOfConsent: true,
-  //       testDeviceIdentifiers: ['EMULATOR'],
-  //     })
-  //     .then(() => {
-  //       return mobileAds().initialize();
-  //     })
-  //     .then(() => {
-  //       console.log("AdMod Initialized");
-  //     })
-  //     .catch((error) => {
-  //       console.error("AdMod Error : ", error);
-  //     });
+  const shownOnce = useRef(false);
 
-  // },[])
+  useEffect(() => {
+    if (Platform.OS === 'web') return;
+
+    loadAppOpenAd();
+
+    setTimeout(() => {
+      // console.log('[AppOpen] cold start show');
+      showAppOpenAd();
+    }, 1500);
+
+    const subscription = AppState.addEventListener('change', (state) => {
+      // console.log('[AppState]', state);
+
+      if (state === 'active') {
+        setTimeout(() => {
+          // console.log('[AppOpen] resume show');
+          showAppOpenAd();
+        }, 500);
+      }
+    });
+
+    return () => subscription.remove();
+  }, []);
   return (
-    <AuthProvider>
-      <RootNavigator />
-    </AuthProvider>
+    <ConfigProvider>
+      <AuthProvider>
+        <RootNavigator />
+      </AuthProvider>
+    </ConfigProvider>
   );
 }
+

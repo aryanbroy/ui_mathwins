@@ -6,12 +6,18 @@ import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SessionType } from '@/app/(tabs)/(hometab)/lobby';
-
+import { soloStart } from '@/lib/api/soloTournament';
+import { SessionInfo } from '@/app/(tabs)/(hometab)/lobby';
 
 // import { BannerAd, BannerAdSize, TestIds, useForeground } from 'react-native-google-mobile-ads';
 
+export enum actionType {
+  GAME = 'game',
+  LOBBY = 'lobby'
+}
+
 type continueParams = {
-  sessionType: SessionType;
+  sessionType: actionType;
   userId: string;
   sessionId: string;
   bankedPoint: number;
@@ -77,8 +83,35 @@ export default function adscreen() {
 // ]
 
   
-  function handleSkip(){
-    navigation.navigate('roundOverview',{params})
+  async function handleSkip(){
+    console.log("Called ", params.sessionType == actionType.LOBBY);
+    
+    if(params.sessionType === actionType.GAME){
+      navigation.navigate('roundOverview',{params})
+    } else if (params.sessionType === actionType.LOBBY){
+      // const lobbyParams = {
+      //   userId: params.userId,
+      //   sessionId: params.sessionId,
+      //   SessionType: params.sessionType,
+      // }
+      console.log("generate new qs");
+      
+      await soloStart()
+        .then((res) => {
+          console.log('soloStart : ', res);
+          const sanitizedAttempt: SessionInfo = {
+            userId: res.data.sanitizedAttemp.userId,
+            sessionId: res.data.sanitizedAttemp.id,
+            sessionType: SessionType.SOLO,
+            sessionDuration: 60000,
+          };
+          navigation.navigate('Question', {
+            session: sanitizedAttempt,
+            sanitizedQuestion: res.data.sanitizedQuestion,
+          });
+        })
+        .catch();
+    }
   }
 
   return (

@@ -21,6 +21,9 @@ import {
   getDailyAttempts,
 } from '@/lib/api/dailyTournament';
 import { ErrObject } from '@/lib/api/parseApiError';
+import { useInterstitialAd } from '@/components/Ads/InterstitialAd';
+import AdBanner from '@/components/Ads/Banner';
+import { useConfig } from '@/context/useConfig';
 
 export type SessionInfo = {
   userId: string;
@@ -36,28 +39,42 @@ export enum SessionType {
 }
 
 type RouteParams = {
+  userId: string;
+  sessionId: string;
   sessionType: SessionType;
+};
+export enum actionType {
+  GAME = 'game',
+  LOBBY = 'lobby',
+}
+
+type continueParams = {
+  sessionType: actionType;
+  userId: string;
+  sessionId: string;
+  bankedPoint: number;
 };
 
 export default function SoloScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
-  const [totalAttempt, setTotalAttempt] = useState(0);
   const [remainingAttempt, setRemainingAttempt] = useState(0);
   const [loading, setLoading] = useState(true);
-  const { user, soundEffect, haptics } = useAuth();
+  const { user } = useAuth();
+  const config = useConfig();
+  const [totalAttempt, setTotalAttempt] = useState(
+    config.single_player.daily_free_attempts
+  );
   const route = useRoute<RouteProp<{ params: RouteParams }>>();
+
+  const { showAd } = useInterstitialAd();
 
   const [err, setErr] = useState<ErrObject | null>(null);
 
-  // const adUnitId = __DEV__ ? TestIds.ADAPTIVE_BANNER : 'ca-app-pub-xxxxxxxxxxxxx/yyyyyyyyyyyyyy';
-  // const bannerRef = useRef<BannerAd>(null);
-  // useForeground(() => {
-  //   Platform.OS === 'ios' && bannerRef.current?.load();
-  // });
-
   useEffect(() => {
+    console.log('CONFIG : ', config.single_player.daily_free_attempts);
+
     const { sessionType } = route.params;
     console.log('Session type: ', route.params.sessionType);
     async function getRemainingAttemp(): Promise<any> {
@@ -76,7 +93,7 @@ export default function SoloScreen() {
           await getSoloAtempts().then((res) => {
             console.log(res);
             setTotalAttempt(res?.data?.totalDailyAttempts);
-            setRemainingAttempt(res?.data.remainingAttempts);
+            setRemainingAttempt(res?.data?.remainingAttempts);
             setLoading(false);
           });
           break;
@@ -116,7 +133,7 @@ export default function SoloScreen() {
     }
   }
 
-  async function createSoloSession() {
+  async function createSession() {
     setLoading(true);
     // await soloStart({ userId: user.userId }
     console.log('user :- ', user);
@@ -147,8 +164,7 @@ export default function SoloScreen() {
         await startDailyGame();
         break;
       case SessionType.SOLO:
-        console.log('start solo session');
-        await createSoloSession();
+        await createSession();
         break;
       case SessionType.INSTANT:
         console.log('start instant game');
@@ -156,18 +172,20 @@ export default function SoloScreen() {
         break;
     }
   }
+  const startGameWithAd = () => {
+    showAd();
+    startGame();
+  };
 
   return (
     <SafeAreaView style={styles.safe}>
+      <AdBanner />
       <LinearGradient
         colors={colors.gradients.background}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.grediantBg}
       >
-        <View style={styles.adArea1}>
-          <Text>ad here</Text>
-        </View>
         <View style={styles.container}>
           <LinearGradient
             colors={colors.gradients.surface}
@@ -184,24 +202,24 @@ export default function SoloScreen() {
               <TouchableOpacity
                 disabled={loading}
                 style={loading ? styles.startBtnDiabled : styles.startBtn}
-                onPress={startGame}
+                onPress={remainingAttempt > 0 ? startGame : startGameWithAd}
               >
                 {loading ? (
                   <Text style={styles.startBtnText}>. . .</Text>
                 ) : (
                   <Text style={styles.startBtnText}>Start game</Text>
                 )}
+                {remainingAttempt <= 0 ? (
+                  <Text style={styles.adText}>ad</Text>
+                ) : (
+                  <></>
+                )}
               </TouchableOpacity>
             </View>
           </LinearGradient>
-          {/* <View style={styles.bannerAd}>
-          <BannerAd ref={bannerRef} unitId={adUnitId} size={BannerAdSize.ANCHORED_ADAPTIVE_BANNER} />
-          </View> */}
-        </View>
-        <View style={styles.adArea2}>
-          <Text>ad here</Text>
         </View>
       </LinearGradient>
+      c
     </SafeAreaView>
   );
 }
@@ -209,6 +227,7 @@ export default function SoloScreen() {
 const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     safe: {
+      backgroundColor: colors.primary,
       width: '100%',
       height: '100%',
     },
@@ -279,6 +298,16 @@ const makeStyles = (colors: ColorScheme) =>
       marginBottom: 10,
       borderWidth: 1,
       borderColor: '#FFFFFF',
+    },
+    adText: {
+      position: 'absolute',
+      right: 0,
+      top: 0,
+      paddingHorizontal: 15,
+      paddingVertical: 5,
+      borderRadius: 10,
+      color: colors.text,
+      backgroundColor: colors.border,
     },
     startBtnText: {
       color: colors.textSecondary,

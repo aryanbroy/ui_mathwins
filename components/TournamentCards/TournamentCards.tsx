@@ -54,7 +54,7 @@ export default function TournamentCards() {
 const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
-      paddingBottom: 24,
+      // paddingBottom: 24,
     },
     gradient: {
       flex: 1,
