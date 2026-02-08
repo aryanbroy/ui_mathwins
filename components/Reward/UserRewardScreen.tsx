@@ -1,9 +1,9 @@
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { ErrObject } from '@/lib/api/parseApiError';
-import { claimDailyReward } from '@/lib/api/rewards';
+import { claimDailyReward, getStreak, redeemReward } from '@/lib/api/rewards';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from 'expo-router';
+import { router, useNavigation } from 'expo-router';
 import React, { useState } from 'react';
 import {
   View,
@@ -12,7 +12,8 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Platform
+  Platform,
+  Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -21,15 +22,30 @@ import AdBanner from '../Ads/Banner';
 import { navigate } from 'expo-router/build/global-state/routing';
 
 export default function UserRewardScreen() {
+  function reloadRewardScreen(){
+    getStreak().then((res)=>{
+      console.log('getStreak ',res);
+      setToday(res.data.streak as number);
+    }).catch((err)=>{
+      console.log('getStreak err ',err);
+      
+    });
+  }
+  React.useEffect(()=>{
+    reloadRewardScreen();
+  },[])
   const [today, setToday] = useState(5);
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
-  const [err, setErr] = useState<ErrObject | null>(null);
+  const [canRedeem, setCanRedeem] = useState<ErrObject | null>(null);
   const [isClaimBtnLoading, setIsClaimBtnLoading] = useState<boolean>(false);
+  const [canClaim, setCanClaim] = useState<boolean>(false);
   const {user} = useAuth();
   const [coins, setCoins] = useState(user?.coins || 0);
   const [maxCoins, setMaxCoins] = useState(2000);
+
+
   
   const claimBtnPress = async () => {
     console.log('claim btn pressed');
@@ -38,16 +54,21 @@ export default function UserRewardScreen() {
       const response = await claimDailyReward();
       console.log('Daily reward: ', response);
     } catch (err: any) {
-      const errObj: ErrObject = {
-        status: err?.status ?? 500,
-        message: err?.message ?? 'Failed to claim reward',
-      };
-      console.log(errObj);
-      setErr(errObj);
+      setCanClaim(false);
+      Alert.alert(`${err}. Try Again Tomorrow !!`);
     } finally {
       setIsClaimBtnLoading(false);
     }
   };
+
+  const handleRedeemButton = async ()=>{
+    console.log("handleRedeemButton : ", 'HELLO');
+    redeemReward().then((res)=>{
+      console.log(res);
+    }).catch((err)=>{
+      console.log(err);
+    })
+  }
 
   return (
       <ScrollView
@@ -87,7 +108,7 @@ export default function UserRewardScreen() {
                           <View
                             style={[
                               styles.streakDay,
-                              day === today && styles.streakDayActive,
+                              day <= today && styles.streakDayActive,
                               day === today + 1 && styles.streakDayNext,
                             ]}
                             >
@@ -106,7 +127,11 @@ export default function UserRewardScreen() {
                   <Text style={styles.dailyLoginText}>DAILY LOGIN REWARD</Text>
                 </View>
                 <TouchableOpacity
-                  style={styles.claimButton}
+                  style={[
+                    styles.claimButton, 
+                    !canClaim && { opacity: 0.5 }
+                  ]}
+                  disabled={canClaim}
                   onPress={claimBtnPress}
                   >
                   {isClaimBtnLoading ? (
@@ -131,7 +156,13 @@ export default function UserRewardScreen() {
                     {coins} / {maxCoins} COINS
                   </Text>
                 </View>
-                <TouchableOpacity style={styles.redeemButton} >
+                <TouchableOpacity 
+                style={[
+                  styles.claimButton, 
+                  coins<maxCoins && { opacity: 0.5 }
+                ]}
+                disabled={coins < maxCoins}
+                onPress={handleRedeemButton}>
                   <Text style={styles.redeemButtonText}>
                     REDEEM YOUR REWARDS
                   </Text>
@@ -140,7 +171,8 @@ export default function UserRewardScreen() {
               <TouchableOpacity 
               style={styles.historyButton}
               onPress={()=>{
-                navigation.navigate('rewardHistoryScreen');
+                console.log(navigation.getState());
+                router.navigate('/rewardHistory');
               }}>
                 <Text style={styles.historyButtonText}>
                   View Reward history
@@ -311,7 +343,6 @@ const makeStyles = (colors: ColorScheme) =>
     claimButton: {
       backgroundColor: colors.secondary,
       paddingHorizontal: 22,
-      // paddingVertical: 12,
       borderRadius: 12,
       borderWidth: 2,
       borderColor: colors.bg,
@@ -319,9 +350,6 @@ const makeStyles = (colors: ColorScheme) =>
       minWidth: 90,
       alignItems: 'center',
       justifyContent: 'center',
-      // paddingHorizontal: 20,
-      // paddingVertical: 10,
-      // borderRadius: 10,
     },
     claimButtonText: {
       fontSize: 15,
@@ -368,6 +396,15 @@ const makeStyles = (colors: ColorScheme) =>
       alignItems: 'center',
       borderWidth: 2,
       borderColor: colors.bg,
+    },
+    redeemButtonDis: {
+      backgroundColor: colors.textMuted,
+      paddingVertical: 10,
+      borderRadius: 12,
+      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: colors.bg,
+      opacity: 0.5,
     },
     redeemButtonText: {
       fontSize: 16,

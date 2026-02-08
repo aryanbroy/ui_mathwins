@@ -73,8 +73,7 @@ export default function NativeAdCard() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
-    marginVertical: 12,
+    marginVertical: 14,
   },
   card: {
     backgroundColor: '#fff',

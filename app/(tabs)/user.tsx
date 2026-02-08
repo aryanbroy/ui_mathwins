@@ -1,6 +1,6 @@
 import { useAuth } from '@/context/authContext';
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Image } from "react-native";
+import { View, Text, StyleSheet, Switch, TouchableOpacity, ScrollView, Image, ActivityIndicator } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather, Ionicons, MaterialIcons, Entypo, MaterialCommunityIcons, FontAwesome  } from "@expo/vector-icons";
@@ -29,13 +29,19 @@ export default function UserProfileScreen() {
   const { isDarkMode, toggleDarkMode, colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
 
+  const [loading, setLoading] = useState(false);
+
   const copyReferral = async () => {
     if (!user?.referralCode) return;
 
     await Clipboard.setStringAsync(user.referralCode);
   };
+  React.useEffect(()=>{
+    setLoading(false);
+  },[user])
   function loginHandle(){
     console.log("login");
+    setLoading(true);
     navigation.navigate('login');
   }
   function handleEditProfile() {
@@ -87,9 +93,13 @@ export default function UserProfileScreen() {
                 </View>
               </View> : 
               <View style={styles.screenContainer}>
-                <TouchableOpacity onPress={loginHandle} style={styles.startBtn}>
-                  <Text style={styles.btnText}>LOGIN</Text>
-                </TouchableOpacity>
+                {
+                  loading ? 
+                  <ActivityIndicator /> :
+                  <TouchableOpacity onPress={loginHandle} style={styles.startBtn}>
+                    <Text style={styles.btnText}>LOGIN</Text>
+                  </TouchableOpacity>
+                }
               </View>
             }
 
@@ -320,7 +330,6 @@ const makeStyles = (colors: ColorScheme) =>
     headerGradient: {
       paddingTop: 60,
     },
-
     header: {
       alignItems: 'center',
     },

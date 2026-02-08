@@ -12,7 +12,7 @@ type ClaimStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
 
 export type RewardClaim = {
   id: string;
-  url: string;
+  voucherCode: string;
   status: ClaimStatus;
   createdAt: string;
   updatedAt: string;
@@ -27,7 +27,7 @@ export default function RewardClaimCard({
   index: number;
 }) {
   const copyLink = async () => {
-    await Clipboard.setStringAsync(claim.url);
+    await Clipboard.setStringAsync(claim.voucherCode);
     Alert.alert('Copied', 'Link copied to clipboard');
   };
 
@@ -55,7 +55,7 @@ export default function RewardClaimCard({
       {/* LINK */}
       <View style={styles.linkRow}>
         <Text style={styles.link} numberOfLines={1}>
-          {claim.url}
+          {claim.voucherCode}
         </Text>
 
         <TouchableOpacity onPress={copyLink}>

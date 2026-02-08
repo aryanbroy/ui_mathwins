@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
@@ -29,9 +30,9 @@ const LeaderboardPodium = () => {
   const getPodiumHeight = (position: any) => {
     switch (position) {
       case 1:
-        return 180;
+        return 200;
       case 2:
-        return 140;
+        return 160;
       case 3:
         return 140;
       default:
@@ -73,7 +74,14 @@ const LeaderboardPodium = () => {
       <View
         style={[styles.podium, { height: getPodiumHeight(leader.position) }]}
       >
-        <Text style={styles.position}>{leader.position}</Text>
+        <LinearGradient
+          colors={["#FFC3CD","#FF738A"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.headerGradient}
+        >
+          <Text style={styles.position}>{leader.position}</Text>
+        </LinearGradient>
       </View>
     </View>
   );
@@ -90,6 +98,12 @@ const LeaderboardPodium = () => {
 };
 
 const styles = StyleSheet.create({
+  headerGradient: {
+    flex:1,
+    width: "100%",
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   container: {
     // flex: 1,
     // backgroundColor: '#FFB3D9',

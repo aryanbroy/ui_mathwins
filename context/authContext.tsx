@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             token: JSON.parse(token),
           };
           await getUser(payload).then((response) => {
-            console.log('response :- ', response);
+            console.log('response getUser:- ', response);
             setUser(response.data);
             console.log('after setUser ', user);
           });

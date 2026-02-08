@@ -17,7 +17,7 @@ export default function ErrorScreen() {
   // const {params} = route.params.params as continueParams;
 
   const handleReturnHome = () => {
-    navigation.navigate('HomeMain');
+    navigation.navigate('homeMain');
   };
 
   return (

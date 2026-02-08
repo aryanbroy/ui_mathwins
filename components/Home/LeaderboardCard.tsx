@@ -16,7 +16,6 @@ const medalBg: Record<string, string> = {
 };
 
 export default function LeaderboardCard({ rank, name, points }: Props) {
-  console.log(rank," ",name," ",points);
   
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
@@ -48,7 +47,8 @@ export default function LeaderboardCard({ rank, name, points }: Props) {
         <Text style={styles.name}>{name}</Text>
         <Text style={styles.points}>{points} OVERALL POINTS</Text>
       </View>
-      {/* Medal */}
+      {
+        rank<= 3 &&
       <View
         style={[
           styles.medalWrapper,
@@ -57,6 +57,7 @@ export default function LeaderboardCard({ rank, name, points }: Props) {
       >
         <MaterialCommunityIcons name="crown" size={32} color="#FFF" />
       </View>
+      }
     </View>
   );
 }
