@@ -17,6 +17,7 @@ export default function UserProfileScreen() {
     logout,
     soundEffect,
     haptics,
+    loading,
     toggleSound,
     toggleHaptics,
   } = useAuth();
@@ -29,19 +30,16 @@ export default function UserProfileScreen() {
   const { isDarkMode, toggleDarkMode, colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
 
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   const copyReferral = async () => {
     if (!user?.referralCode) return;
 
     await Clipboard.setStringAsync(user.referralCode);
   };
-  React.useEffect(()=>{
-    setLoading(false);
-  },[user])
   function loginHandle(){
     console.log("login");
-    setLoading(true);
+    // setLoading(true);
     navigation.navigate('login');
   }
   function handleEditProfile() {
@@ -74,35 +72,33 @@ export default function UserProfileScreen() {
                 style={styles.avatarImage}
               />
             </View>
-            {user ?
-              <View style={styles.screenContainer}>
-                <Text style={styles.nameText}>{user?.username || 'User'}</Text>
-                <Text style={styles.emailText}>{user?.email}</Text>
+            {
+              loading ? 
+              <ActivityIndicator /> :
+              user ?
+                <View style={styles.screenContainer}>
+                  <Text style={styles.nameText}>{user?.username || 'User'}</Text>
+                  <Text style={styles.emailText}>{user?.email}</Text>
 
-                <View style={styles.referralRow}>
-                  <Text style={styles.referralText}>
-                    {user?.referralCode}
-                  </Text>
+                  <View style={styles.referralRow}>
+                    <Text style={styles.referralText}>
+                      {user?.referralCode}
+                    </Text>
 
-                  <TouchableOpacity
-                    style={styles.copyButton}
-                    onPress={copyReferral}
-                  >
-                    <Feather name="copy" size={14} color={colors.text} />
-                  </TouchableOpacity>
+                    <TouchableOpacity
+                      style={styles.copyButton}
+                      onPress={copyReferral}
+                    >
+                      <Feather name="copy" size={14} color={colors.text} />
+                    </TouchableOpacity>
+                  </View>
+                </View> : 
+                <View style={styles.screenContainer}>
+                    <TouchableOpacity onPress={loginHandle} style={styles.startBtn}>
+                      <Text style={styles.btnText}>LOGIN</Text>
+                    </TouchableOpacity>
                 </View>
-              </View> : 
-              <View style={styles.screenContainer}>
-                {
-                  loading ? 
-                  <ActivityIndicator /> :
-                  <TouchableOpacity onPress={loginHandle} style={styles.startBtn}>
-                    <Text style={styles.btnText}>LOGIN</Text>
-                  </TouchableOpacity>
-                }
-              </View>
             }
-
             <TouchableOpacity
               onPress={handleEditProfile}
               style={styles.editProfileButton}

@@ -13,9 +13,6 @@ export default function ErrorScreen() {
   const [statusCode, useStatusCode] = useState(400);
   const [message, useMessage] = useState(`The page you were looking for seems to\nhave gone missing.`);
 
-  // export continueParams type
-  // const {params} = route.params.params as continueParams;
-
   const handleReturnHome = () => {
     navigation.navigate('homeMain');
   };
@@ -44,7 +41,7 @@ export default function ErrorScreen() {
 
           {/* Error Message */}
           <View>
-            <Text style={styles.errorTitle}>Oh no..... Error {statusCode} :(</Text>
+            <Text style={styles.errorTitle}>Oh no..... Error {statusCode} :</Text>
             <Text style={styles.errorMessage}>{message}</Text>
           </View>
           {/* Return Button */}

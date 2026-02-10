@@ -1,4 +1,5 @@
 import { TournamentStatus } from '@/types/api/instant';
+import { useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 type InstantTournamentCardProps = {
@@ -17,10 +18,13 @@ export function InstantTournamentCard({
   status,
   onPress,
 }: InstantTournamentCardProps) {
+  function handleClick(){
+    onPress();
+  }
   return (
     <TouchableOpacity
       style={[styles.card, status === 'CLOSED' && styles.closed]}
-      onPress={onPress}
+      onPress={handleClick}
       disabled={status === 'CLOSED'}
     >
       <View style={styles.header}>

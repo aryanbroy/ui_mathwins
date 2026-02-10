@@ -24,6 +24,7 @@ import { ErrObject } from '@/lib/api/parseApiError';
 import { useInterstitialAd } from '@/components/Ads/InterstitialAd';
 import AdBanner from '@/components/Ads/Banner';
 import { useConfig } from '@/context/useConfig';
+import { router } from 'expo-router';
 
 export type SessionInfo = {
   userId: string;
@@ -95,6 +96,8 @@ export default function SoloScreen() {
             setTotalAttempt(res?.data?.totalDailyAttempts);
             setRemainingAttempt(res?.data?.remainingAttempts);
             setLoading(false);
+          }).catch(()=>{
+            router.navigate('/errorScreen');
           });
           break;
       }
@@ -196,8 +199,7 @@ export default function SoloScreen() {
             <View style={styles.box}>
               <Image source={{ uri: user?.picture }} style={styles.avatar} />
               <Text style={styles.attemptsText}>
-                Solo tournament attempts left : {remainingAttempt} /{' '}
-                {totalAttempt}
+                Solo tournament attempts left : {remainingAttempt} / {totalAttempt}
               </Text>
               <TouchableOpacity
                 disabled={loading}
@@ -219,7 +221,6 @@ export default function SoloScreen() {
           </LinearGradient>
         </View>
       </LinearGradient>
-      c
     </SafeAreaView>
   );
 }

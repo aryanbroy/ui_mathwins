@@ -7,11 +7,13 @@ import LeaderboardCard from '@/components/Home/LeaderboardCard';
 import { useEffect, useState } from 'react';
 import { fetchDailyLeaderboard } from '@/lib/api/dailyTournament';
 import { InstantTournamentCard } from '@/components/Home/InstantTournamentCard';
-import { fetchPastTournaments } from '@/lib/api/instantTournament';
+import { fetchInstantSessionLeaderboard, fetchPastTournaments } from '@/lib/api/instantTournament';
 import { InstantParticipant } from '@/types/api/instant';
 import TopThreePodium from '@/components/Leaderboard/TopThreePodium';
+import { useNavigation } from 'expo-router';
+import { HomeScreenNavigationProp } from '@/types/tabTypes';
 
-type TabKey = 'allTime' | 'daily' | 'instant' | 'solo';
+type TabKey = 'allTime' | 'daily' | 'instant';
 type RankedLeaderboard = {
   userId: string;
   bestScore: number;
@@ -25,10 +27,13 @@ export default function LeaderBoard() {
   const [dailyLeaderBoard, setDailyLeaderboard] = useState<RankedLeaderboard[]>(
     []
   );
+  const navigation = useNavigation<HomeScreenNavigationProp>();
   const [errMsg, setErrMsg] = useState<string | null>(null);
   const [instantTournamentsPlayed, setInstantTournamentsPlayed] = useState<
     InstantParticipant[] | null
   >(null);
+  const [showInstantSessions, setShowInstantSessions] = useState(true);
+  const [instantLeaderoard, setInstantLearboard] = useState<any>([]);
 
   useEffect(() => {
     const getDailyLeaderboard = async () => {
@@ -58,15 +63,34 @@ export default function LeaderBoard() {
       }
     };
 
+    const getAllTimeLeaderboard = async () => {
+      setErrMsg(null);
+      console.log('fetching instant tournaments');
+      try {
+        const tournaments: InstantParticipant[] = await fetchPastTournaments();
+        setInstantTournamentsPlayed(tournaments);
+      } catch (err: any) {
+        setErrMsg(err?.message ?? 'Failed to load daily attempts');
+      }
+    };
+
     if (activeTab === 'daily') {
       getDailyLeaderboard();
     } else if (activeTab === 'instant') {
       getInstantTournaments();
+    } else if (activeTab === 'allTime') {
+      getInstantTournaments();
     }
   }, [activeTab, page]);
 
-  const onClick = (value: number) => {
-    setPage(value);
+  const onClickInstantCard = (tournamentId: string) => {
+    fetchInstantSessionLeaderboard(tournamentId).then((res)=>{
+      console.log("onClickInstantCard : ",res);
+      setInstantLearboard(res);
+      setShowInstantSessions(false);
+    }).catch(
+
+    );
   };
 
   const renderContent = () => {
@@ -103,16 +127,28 @@ export default function LeaderBoard() {
       case 'instant':
         return (
           <>
-            {instantTournamentsPlayed?.map((tournament) => (
-              <InstantTournamentCard
-                key={tournament.tournamentId}
-                joinedCount={tournament.tournament.playersCount}
-                maxPlayers={tournament.tournament.maxPlayers}
-                expiresAt={tournament.tournament.expiresAt}
-                status={tournament.tournament.status}
-                onPress={() => console.log('display leaderboard')}
-              />
-            ))}
+            {
+              showInstantSessions ?
+              instantTournamentsPlayed?.map((tournament) => (
+                <InstantTournamentCard
+                  key={tournament.tournamentId}
+                  joinedCount={tournament.tournament.playersCount}
+                  maxPlayers={tournament.tournament.maxPlayers}
+                  expiresAt={tournament.tournament.expiresAt}
+                  status={tournament.tournament.status}
+                  onPress={() => onClickInstantCard(tournament.tournamentId)}
+                /> 
+              ))
+              :
+              instantLeaderoard?.map((item:any)=>(
+                <LeaderboardCard
+                  rank={item.rank}
+                  key={item.userId}
+                  name={item.user.username}
+                  points={item.bestScore}
+                />
+              ))
+            }
           </>
         );
     }

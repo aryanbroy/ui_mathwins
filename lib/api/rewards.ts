@@ -101,18 +101,42 @@ export const getAllClaims = async () => {
 
 export const approveClaim = async (claimId : string, voucherCode : string,) => {
   const token = (await AsyncStorage.getItem('token')) as string;
-  console.log("c : ", claimId," v ode : ",voucherCode);
-  
+
   try {
     const res = await api({
       method: 'post',
-      url: 'api/admin/rewards/claims',
+      url: 'api/admin/rewards/fulfill',
       headers: {
         Authorization: `Bearer ${JSON.parse(token)}`,
       },
       data: {
         claimId,
         voucherCode,
+      },
+    });
+    console.log('Response: ', res);
+    const resData = res.data;
+    return resData;
+  } catch (err: any) {
+    const { message, status } = parseApiError(err);
+    throw new ApiHandledError(status, message);
+  }
+};
+
+
+export const rejectClaim = async (claimId : string, note : string,) => {
+  const token = (await AsyncStorage.getItem('token')) as string;
+
+  try {
+    const res = await api({
+      method: 'post',
+      url: 'api/admin/rewards/reject',
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      },
+      data: {
+        claimId,
+        note,
       },
     });
     console.log('Response: ', res);

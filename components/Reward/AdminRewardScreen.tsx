@@ -15,7 +15,7 @@ import useAppTheme, { ColorScheme } from "@/context/useAppTheme";
 import { LinearGradient } from "expo-linear-gradient";
 import NativeAdCard from "../Ads/nativeAdCard";
 import Entypo from "@expo/vector-icons/Entypo";
-import { approveClaim, getAllClaims } from "@/lib/api/rewards";
+import { approveClaim, getAllClaims, rejectClaim } from "@/lib/api/rewards";
 
 type userDataType = {
   id: string;
@@ -59,7 +59,7 @@ export default function AdminRewardScreen() {
     approveClaim(itemId, link)
       .then((res) => {
         console.log('Claim approved successfully', res);
-        Alert.alert('Success', 'Reward approved and sent successfully!');
+        Alert.alert('Success', res.message);
         setLinks(prev => ({...prev, [itemId]: ''}));
         reloadRewardScreen();
       })
@@ -73,30 +73,28 @@ export default function AdminRewardScreen() {
   }
   
   function handleRejectButton(itemId: string, note: string){
-    // if(!note || note.trim() === ''){
-    //   Alert.alert('Error', 'Rejection note is required');
-    //   return;
-    // }
+    if(!note || note.trim() === ''){
+      Alert.alert('Error', 'Rejection note is required');
+      return;
+    }
     
-    // setLoadingStates(prev => ({...prev, [itemId]: true}));
-    // console.log("handleRejectButton", itemId, note);
+    setLoadingStates(prev => ({...prev, [itemId]: true}));
+    console.log("handleRejectButton", itemId, note);
     
-    // rejectClaim(itemId, note)
-    //   .then((res) => {
-    //     console.log('Claim rejected successfully', res);
-    //     Alert.alert('Success', 'Reward request rejected!');
-    //     // Clear the input for this item
-    //     setLinks(prev => ({...prev, [itemId]: ''}));
-    //     // Reload the list
-    //     reloadRewardScreen();
-    //   })
-    //   .catch((err) => {
-    //     console.log('Error rejecting claim', err);
-    //     Alert.alert('Error', 'Failed to reject reward. Please try again.');
-    //   })
-    //   .finally(() => {
-    //     setLoadingStates(prev => ({...prev, [itemId]: false}));
-    //   });
+    rejectClaim(itemId, note)
+      .then((res) => {
+        console.log('Claim rejected successfully', res);
+        Alert.alert('Success', 'Reward request rejected!');
+        setLinks(prev => ({...prev, [itemId]: ''}));
+        reloadRewardScreen();
+      })
+      .catch((err) => {
+        console.log('Error rejecting claim', err);
+        Alert.alert('Error', 'Failed to reject reward. Please try again.');
+      })
+      .finally(() => {
+        setLoadingStates(prev => ({...prev, [itemId]: false}));
+      });
   }
 
   const renderItem = ({ item, index }: any) => {

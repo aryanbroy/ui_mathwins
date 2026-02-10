@@ -70,10 +70,6 @@ export default function RewardHistoryScreen() {
   );
 }
 
-
-// -----------------------------
-// Styles
-// -----------------------------
 const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
   safe: {

@@ -127,10 +127,7 @@ export default function UserRewardScreen() {
                   <Text style={styles.dailyLoginText}>DAILY LOGIN REWARD</Text>
                 </View>
                 <TouchableOpacity
-                  style={[
-                    styles.claimButton, 
-                    !canClaim && { opacity: 0.5 }
-                  ]}
+                  style={styles.claimButton}
                   disabled={canClaim}
                   onPress={claimBtnPress}
                   >

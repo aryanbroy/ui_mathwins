@@ -9,6 +9,8 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import AdBanner from '@/components/Ads/Banner';
+import { HomeScreenNavigationProp } from '@/types/tabTypes';
+import { useNavigation } from '@react-navigation/native';
 
 export const dummyUsers = [
   {
@@ -66,6 +68,7 @@ export const dummyUsers = [
 export default function Index() {
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
+  const navigation = useNavigation<HomeScreenNavigationProp>();
 
   return (
     <ScrollView
@@ -96,7 +99,10 @@ export default function Index() {
               points={points}
             />
           ))}
-          <HomeBtn onPress={() => console.log('btn pressed')} />
+          <HomeBtn onPress={() => {
+            console.log('PRESSED');
+            // navigation.navigate('');
+          }} />
         </LinearGradient>
       </SafeAreaView>
     </ScrollView>

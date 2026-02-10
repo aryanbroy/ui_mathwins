@@ -31,15 +31,12 @@ function RootNavigator() {
 }
 
 export default function RootLayout() {
-  const shownOnce = useRef(false);
-
   useEffect(() => {
     if (Platform.OS === 'web') return;
 
     loadAppOpenAd();
 
     setTimeout(() => {
-      // console.log('[AppOpen] cold start show');
       showAppOpenAd();
     }, 1500);
 

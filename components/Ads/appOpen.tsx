@@ -48,6 +48,14 @@ appOpenAd.addAdEventListener(AdEventType.CLOSED, () => {
   loadAppOpenAd();
 });
 
-appOpenAd.addAdEventListener(AdEventType.ERROR, (err) => {
-  console.log('[AppOpen] ERROR', err);
+appOpenAd.addAdEventListener(AdEventType.ERROR, () => {
+  console.log('[AppOpen] failed (no fill)');
+
+  // 🔥 reset state safely
+  isLoaded = false;
+  isShowing = false;
+
+  // preload next silently
+  setTimeout(loadAppOpenAd, 2000);
 });
+

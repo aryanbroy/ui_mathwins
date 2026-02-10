@@ -7,8 +7,11 @@ import {
   Alert,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
+import { Feather } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 
-type ClaimStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
+type ClaimStatus = 'Pending' | 'Fulfilled' | 'Rejected';
 
 export type RewardClaim = {
   id: string;
@@ -17,6 +20,7 @@ export type RewardClaim = {
   createdAt: string;
   updatedAt: string;
   rejectionReason?: string;
+  coinsLocked: number;
 };
 
 export default function RewardClaimCard({
@@ -26,155 +30,149 @@ export default function RewardClaimCard({
   claim: RewardClaim;
   index: number;
 }) {
+  const { colors } = useAppTheme();
+  const styles = React.useMemo(() => makeStyles(colors), [colors]);
+
   const copyLink = async () => {
     await Clipboard.setStringAsync(claim.voucherCode);
     Alert.alert('Copied', 'Link copied to clipboard');
   };
 
-  const statusColors = {
-    PENDING: '#F59E0B',
-    APPROVED: '#16A34A',
-    REJECTED: '#DC2626',
+  const statusConfig = {
+    Pending: { label: 'Locked', color: '#F59E0B' },
+    Fulfilled: { label: 'Deducted', color: '#16A34A' },
+    Rejected: { label: 'Added', color: '#DC2626' },
   };
 
-  const statusColor = statusColors[claim.status];
+  const s = statusConfig[claim.status];
+
+  const formatDate = (d: string) =>
+    new Date(d).toLocaleString(undefined, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+    });
 
   return (
-    <View style={styles.card}>
-      {/* HEADER */}
-      <View style={styles.headerRow}>
-        <View style={styles.indexCircle}>
-          <Text style={styles.indexText}>{index + 1}</Text>
-        </View>
+    <LinearGradient
+      colors={colors.gradients.surface} 
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.card}
+    >
+      {/* TOP */}
+      <View style={styles.topRow}>
+        <Text style={styles.index}>#{index + 1}</Text>
 
-        <Text style={[styles.statusText, { color: statusColor }]}>
-          {claim.status}
+        <View style={[styles.badge, { backgroundColor: s.color }]}>
+          <Text style={styles.badgeText}>{claim.status}</Text>
+        </View>
+      </View>
+
+      {/* MAIN */}
+      <View style={styles.mainRow}>
+        {/* Coins */}
+        <Text style={[styles.coins, { color: s.color }]}>
+          {claim.status === 'Rejected' ? '+' : '-'}
+          {claim.coinsLocked}
         </Text>
-      </View>
 
-      {/* LINK */}
-      <View style={styles.linkRow}>
-        <Text style={styles.link} numberOfLines={1}>
-          {claim.voucherCode}
-        </Text>
+        {/* Details */}
+        <View style={{ flex: 1 }}>
+          {(claim.voucherCode || claim.rejectionReason) && (
+            <View style={styles.linkRow}>
+              <Text style={styles.link} numberOfLines={1}>
+                {claim.voucherCode || claim.rejectionReason}
+              </Text>
 
-        <TouchableOpacity onPress={copyLink}>
-          <Text style={styles.copy}>📋</Text>
-        </TouchableOpacity>
-      </View>
+              {claim.voucherCode && (
+                <TouchableOpacity onPress={copyLink}>
+                  <Feather
+                    name="copy"
+                    size={16}
+                    color={colors.textMuted}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
+          )}
 
-      <View style={styles.divider} />
-
-      {/* DATES */}
-      <View style={styles.dateRow}>
-        <View>
-          <Text style={styles.label}>createdAt</Text>
-          <Text style={styles.value}>{claim.createdAt}</Text>
-        </View>
-
-        <View>
-          <Text style={styles.label}>updatedAt</Text>
-          <Text style={styles.value}>{claim.updatedAt}</Text>
-        </View>
-      </View>
-
-      {/* OPTIONAL REJECTION */}
-      {claim.rejectionReason && (
-        <View style={styles.reasonBox}>
-          <Text style={styles.reasonLabel}>rejectionReason</Text>
-          <Text style={styles.reasonText}>
-            {claim.rejectionReason}
+          {/* Dates (Created + Updated) */}
+          <Text style={styles.date}>
+            Created: {formatDate(claim.createdAt)}
+          </Text>
+          <Text style={styles.date}>
+            Updated: {formatDate(claim.updatedAt)}
           </Text>
         </View>
-      )}
-    </View>
+      </View>
+    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 14,
-    elevation: 3,
-  },
+const makeStyles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    card: {
+      borderRadius: 18,
+      padding: 14,
+      marginBottom: 12,
+      shadowColor: '#000',
+      shadowOpacity: 0.12,
+      shadowRadius: 8,
+      elevation: 4,
+    },
 
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
+    topRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 8,
+    },
 
-  indexCircle: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: '#111',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 10,
-  },
+    index: {
+      fontSize: 12,
+      color: colors.textMuted,
+    },
 
-  indexText: {
-    color: '#fff',
-    fontWeight: '700',
-  },
+    badge: {
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 20,
+    },
 
-  statusText: {
-    fontSize: 20,
-    fontWeight: '800',
-  },
+    badgeText: {
+      color: '#fff',
+      fontSize: 11,
+      fontWeight: '600',
+    },
 
-  linkRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
+    mainRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: 12,
+    },
 
-  link: {
-    flex: 1,
-    fontSize: 14,
-    color: '#333',
-    marginRight: 8,
-  },
+    coins: {
+      fontSize: 22,
+      fontWeight: '800',
+      width: 75,
+    },
 
-  copy: {
-    fontSize: 18,
-  },
+    linkRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+    },
 
-  divider: {
-    height: 1,
-    backgroundColor: '#eee',
-    marginVertical: 10,
-  },
+    link: {
+      flex: 1,
+      fontSize: 14,
+      color: colors.text,
+      marginRight: 8,
+    },
 
-  dateRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-
-  label: {
-    fontSize: 12,
-    color: '#888',
-  },
-
-  value: {
-    fontSize: 14,
-    fontWeight: '600',
-  },
-
-  reasonBox: {
-    marginTop: 10,
-  },
-
-  reasonLabel: {
-    fontSize: 12,
-    color: '#888',
-  },
-
-  reasonText: {
-    marginTop: 4,
-    fontSize: 14,
-  },
-});
+    date: {
+      fontSize: 11,
+      color: colors.textMuted,
+      marginTop: 2,
+    },
+  });

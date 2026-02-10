@@ -44,8 +44,7 @@ export const getDailyTournamentDetails = async () => {
   }
 };
 
-export const createDailySession =
-  async (): Promise<createDailySessionResponse> => {
+export const createDailySession = async (): Promise<createDailySessionResponse> => {
     try {
       const token = (await AsyncStorage.getItem('token')) as string;
       const res = await api({

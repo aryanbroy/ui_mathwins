@@ -147,3 +147,28 @@ export const fetchPastTournaments = async () => {
     throw new ApiHandledError(status, message);
   }
 };
+
+export const fetchInstantSessionLeaderboard = async (tournamentId: string) => {
+  try {
+    console.log('get request to fetch daily leaderboard...');
+    const token = (await AsyncStorage.getItem('token')) as string;
+    const res = await api({
+      method: 'post',
+      url: 'api/instant/session_leaderboard',
+      data: {
+        tournamentId
+      },
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      },
+    });
+    console.log(res);
+    const resData: PastTournaments = res.data;
+    const data = resData.data;
+    return data;
+  } catch (err: any) {
+    console.log('Error fetching leaderboard: ', err);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
+  }
+};

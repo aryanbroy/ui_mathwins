@@ -120,7 +120,7 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
           [CONFIG_TIME_KEY, Date.now().toString()],
         ]);
       }).catch((error)=>{
-        console.error(error);
+        console.log(error);
       }); 
 
     } catch {

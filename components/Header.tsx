@@ -67,7 +67,7 @@ const makeStyles = (colors: ColorScheme) =>
     },
     progressBarFill: {
       height: '100%',
-      backgroundColor: '#DC2626',
+      backgroundColor: colors.primary,
       borderRadius: 10,
     },
     leftSection: {

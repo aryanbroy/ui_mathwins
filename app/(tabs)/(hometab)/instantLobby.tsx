@@ -22,6 +22,8 @@ import {
 } from '@/lib/api/instantTournament';
 import { InstantQuestion, Player } from '@/types/api/instant';
 import { SessionInfo, SessionType } from './lobby';
+import { LinearGradient } from 'expo-linear-gradient';
+import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 
 export default function InstantTournamentLobby() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -43,6 +45,8 @@ export default function InstantTournamentLobby() {
   const [roomId, setRoomId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [currentScore, setCurrentScore] = useState<number>(0);
+  const { colors } = useAppTheme();
+  const styles = React.useMemo(() => makeStyles(colors), [colors]);
 
   const load = useCallback(async () => {
     setIsLoading(false);
@@ -141,7 +145,7 @@ export default function InstantTournamentLobby() {
       console.log('Final score: ', submissionRes.finalScore);
       console.log('Status: ', submissionRes.status);
 
-      navigation.navigate('HomeMain');
+      navigation.navigate('homeMain');
     } catch (err: any) {
       setErrMsg(err?.message ?? 'Failed to load start game');
     } finally {
@@ -151,20 +155,24 @@ export default function InstantTournamentLobby() {
 
   const handleRetry = () => load();
 
-  const renderPlayer = ({ item, index }: { item: Player; index: number }) => (
-    <View style={styles.playerRow}>
-      <View style={styles.avatarCircle}>
-        <Text style={styles.avatarText}>{item.user.username.charAt(0)}</Text>
-      </View>
-
-      <View style={styles.playerInfo}>
-        <Text style={styles.playerName}>{item.user.username}</Text>
-        {/* <Text style={styles.playerScore}>{item.score ?? 0} pts</Text> */}
-      </View>
-
-      <Text style={styles.rankBubble}>{index + 1}</Text>
+const renderPlayer = ({ item, index }: { item: Player; index: number }) => (
+  <LinearGradient
+    colors={colors.gradients.surface}
+    style={styles.playerRow}
+  >
+    <View style={styles.avatarCircle}>
+      <Text style={styles.avatarText}>
+        {item.user.username.charAt(0).toUpperCase()}
+      </Text>
     </View>
-  );
+
+    <Text style={styles.playerName}>{item.user.username}</Text>
+
+    <View style={styles.rankBubble}>
+      <Text style={styles.rankText}>{index + 1}</Text>
+    </View>
+  </LinearGradient>
+);
 
   const getScreenState = () => {
     if (tourState === TournamentState.FINISHED) return 'finished';
@@ -220,87 +228,77 @@ export default function InstantTournamentLobby() {
         );
       case 'ready':
         return (
-          <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="dark-content" />
-
-            <View style={styles.topRow}>
-              <Text style={styles.title}>Instant Tournament</Text>
-              <Text style={styles.roomTag}>Room • {roomId}</Text>
-            </View>
-
-            <View style={styles.summaryCard}>
-              <View style={styles.summaryRow}>
-                <View>
-                  <Text style={styles.summaryLabel}>Players</Text>
-                  <Text style={styles.summaryValue}>
-                    {joinedCount}/{roomCapacity}
-                  </Text>
-                </View>
-
-                <View style={{ alignItems: 'flex-end' }}>
-                  <Text style={styles.summaryLabel}>Closes in</Text>
-                  <Text style={styles.summaryValue}>
-                    {formatTime(remainingSeconds)}
-                  </Text>
-                </View>
+          <SafeAreaView style={styles.safe}>
+            <LinearGradient
+              colors={colors.gradients.background}
+              style={styles.bg}
+            >
+              {/* HEADER */}
+              <View style={styles.header}>
+                <Text style={styles.title}>Instant Tournament</Text>
+                <Text style={styles.roomTag}>Room • {roomId}</Text>
               </View>
 
-              <View style={styles.progressBarContainer}>
-                <View
-                  style={[
-                    styles.progressBarFill,
-                    { width: `${(joinedCount / roomCapacity) * 100}%` },
-                  ]}
-                />
-              </View>
+              {/* SUMMARY CARD */}
+              <View
+                style={styles.card}
+              >
+                <View style={styles.summaryRow}>
+                  <View>
+                    <Text style={styles.label}>Players</Text>
+                    <Text style={styles.value}>
+                      {joinedCount}/{roomCapacity}
+                    </Text>
+                  </View>
 
-              <View style={styles.actionsRow}>
-                <TouchableOpacity style={styles.ghostButton} onPress={onInvite}>
-                  <Text style={styles.ghostText}>Invite</Text>
-                </TouchableOpacity>
+                  <View style={{ alignItems: 'flex-end' }}>
+                    <Text style={styles.label}>Closes in</Text>
+                    <Text style={styles.value}>
+                      {formatTime(remainingSeconds)}
+                    </Text>
+                  </View>
+                </View>
 
-                {!roomId ? (
-                  <TouchableOpacity style={styles.loadingBtn} disabled>
-                    <Text style={styles.primaryText}>Loading</Text>
+                {/* progress */}
+                <View style={styles.progressTrack}>
+                  <View
+                    style={[
+                      styles.progressFill,
+                      { width: `${(joinedCount / roomCapacity) * 100}%` },
+                    ]}
+                  />
+                </View>
+
+                {/* buttons */}
+                <View style={styles.actionsRow}>
+                  <TouchableOpacity style={styles.secondaryBtn} onPress={onInvite}>
+                    <Text style={styles.secondaryTxt}>Invite</Text>
                   </TouchableOpacity>
-                ) : (
+
                   <TouchableOpacity
-                    style={
-                      disableStartBtn ? styles.loadingBtn : styles.primaryButton
-                    }
+                    style={disableStartBtn ? styles.disabledBtn : styles.primaryBtn}
                     disabled={disableStartBtn}
                     onPress={onStartGame}
                   >
-                    <Text style={styles.primaryText}>Start</Text>
+                    <Text style={styles.primaryTxt}>Start</Text>
                   </TouchableOpacity>
-                )}
+                </View>
               </View>
-            </View>
 
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Players</Text>
-              <Text style={styles.sectionSub}>Live</Text>
-            </View>
+              {/* PLAYERS LIST */}
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionTitle}>Players</Text>
+                <Text style={styles.sectionSub}>Live</Text>
+              </View>
 
-            <FlatList
-              data={players}
-              keyExtractor={(i) => i.userId}
-              renderItem={renderPlayer}
-              style={styles.list}
-              contentContainerStyle={{ paddingBottom: 24 }}
-            />
-
-            {/* <View style={styles.footer}> */}
-            {/*   <Text style={styles.footerText}> */}
-            {/*     3 min per player · Early submit allowed (ad-gated) */}
-            {/*   </Text> */}
-            {/*   <TouchableOpacity */}
-            {/*     style={styles.linkBtn} */}
-            {/*     onPress={() => alert('Leaderboard (dummy)')} */}
-            {/*   > */}
-            {/*     <Text style={styles.linkText}>Leaderboard</Text> */}
-            {/*   </TouchableOpacity> */}
-            {/* </View> */}
+              <FlatList
+                data={players}
+                keyExtractor={(i) => i.userId}
+                renderItem={renderPlayer}
+                contentContainerStyle={{ paddingBottom: 30 }}
+                showsVerticalScrollIndicator={false}
+              />
+            </LinearGradient>
           </SafeAreaView>
         );
     }
@@ -308,115 +306,170 @@ export default function InstantTournamentLobby() {
   return renderContent();
 }
 
-const styles = StyleSheet.create({
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
-  container: { flex: 1, backgroundColor: '#FAFAFB', padding: 16 },
-  topRow: { marginBottom: 12 },
-  title: { fontSize: 20, fontWeight: '700', color: '#111' },
-  roomTag: { color: '#8B8F98', marginTop: 4 },
+const makeStyles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+    safe: {
+      flex: 1,
+      backgroundColor: colors.primary,
+    },
 
-  summaryCard: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 12,
-    marginBottom: 14,
-    shadowColor: '#000',
-    shadowOpacity: 0.03,
-    shadowRadius: 6,
-    elevation: 1,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  summaryLabel: { color: '#8B8F98', fontSize: 12 },
-  summaryValue: { fontSize: 16, fontWeight: '700', marginTop: 4 },
+    bg: {
+      flex: 1,
+      padding: 16,
+    },
 
-  progressBarContainer: {
-    height: 6,
-    backgroundColor: '#F1F3F8',
-    borderRadius: 4,
-    overflow: 'hidden',
-    marginTop: 10,
-  },
-  progressBarFill: { height: 6, backgroundColor: '#6A5AE0' },
+    header: {
+      marginBottom: 16,
+    },
 
-  actionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    marginTop: 12,
-  },
-  ghostButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: '#F6F7FB',
-  },
-  ghostText: { color: '#4A4A4A', fontWeight: '600' },
-  primaryButton: {
-    paddingVertical: 9,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: '#6A5AE0',
-    marginLeft: 10,
-  },
-  primaryText: { color: '#fff', fontWeight: '700' },
-  loadingBtn: {
-    paddingVertical: 9,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: 'grey',
-    opacity: 0.6,
-    marginLeft: 10,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  sectionTitle: { fontWeight: '700', fontSize: 16 },
-  sectionSub: { color: '#9AA0A6' },
+    title: {
+      fontSize: 22,
+      fontWeight: '700',
+      color: colors.textSecondary,
+    },
 
-  list: { flex: 1 },
-  playerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 10,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    marginBottom: 8,
-  },
-  avatarCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#F2F4FB',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: { fontWeight: '700', color: '#565656' },
-  playerInfo: { flex: 1, marginLeft: 12 },
-  playerName: { fontWeight: '700', color: '#111' },
-  playerScore: { color: '#8B8F98', marginTop: 4, fontSize: 12 },
-  rankBubble: {
-    backgroundColor: '#F6F7FB',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 20,
-    color: '#6A5AE0',
-    fontWeight: '700',
-  },
+    roomTag: {
+      marginTop: 4,
+      color: colors.textSecondary,
+      fontSize: 13,
+    },
 
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-  },
-  footerText: { color: '#8B8F98', fontSize: 13 },
-  linkBtn: { paddingHorizontal: 10, paddingVertical: 6 },
-  linkText: { color: '#6A5AE0', fontWeight: '700' },
-});
+    card: {
+      borderRadius: 20,
+      padding: 16,
+      marginBottom: 18,
+      backgroundColor: colors.bg,
+      shadowColor: '#000',
+      shadowOpacity: 0.15,
+      shadowRadius: 10,
+      elevation: 6,
+    },
+
+    summaryRow: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 12,
+    },
+
+    label: {
+      color: colors.textMuted,
+      fontSize: 13,
+    },
+
+    value: {
+      fontSize: 18,
+      fontWeight: '700',
+      color: colors.text,
+    },
+
+    progressTrack: {
+      height: 6,
+      borderRadius: 6,
+      backgroundColor: colors.text,
+      overflow: 'hidden',
+      marginVertical: 14,
+    },
+
+    progressFill: {
+      height: '100%',
+      backgroundColor: colors.primary,
+    },
+
+    actionsRow: {
+      flexDirection: 'row',
+      gap: 12,
+    },
+
+    primaryBtn: {
+      flex: 1,
+      backgroundColor: colors.primary,
+      paddingVertical: 12,
+      borderRadius: 14,
+      alignItems: 'center',
+    },
+
+    disabledBtn: {
+      flex: 1,
+      backgroundColor: colors.textMuted,
+      paddingVertical: 12,
+      borderRadius: 14,
+      alignItems: 'center',
+    },
+
+    primaryTxt: {
+      color: '#fff',
+      fontWeight: '600',
+    },
+
+    secondaryBtn: {
+      flex: 1,
+      backgroundColor: colors.border,
+      paddingVertical: 12,
+      borderRadius: 14,
+      alignItems: 'center',
+    },
+
+    secondaryTxt: {
+      color: colors.text,
+      fontWeight: '600',
+    },
+
+    sectionHeader: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginBottom: 10,
+    },
+
+    sectionTitle: {
+      fontSize: 16,
+      fontWeight: '600',
+      color: colors.textSecondary,
+    },
+
+    sectionSub: {
+      fontSize: 13,
+      color: colors.textMuted,
+    },
+
+    playerRow: {
+      borderRadius: 16,
+      padding: 14,
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 10,
+    },
+
+    avatarCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      backgroundColor: colors.border,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 12,
+    },
+
+    avatarText: {
+      fontWeight: '700',
+      color: colors.text,
+    },
+
+    playerName: {
+      flex: 1,
+      color: colors.text,
+      fontWeight: '600',
+    },
+
+    rankBubble: {
+      backgroundColor: colors.primary,
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 12,
+    },
+
+    rankText: {
+      color: '#fff',
+      fontWeight: '700',
+    },
+  });
