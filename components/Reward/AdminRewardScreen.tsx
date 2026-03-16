@@ -173,7 +173,7 @@ const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     safe: {
       flex: 1,
-      backgroundColor: colors.primary
+      backgroundColor: colors.bg
     },
     container: {
       flex: 1,

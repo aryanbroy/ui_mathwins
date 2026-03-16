@@ -2,19 +2,19 @@ import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from '@react-navigation/native';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
+import { router, useNavigation } from 'expo-router';
 
 export default function ErrorScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   const [statusCode, useStatusCode] = useState(400);
-  const [message, useMessage] = useState(`The page you were looking for seems to\nhave gone missing.`);
+  const [message, useMessage] = useState(`The page you were looking for seems to have gone missing.`);
 
   const handleReturnHome = () => {
-    navigation.navigate('homeMain');
+    router.replace('./(tabs)');
   };
 
   return (
@@ -110,15 +110,17 @@ const makeStyles = (colors: ColorScheme) =>
     },
     errorTitle: {
       fontSize: 32,
-      fontWeight: 700,
+      // fontWeight: 700,
+      fontFamily: 'Saira-Medium',
       color: colors.text,
       textAlign: 'center',
       marginBottom: 20,
     },
     errorMessage: {
-      fontSize: 15,
+      fontSize: 10,
       color: colors.text,
       textAlign: 'center',
+      fontFamily: 'Poppins-Medium',
       lineHeight: 20,
       marginBottom: 60,
       opacity: 0.9,
@@ -138,8 +140,9 @@ const makeStyles = (colors: ColorScheme) =>
     },
     returnButtonText: {
       fontSize: 20,
-      fontWeight: '700',
+      // fontWeight: '700',
       color: '#FFFFFF',
+      fontFamily: 'Rubik-Medium',
       textAlign: 'center',
     },
   });

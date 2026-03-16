@@ -82,19 +82,20 @@ export default function ReferralCodeInput({length = LENGTH,onChange,}: Props) {
 const makeStyles = (colors: ColorScheme) =>
     StyleSheet.create({
     row: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+      flexDirection: 'row',
+      gap: 8,
     },
     box: {
-        minWidth: 40,
-        minHeight: 50,
-        borderWidth: 1,
-        borderColor: colors.primary,
-        borderRadius: 10,
-        textAlign: 'center',
-        fontSize: 18,
-        fontWeight: 700,
-        backgroundColor: colors.backgrounds.input,
-        color: colors.text,
+      flex: 1,
+      aspectRatio: 1,
+      minHeight: 50,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      borderRadius: 10,
+      textAlign: 'center',
+      fontSize: 18,
+      fontWeight: 700,
+      backgroundColor: colors.backgrounds.input,
+      color: colors.text,
     },
     });

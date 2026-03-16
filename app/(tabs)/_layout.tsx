@@ -10,9 +10,7 @@ const Tab = createBottomTabNavigator();
 
 export default function TabLayout() {
   return (
-    <ThemeProvider>
-      <TabNavigator />
-    </ThemeProvider>
+    <TabNavigator />
   );
 }
 

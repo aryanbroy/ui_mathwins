@@ -24,6 +24,8 @@ import { InstantQuestion, Player } from '@/types/api/instant';
 import { SessionInfo, SessionType } from './lobby';
 import { LinearGradient } from 'expo-linear-gradient';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
+import { router } from 'expo-router';
+import NativeAdCard from '@/components/Ads/nativeAdCard';
 
 export default function InstantTournamentLobby() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -47,6 +49,7 @@ export default function InstantTournamentLobby() {
   const [currentScore, setCurrentScore] = useState<number>(0);
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
+  const AD_FREQUENCY = 2;
 
   const load = useCallback(async () => {
     setIsLoading(false);
@@ -156,8 +159,7 @@ export default function InstantTournamentLobby() {
   const handleRetry = () => load();
 
 const renderPlayer = ({ item, index }: { item: Player; index: number }) => (
-  <LinearGradient
-    colors={colors.gradients.surface}
+  <View
     style={styles.playerRow}
   >
     <View style={styles.avatarCircle}>
@@ -171,14 +173,27 @@ const renderPlayer = ({ item, index }: { item: Player; index: number }) => (
     <View style={styles.rankBubble}>
       <Text style={styles.rankText}>{index + 1}</Text>
     </View>
-  </LinearGradient>
+  </View>
 );
+const renderItem = ({ item, index }: any) => {
+  return (
+    <>
+      {index !== 0 && index % AD_FREQUENCY === 0 && (
+        <NativeAdCard />
+      )}
+
+      {renderPlayer({ item, index })}
+    </>
+  );
+};
 
   const getScreenState = () => {
     if (tourState === TournamentState.FINISHED) return 'finished';
     if (tourState === TournamentState.PLAYING) return 'playing';
     if (isLoading) return 'loading';
-    if (errMsg != null) return 'err';
+    if (errMsg != null) {
+      return router.navigate('/errorScreen');
+    };
     return 'ready';
   };
 
@@ -191,12 +206,6 @@ const renderPlayer = ({ item, index }: { item: Player; index: number }) => (
           <View style={styles.center}>
             <ActivityIndicator />
             <Text style={{ marginTop: 8 }}>Loading...</Text>
-          </View>
-        );
-      case 'err':
-        return (
-          <View>
-            <Text>Error fetching tournament details: {errMsg}</Text>
           </View>
         );
 
@@ -294,7 +303,7 @@ const renderPlayer = ({ item, index }: { item: Player; index: number }) => (
               <FlatList
                 data={players}
                 keyExtractor={(i) => i.userId}
-                renderItem={renderPlayer}
+                renderItem={renderItem}
                 contentContainerStyle={{ paddingBottom: 30 }}
                 showsVerticalScrollIndicator={false}
               />
@@ -312,6 +321,7 @@ const makeStyles = (colors: ColorScheme) =>
     safe: {
       flex: 1,
       backgroundColor: colors.primary,
+      marginBottom: -30,
     },
 
     bg: {
@@ -327,14 +337,16 @@ const makeStyles = (colors: ColorScheme) =>
       fontSize: 22,
       fontWeight: '700',
       color: colors.textSecondary,
+      fontFamily: 'Saira-Medium'
     },
-
+    
     roomTag: {
       marginTop: 4,
       color: colors.textSecondary,
+      fontFamily: 'Saira-Medium',
       fontSize: 13,
     },
-
+    
     card: {
       borderRadius: 20,
       padding: 16,
@@ -345,16 +357,17 @@ const makeStyles = (colors: ColorScheme) =>
       shadowRadius: 10,
       elevation: 6,
     },
-
+    
     summaryRow: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginBottom: 12,
     },
-
+    
     label: {
       color: colors.textMuted,
       fontSize: 13,
+      fontFamily: 'Saira-Medium',
     },
 
     value: {
@@ -384,62 +397,69 @@ const makeStyles = (colors: ColorScheme) =>
     primaryBtn: {
       flex: 1,
       backgroundColor: colors.primary,
-      paddingVertical: 12,
-      borderRadius: 14,
+      paddingVertical: 8,
+      borderRadius: 10,
       alignItems: 'center',
     },
 
     disabledBtn: {
       flex: 1,
       backgroundColor: colors.textMuted,
-      paddingVertical: 12,
-      borderRadius: 14,
+      paddingVertical: 8,
+      borderRadius: 10,
       alignItems: 'center',
     },
-
+    
     primaryTxt: {
+      fontSize: 18,
       color: '#fff',
       fontWeight: '600',
+      fontFamily: 'Saira-Medium',
     },
 
     secondaryBtn: {
       flex: 1,
-      backgroundColor: colors.border,
-      paddingVertical: 12,
+      backgroundColor: '#FF627D',
+      paddingVertical: 8,
       borderRadius: 14,
       alignItems: 'center',
     },
 
     secondaryTxt: {
-      color: colors.text,
+      fontSize: 18,
       fontWeight: '600',
+      color: colors.textSecondary,
+      fontFamily: 'Saira-Medium',
     },
-
+    
     sectionHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       marginBottom: 10,
     },
-
+    
     sectionTitle: {
       fontSize: 16,
       fontWeight: '600',
       color: colors.textSecondary,
+      fontFamily: 'Saira-Medium',
     },
-
+    
     sectionSub: {
       fontSize: 13,
-      color: colors.textMuted,
+      color: colors.textSecondary,
+      fontFamily: 'Saira-Medium',
     },
-
+    
     playerRow: {
-      borderRadius: 16,
+      borderRadius: 10,
       padding: 14,
       flexDirection: 'row',
       alignItems: 'center',
       marginBottom: 10,
+      backgroundColor: colors.bg
     },
-
+    
     avatarCircle: {
       width: 40,
       height: 40,
@@ -449,27 +469,29 @@ const makeStyles = (colors: ColorScheme) =>
       alignItems: 'center',
       marginRight: 12,
     },
-
+    
     avatarText: {
       fontWeight: '700',
       color: colors.text,
     },
-
+    
     playerName: {
       flex: 1,
       color: colors.text,
       fontWeight: '600',
+      fontFamily: 'Saira-Medium',
     },
-
+    
     rankBubble: {
       backgroundColor: colors.primary,
       paddingHorizontal: 10,
       paddingVertical: 4,
-      borderRadius: 12,
+      borderRadius: 100,
     },
-
+    
     rankText: {
       color: '#fff',
       fontWeight: '700',
+      fontFamily: 'Saira-Medium',
     },
   });

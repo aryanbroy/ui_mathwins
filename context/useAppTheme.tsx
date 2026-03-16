@@ -5,6 +5,7 @@ export interface ColorScheme {
   // base surfaces
   bg: string;              // screen background
   bgPrimary: string;
+  bgIndex: string;
   surface: string;         // generic surface (modals, blocks)
   card: string;            // cards like Profile settings rows
 
@@ -70,15 +71,16 @@ export interface ColorScheme {
 
 const lightColors: ColorScheme = {
   bg: "#F5F4FF",              // very light lavender backing
-  bgPrimary: "#6A4DFB",
+  bgPrimary: "#8344FF",
+  bgIndex: "#6A5AE0",
   surface: "#FFFFFF",         // plain white surface
   card: "#FFFFFF",            // profile cards
 
   text: "#111827",
   textSecondary: "#FFFFFF",
-  textHighlight: "#660012",
+  textHighlight: "#493CA6",
   textMuted: "#6B7280",
-  textOnPrimary: "#000",
+  textOnPrimary: "#68313A",
   
   border: "#838383",
   divider: "#E5E7EB",
@@ -136,8 +138,9 @@ const lightColors: ColorScheme = {
 
 const darkColors: ColorScheme = {
   bg: "#020617",         // near-black blue
-  bgPrimary: "#000",
-  surface: "#020617",
+  bgPrimary: "#242424",
+  bgIndex: "#000",
+  surface: "#171717",
   card: "#1F2933",       // cards in profile/settings
   
   text: "#F9FAFB",

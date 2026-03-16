@@ -64,10 +64,7 @@ export default function OtpScreen() {
 
 
   return (
-      <LinearGradient
-        colors={colors.gradients.background}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 0, y: 1 }}
+      <View
         style={styles.gradient}
       >
         <SafeAreaView style={styles.safe}>
@@ -83,10 +80,7 @@ export default function OtpScreen() {
         </View>
 
         <View style={styles.card}>
-          <LinearGradient
-            colors={colors.gradients.surface}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
+          <View
             style={styles.gradient2}
           >
             <ScrollView
@@ -134,16 +128,17 @@ export default function OtpScreen() {
               </TouchableOpacity>
               <NativeAdCard />
             </ScrollView>
-          </LinearGradient>
+          </View>
         </View>
       </SafeAreaView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     gradient: {
+      backgroundColor: colors.bgPrimary,
       flex: 1,
     },
     safe: {
@@ -155,6 +150,7 @@ const makeStyles = (colors: ColorScheme) =>
     },
     gradient2: {
       flex: 1,
+      backgroundColor: colors.surface,
       paddingHorizontal: 20,
       paddingTop: 24,
       paddingBottom: 32,
@@ -168,15 +164,17 @@ const makeStyles = (colors: ColorScheme) =>
     },
     title: {
       fontSize: 32,
-      fontWeight: '800',
+      fontWeight: 900,
+      fontFamily: 'Rubic-Bold',
       textAlign: 'center',
-      color: colors.textOnPrimary,
+      color: colors.textSecondary,
     },
     subtitle: {
       fontSize: 14,
       marginBottom: 20,
+      fontFamily: 'Rubic-Medium',
       textAlign: 'center',
-      color: colors.textOnPrimary,
+      color: colors.textSecondary,
     },
     card: {
       flex: 1,
@@ -194,6 +192,7 @@ const makeStyles = (colors: ColorScheme) =>
     label: {
       fontSize: 14,
       color: colors.text,
+      fontFamily: 'Rubic-Medium',
       marginBottom: 8,
     },
     resendBox: {
@@ -202,14 +201,16 @@ const makeStyles = (colors: ColorScheme) =>
     msg: {
       color: colors.text,
       textAlign: 'center',
+      fontFamily: 'Rubic-Medium',
     },
     resendBtn: {
-
+      
     },
     resendBtnText: {
       color: colors.primary,
       textAlign: 'center',
-      marginVertical: 10,
+      marginVertical: 5,
+      fontFamily: 'Rubic-Medium',
       textDecorationLine: 'underline',
     },
     primaryButton: {
@@ -220,8 +221,9 @@ const makeStyles = (colors: ColorScheme) =>
       marginBottom: 24,
     },
     primaryButtonText: {
-      color: colors.textOnPrimary,
+      color: colors.textSecondary,
       fontSize: 16,
-      fontWeight: '600',
+      fontWeight: 'bold',
+      fontFamily: 'Rubic-Medium',
     },
   });

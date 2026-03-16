@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Animated,
+  ScrollView,
 } from 'react-native';
 import { RouteProp, useNavigation, useRoute } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
@@ -30,6 +31,7 @@ import adscreen from './adScreen';
 import Error404Screen from '@/app/errorScreen';
 import { useRewardedAd } from '@/components/Ads/Rewarded';
 import { useInterstitialAd } from '@/components/Ads/InterstitialAd';
+import AdBanner from '@/components/Ads/Banner';
 
 type sanitizedQuestionType = {
   id: string;
@@ -126,7 +128,7 @@ export default function QuestionScreen() {
   const [isSubmittingSession, setIsSubmittingSession] =
     useState<boolean>(false);
   const questionStartRemainingRef = useRef<number>(0);
-
+  
   const handleDailySessionSubmit = async () => {
     setIsSubmittingSession(true);
     // setErr(null);
@@ -177,8 +179,10 @@ export default function QuestionScreen() {
     userId: session.userId,
     sessionId: session.sessionId,
   };
+  const {stopFeedback} = useFeedback();
 
   useEffect(() => {
+    // stopFeedback('lobby');
     if (session.sessionType === SessionType.SOLO) {
       startTimer();
     } else if (
@@ -193,21 +197,7 @@ export default function QuestionScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Timer Functions
-  // useEffect(() => {
-  //   if (session.sessionType === SessionType.SOLO) {
-  //     startTimer();
-  //   } else if (session.sessionType === SessionType.DAILY) {
-  //     startDailyTimerOnce();
-  //   }
-  //
-  //   return () => {
-  //     if (intervalRef.current) {
-  //       clearInterval(intervalRef.current);
-  //     }
-  //   };
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [sanitizedQuestion.id]);
+
 
   const handleDailyEnd = async () => {
     console.log('Daily timer finished');
@@ -272,6 +262,7 @@ export default function QuestionScreen() {
     }
 
     setIsRunning(true);
+    
     startTimeRef.current = Date.now();
     pausedTimeRef.current = initialTime;
     setRemainingTime(initialTime);
@@ -373,190 +364,6 @@ export default function QuestionScreen() {
     Array.from({ length: 10 }, () => new Animated.Value(1))
   ).current;
 
-  // const startBlinking = () => {
-  //   // Stop any existing animations
-  //   blinkAnims.forEach(anim => anim.stopAnimation());
-
-  //   // Create random blink animations for each number
-  //   blinkAnims.forEach((anim, index) => {
-  //     // Random delay before starting (0-800ms)
-  //     const startDelay = Math.random() * 800;
-
-  //     // Random blink duration (200-500ms)
-  //     const blinkDuration = 200 + Math.random() * 300;
-
-  //     // Random pause between blinks (100-400ms)
-  //     const pauseDuration = 100 + Math.random() * 300;
-
-  //     // Random minimum opacity (0.2-0.5)
-  //     const minOpacity = 0.2 + Math.random() * 0.3;
-
-  //     setTimeout(() => {
-  //       Animated.loop(
-  //         Animated.sequence([
-  //           // Fade out
-  //           Animated.timing(anim, {
-  //             toValue: minOpacity,
-  //             duration: blinkDuration,
-  //             useNativeDriver: true,
-  //           }),
-  //           // Fade in
-  //           Animated.timing(anim, {
-  //             toValue: 1,
-  //             duration: blinkDuration,
-  //             useNativeDriver: true,
-  //           }),
-  //           // Pause
-  //           Animated.delay(pauseDuration),
-  //         ])
-  //       ).start();
-  //     }, startDelay);
-  //   });
-  // };
-
-  const startBlinking = () => {
-    blinkAnims.forEach((anim) => {
-      anim.stopAnimation();
-      anim.setValue(1);
-    });
-
-    blinkAnims.forEach((anim, index) => {
-      const startDelay = Math.random() * 800;
-      const blinkDuration = 200 + Math.random() * 300;
-      const pauseDuration = 100 + Math.random() * 300;
-      const minOpacity = 0.2 + Math.random() * 0.3;
-
-      setTimeout(() => {
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(anim, {
-              toValue: minOpacity,
-              duration: blinkDuration,
-              useNativeDriver: true,
-            }),
-            Animated.timing(anim, {
-              toValue: 1,
-              duration: blinkDuration,
-              useNativeDriver: true,
-            }),
-            Animated.delay(pauseDuration),
-          ])
-        ).start();
-      }, startDelay);
-    });
-  };
-
-  const startSlotMachineEffect = () => {
-    blinkAnims.forEach((anim) => anim.stopAnimation());
-
-    blinkAnims.forEach((anim, index) => {
-      const startDelay = Math.random() * 1000;
-
-      setTimeout(() => {
-        Animated.loop(
-          Animated.sequence([
-            // Quick fade to very low
-            Animated.timing(anim, {
-              toValue: 0.1,
-              duration: 80,
-              useNativeDriver: true,
-            }),
-            // Pop back up
-            Animated.timing(anim, {
-              toValue: 1,
-              duration: 80,
-              useNativeDriver: true,
-            }),
-            // Stay visible
-            Animated.delay(Math.random() * 200 + 100),
-            // Quick fade again
-            Animated.timing(anim, {
-              toValue: 0.3,
-              duration: 120,
-              useNativeDriver: true,
-            }),
-            // Pop back
-            Animated.timing(anim, {
-              toValue: 1,
-              duration: 120,
-              useNativeDriver: true,
-            }),
-            // Random longer pause
-            Animated.delay(Math.random() * 500 + 200),
-          ])
-        ).start();
-      }, startDelay);
-    });
-  };
-
-  const startWaveEffect = () => {
-    blinkAnims.forEach((anim) => anim.stopAnimation());
-
-    blinkAnims.forEach((anim, index) => {
-      // Stagger based on position
-      const delay = index * 100;
-
-      setTimeout(() => {
-        Animated.loop(
-          Animated.sequence([
-            Animated.timing(anim, {
-              toValue: 0.2,
-              duration: 250,
-              useNativeDriver: true,
-            }),
-            Animated.timing(anim, {
-              toValue: 1,
-              duration: 250,
-              useNativeDriver: true,
-            }),
-          ])
-        ).start();
-      }, delay);
-    });
-  };
-
-  const startGlitchEffect = () => {
-    blinkAnims.forEach((anim) => anim.stopAnimation());
-
-    const glitchCycle = () => {
-      // Random number of glitches (2-5)
-      const glitchCount = 2 + Math.floor(Math.random() * 4);
-
-      for (let i = 0; i < glitchCount; i++) {
-        setTimeout(() => {
-          // Pick 2-4 random numbers to glitch
-          const targets = [];
-          const count = 2 + Math.floor(Math.random() * 3);
-
-          for (let j = 0; j < count; j++) {
-            targets.push(Math.floor(Math.random() * 10));
-          }
-
-          targets.forEach((index) => {
-            const anim = blinkAnims[index];
-            const intensity = 0.1 + Math.random() * 0.4;
-
-            Animated.sequence([
-              Animated.timing(anim, {
-                toValue: intensity,
-                duration: 30,
-                useNativeDriver: true,
-              }),
-              Animated.timing(anim, {
-                toValue: 1,
-                duration: 30,
-                useNativeDriver: true,
-              }),
-            ]).start();
-          });
-        }, i * 80);
-      }
-
-      setTimeout(glitchCycle, 300 + Math.random() * 500);
-    };
-
-    glitchCycle();
-  };
 
   const scaleAnims = useRef(
     Array.from({ length: 10 }, () => new Animated.Value(1))
@@ -664,10 +471,6 @@ export default function QuestionScreen() {
   };
 
   const handleSubmit = async (selectedAnswer: number) => {
-    // if (answer === null) {
-    //   alert('Please select an answer');
-    //   return;
-    // }
     await playFeedback('submit');
     if (
       session.sessionType === SessionType.DAILY ||
@@ -680,11 +483,7 @@ export default function QuestionScreen() {
 
     setIsChecking(true);
     setShowResult(false);
-    // startBlinking();
-    // startSlotMachineEffect();
-    // startWaveEffect();
     startPulseWave();
-    // startGlitchEffect();
 
     const timeTaken = getTimeTaken();
     console.log('Time taken (ms):', timeTaken);
@@ -706,11 +505,6 @@ export default function QuestionScreen() {
         console.log('Response: ', response);
         console.log('answer: ', answer);
         setShowPopup(true);
-
-        // setTimeout(() => {
-        //   setShowPopup(true);
-        // }, 100);
-
         // Avoid double checking for session.sessionType === SessionType.?
         let check =
           session.sessionType === SessionType.SOLO
@@ -737,30 +531,6 @@ export default function QuestionScreen() {
               setSanitizedQuestion(response.data.nextQuestion);
               questionStartRemainingRef.current = remainingMs;
               resumeDailyTimer();
-            }, 1200);
-          } else if (session.sessionType === SessionType.SOLO) {
-            setTimeout(() => {
-              setShowPopup(false);
-              if (response.data.isRoundCompleted) {
-                setRound(response.data.roundNumber + 1);
-                console.log('response :- ', response);
-                showAd();
-                const params: continueParams = {
-                  sessionType: session.sessionType,
-                  userId: sessionDetails?.userId as string,
-                  sessionId: sessionDetails?.sessionId as string,
-                  bankedPoint: response?.data.bankedPoint as number,
-                };
-                navigation.navigate('roundOverview', { params });
-              } else {
-                resetQuestion();
-                resetTimer();
-                setIsChecking(false);
-                setShowResult(false);
-                setSanitizedQuestion(response.data.nextQuestion);
-                questionStartRemainingRef.current = remainingMs;
-                resumeDailyTimer();
-              }
             }, 1200);
           } else if (session.sessionType === SessionType.SOLO) {
             setTimeout(() => {
@@ -816,9 +586,7 @@ export default function QuestionScreen() {
     }
   };
 
-  const { showAd } = useInterstitialAd(() => {
-    console.log('DONE');
-  });
+  const { showAd } = useInterstitialAd();
 
   // Lifeline: 50-50
   const handleFiftyfiftySubmitWithAd = () => {
@@ -836,15 +604,16 @@ export default function QuestionScreen() {
       sessionId: session.sessionId,
       questionId: sanitizedQuestion.id,
     };
-
+    
     applyFiftyfifty(payload)
-      .then((res) => {
-        console.log('50-50 response:', res);
-        if (res.success && res.disabledOptions) {
-          setDisabledOptions(res.disabledOptions);
-          setIsFiftyFiftyAvailable(false);
-        }
-      })
+    .then((res) => {
+      console.log('50-50 response:', res);
+      if (res.success && res.disabledOptions) {
+        setDisabledOptions(res.disabledOptions);
+        startTimer();
+        setIsFiftyFiftyAvailable(false);
+      }
+    })
       .catch((err) => {
         console.error('50-50 error:', err);
         alert('Error applying 50-50. Please try again.');
@@ -901,6 +670,7 @@ export default function QuestionScreen() {
         console.log('Level Down response:', res);
         if (res.success && res.data?.newQuestion) {
           resetQuestion();
+          startTimer();
           setSanitizedQuestion(res.data.newQuestion);
           setIsLevelDownAvailable(false);
         }
@@ -919,13 +689,17 @@ export default function QuestionScreen() {
       case 'playing':
       default:
         return (
-          <LinearGradient
-            colors={colors.gradients.background}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
+          <View
             style={styles.container}
           >
+            <ScrollView
+              bounces={false}
+              alwaysBounceVertical={false}
+              showsVerticalScrollIndicator={false}
+              style={styles.scrollView}
+            >
             <SafeAreaView style={styles.safe}>
+              <AdBanner />
               <View style={styles.detailsBox}>
                 <View style={styles.questionMeta}>
                   <Text style={styles.questionNumber}>
@@ -943,7 +717,7 @@ export default function QuestionScreen() {
                   <AntDesign
                     name="clock-circle"
                     size={20}
-                    color={colors.text}
+                    color={colors.textSecondary}
                   />
                   {session.sessionType === SessionType.SOLO ? (
                     <Text style={styles.time}>
@@ -1039,7 +813,7 @@ export default function QuestionScreen() {
                 >
                   <Text style={styles.lifelineBtnText}>50-50</Text>
                   {!isFiftyFiftyAvailable ? (
-                    <Text style={styles.adText}>ad</Text>
+                    <Text style={styles.adText}>Ad</Text>
                   ) : (
                     <></>
                   )}
@@ -1055,7 +829,7 @@ export default function QuestionScreen() {
                 >
                   <Text style={styles.lifelineBtnText}>+30 Sec</Text>
                   {!isThirtySecAvailable ? (
-                    <Text style={styles.adText}>ad</Text>
+                    <Text style={styles.adText}>Ad</Text>
                   ) : (
                     <></>
                   )}
@@ -1071,34 +845,13 @@ export default function QuestionScreen() {
                 >
                   <Text style={styles.lifelineBtnText}>Level Down</Text>
                   {!isLevelDownAvailable ? (
-                    <Text style={styles.adText}>ad</Text>
+                    <Text style={styles.adText}>Ad</Text>
                   ) : (
                     <></>
                   )}
                 </TouchableOpacity>
               </View>
 
-              {/* 
-              <TouchableOpacity
-                style={[
-                  styles.nextBtn,
-                  (loading || isChecking || showResult || answer === null) &&
-                    styles.nextBtnDisabled,
-                ]}
-                onPress={handleSubmit}
-                disabled={
-                  loading || isChecking || showResult || answer === null
-                }
-              >
-                <Text style={styles.startBtnText}>
-                  {loading || isChecking
-                    ? 'Loading...'
-                    : showResult
-                      ? 'Next Question...'
-                      : 'Submit Answer'}
-                </Text> 
-              </TouchableOpacity>
-              */}
               <ResultPopup
                 key={sanitizedQuestion.id}
                 visible={showPopup}
@@ -1114,7 +867,8 @@ export default function QuestionScreen() {
                 <></>
               )}
             </SafeAreaView>
-          </LinearGradient>
+            </ScrollView>
+          </View>
         );
       case 'finished':
         return (
@@ -1140,6 +894,7 @@ const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
+      backgroundColor: colors.bgPrimary
     },
     safe: {
       padding: 16,
@@ -1147,13 +902,18 @@ const makeStyles = (colors: ColorScheme) =>
       alignItems: 'center',
       justifyContent: 'center',
     },
+    scrollView: {
+      flex: 1,
+      backgroundColor: colors.bgPrimary,
+    },
     detailsBox: {
       width: '100%',
       backgroundColor: colors.card,
       paddingHorizontal: 20,
-      paddingVertical: 20,
+      paddingVertical: 10,
       borderRadius: 10,
       borderWidth: 3,
+      marginTop: 10,
     },
     questionMeta: {
       flexDirection: 'row',
@@ -1162,8 +922,10 @@ const makeStyles = (colors: ColorScheme) =>
       marginBottom: 10,
     },
     questionNumber: {
-      fontWeight: '900',
-      fontSize: 20,
+      fontWeight: 'bold',
+      fontFamily: 'Saira-Medium',
+      fontSize: 18,
+      textDecorationLine: 'underline',
       color: colors.text,
     },
     questionLevel: {
@@ -1171,63 +933,66 @@ const makeStyles = (colors: ColorScheme) =>
       paddingHorizontal: 10,
       paddingVertical: 5,
       borderRadius: 5,
-      fontWeight: '800',
+      fontWeight: 'bold',
+      fontFamily: 'Saira-Medium',
       color: '#FFF',
     },
     question: {
       color: colors.text,
-      fontSize: 20,
+      fontSize: 16,
       fontWeight: '500',
+      fontFamily: 'Saira-Medium',
     },
     answerMeta: {
       width: '100%',
       gap: 10,
       alignItems: 'center',
-      paddingVertical: 20,
+      paddingVertical: 10,
     },
     timer: {
       width: 160,
-      backgroundColor: colors.shadow,
+      backgroundColor: colors.textHighlight,
       paddingHorizontal: 15,
       paddingVertical: 8,
-      borderRadius: 10,
+      borderRadius: 5,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
       gap: 10,
     },
     time: {
-      fontWeight: '700',
+      // fontWeight: '700',
       fontSize: 18,
-      color: colors.text,
-      fontFamily: 'monospace',
+      color: colors.textSecondary,
+      fontFamily: 'Saira-Medium',
     },
     hintBox: {
       width: '100%',
-      backgroundColor: colors.card,
+      backgroundColor: '#FFF',
       alignItems: 'center',
       justifyContent: 'center',
-      paddingVertical: 10,
-      borderRadius: 10,
-      borderWidth: 3,
+      paddingVertical: 5,
+      borderRadius: 5,
+      borderWidth: 2,
       borderColor: colors.secondary,
     },
     hintText: {
       fontSize: 20,
-      fontWeight: '700',
+      // fontWeight: '700',
+      fontFamily: 'Saira-Medium',
       color: colors.secondary,
     },
     questionArea: {
-      paddingHorizontal: 10,
-      marginVertical: 20,
+      padding: 10,
     },
     optionsContainer: {},
     row: {
-      paddingVertical: 15,
+      paddingVertical: 10,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      gap: 50,
+      gap: 30,
+      // justifyContent: "space-between"
     },
     optionBtn: {
       width: 60,
@@ -1258,7 +1023,8 @@ const makeStyles = (colors: ColorScheme) =>
     },
     optionText: {
       fontSize: 20,
-      fontWeight: '900',
+      // fontWeight: '900',
+      fontFamily: 'Saira-Medium',
       color: colors.secondary,
     },
     optionTextSelected: {
@@ -1276,20 +1042,23 @@ const makeStyles = (colors: ColorScheme) =>
       backgroundColor: colors.secondary,
       paddingVertical: 12,
       paddingHorizontal: 16,
-      borderRadius: 12,
+      borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
+      overflow: 'hidden'
     },
     adText: {
       position: 'absolute',
       right: 0,
       top: 0,
-      paddingHorizontal: 10,
+      paddingHorizontal: 5,
       paddingVertical: 3,
-      borderRadius: 10,
-      fontSize: 10,
+      borderRadius: 5,
+      fontSize: 8,
       color: colors.text,
-      backgroundColor: colors.border,
+      fontFamily: 'Poppins-Medium',
+      // backgroundColor: colors.border,
+      opacity: 0.8,
     },
     adScreen: {
       position: 'absolute',
@@ -1303,7 +1072,8 @@ const makeStyles = (colors: ColorScheme) =>
     },
     lifelineBtnText: {
       fontSize: 16,
-      fontWeight: '700',
+      fontWeight: 'bold',
+      fontFamily: 'Rubic-Medium',
       color: colors.textSecondary,
     },
     nextBtn: {

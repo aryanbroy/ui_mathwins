@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getUser, loginUser } from '@/lib/api/user';
+import { router } from 'expo-router';
 
 type UserData = {
     name?: string;
@@ -44,6 +45,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [ userToken, setUserToken ] = useState("");
   useEffect(() => {
     const restoreUser = async () => {
+      setLoading(true);
       try {
         // console.log("authCOntext called");
 
@@ -58,11 +60,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           };
           await getUser(payload).then((response) => {
             console.log('response getUser:- ', response);
+            setLoading(false);
             setUser(response.data);
             console.log('after setUser ', user);
           });
         }
       } catch (e) {
+        setLoading(false);
         console.log('Error loading token from AsyncStorage:', e);
       } finally {
         setLoading(false);
@@ -73,7 +77,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (user: UserData) => {
     console.log("authContext : user = ",user);
-    
+    setLoading(true);
     try {
       if (!user.name || !user.email) {
         throw new Error('User name or email missing');
@@ -86,12 +90,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       loginUser(payload).then(async (response)=>{
         console.log("response loginUser :- ",response);
+        setLoading(false);
         // const newUser = {...user, userId: .id}
         await AsyncStorage.setItem("token", JSON.stringify(response.data)).then(()=>{console.log("done !!")}).catch(()=>{console.log("err");});
         setUserToken(response.data);
-      }).catch((err)=>{console.log("error :- ",err);
+      }).catch((err)=>{
+        setLoading(false);
+        console.log("error :- ",err);
       });
     } catch (e) {
+      setLoading(false);
       console.log("c", e);
     }
   };

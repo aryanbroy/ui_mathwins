@@ -1,6 +1,9 @@
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Image } from 'expo-image';
+import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 
 const LeaderboardPodium = () => {
   const leaders = [
@@ -26,6 +29,15 @@ const LeaderboardPodium = () => {
       avatar: '👨‍💼',
     },
   ];
+  const getCrownBgColor = (position: number) => {
+    const colors: Record<number, string> = {
+      1: '#ffc115', 
+      2: '#BFC4CC', 
+      3: '#c16700', 
+    };
+    // Default color if position is > 3
+    return colors[position] || '#FFF'; 
+  };
 
   const getPodiumHeight = (position: any) => {
     switch (position) {
@@ -40,18 +52,22 @@ const LeaderboardPodium = () => {
     }
   };
 
-  const getCrownSize = (position: any) => {
-    return position === 1 ? 32 : 24;
-  };
+  const logoSource = require("@/assets/images/leaderboard/podium.png");
+  const { colors } = useAppTheme();
+  const styles = React.useMemo(() => makeStyles(colors), [colors]);
 
   const renderLeader = (leader: any) => (
     <View key={leader.position} style={styles.leaderContainer}>
-      <View style={styles.crownContainer}>
-        <Text
-          style={[styles.crown, { fontSize: getCrownSize(leader.position) }]}
-        >
-          {leader.crown}
-        </Text>
+      <View
+        style={[
+          styles.crownContainer,
+          { backgroundColor: getCrownBgColor(leader.position as number) },
+        ]}
+      >
+        <MaterialCommunityIcons 
+        name="crown" 
+        size={28} 
+        color='#FFF'/>
       </View>
 
       <View style={styles.avatarContainer}>
@@ -66,22 +82,21 @@ const LeaderboardPodium = () => {
 
       <View style={styles.scoreContainer}>
         <Text style={styles.score}>{leader.score}</Text>
-        <View style={styles.badge}>
-          <Text style={styles.badgeIcon}>✓</Text>
-        </View>
+        <Text style={styles.badgeIcon}>🪙</Text>
+        {/* <View style={styles.badge}>
+        </View> */}
       </View>
 
       <View
+        // style={[styles.podium, { height: getPodiumHeight(leader.position) }]}
         style={[styles.podium, { height: getPodiumHeight(leader.position) }]}
       >
-        <LinearGradient
-          colors={["#FFC3CD","#FF738A"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 0, y: 1 }}
-          style={styles.headerGradient}
-        >
-          <Text style={styles.position}>{leader.position}</Text>
-        </LinearGradient>
+        <Image 
+        source={logoSource} 
+        style={styles.avatarImage} 
+        contentFit="fill"/>
+        <Text 
+        style={styles.position}>{leader.position}</Text>
       </View>
     </View>
   );
@@ -97,12 +112,11 @@ const LeaderboardPodium = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  headerGradient: {
-    flex:1,
-    width: "100%",
-    alignItems: 'center',
-    justifyContent: 'center'
+const makeStyles = (colors: ColorScheme) => StyleSheet.create({
+  avatarImage: {
+    marginHorizontal: 20,
+    height: '100%',
+    width: '100%',
   },
   container: {
     // flex: 1,
@@ -119,19 +133,20 @@ const styles = StyleSheet.create({
   },
   leaderContainer: {
     alignItems: 'center',
-    width: 110,
   },
   crownContainer: {
-    marginBottom: 8,
-    height: 36,
-    justifyContent: 'center',
+    width: 40,
+    height: 40,
+    borderRadius: 14,
     alignItems: 'center',
-  },
-  crown: {
-    fontSize: 24,
+    justifyContent: 'center',
+    position: 'absolute',
+    zIndex: 1,
   },
   avatarContainer: {
-    marginBottom: 8,
+    position: 'relative',
+    marginTop: 30,
+    marginBottom: 4,
   },
   avatar: {
     width: 70,
@@ -149,8 +164,8 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#333',
-    marginTop: 4,
+    fontFamily: 'Rubik-Medium',
+    color: colors.textOnPrimary,
     marginBottom: 6,
     textAlign: 'center',
   },
@@ -158,44 +173,40 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FF8FB8',
-    paddingHorizontal: 16,
+    paddingHorizontal: 10,
     paddingVertical: 8,
-    borderRadius: 20,
+    borderRadius: 10,
     marginBottom: 8,
     gap: 6,
   },
   score: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: 'bold',
+    fontFamily: 'Rubik-Medium',
     color: '#FFFFFF',
-  },
-  badge: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   badgeIcon: {
-    fontSize: 12,
-    color: '#FF8FB8',
-    fontWeight: 'bold',
+    fontSize: 10,
+    borderWidth: 2,
+    borderColor: '#FFF',
+    borderRadius: 100,
   },
   podium: {
-    width: '100%',
-    backgroundColor: '#FFB3D9',
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    width: 100,
+    marginBottom: -10,
+    // backgroundColor: '#f706f34b',
+    // borderTopLeftRadius: 12,
+    // borderTopRightRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    opacity: 0.7,
+    // opacity: 0.7,
   },
   position: {
-    fontSize: 72,
-    fontWeight: 'bold',
+    position: 'absolute',
+    fontSize: 60,
     color: '#FFFFFF',
-    opacity: 0.6,
+    fontFamily: 'Saira-Medium'
+    // opacity: 0.6,
   },
 });
 

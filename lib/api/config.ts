@@ -6,12 +6,17 @@ export const getConfig = async () => {
   try {
     
     // const res = await api.post('api/admin/gameConfig', params);
+
     const token = (await AsyncStorage.getItem('token')) as string;
-    const res = await api.post('api/game/gameConfig', {}, {
+    const res = await api({
+      method: 'get',
+      url: 'api/game/gameConfig',
       headers: {
         Authorization: `Bearer ${JSON.parse(token)}`,
       },
     });
+    // console.log("RESPONCE gameConfig : ",res);
+    
     return res.data;
   } catch (err) {
     const msg = parseApiError(err);
@@ -32,6 +37,22 @@ export const saveConfig = async (params: saveConfigParams) => {
         note: params.note, 
         payload: params.newConfig
       }, {
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      },
+    });
+    return res.data;
+  } catch (err) {
+    const msg = parseApiError(err);
+    throw new Error(msg.message);
+  }
+};
+
+export const createDaily = async () => {
+  try {
+    const token = (await AsyncStorage.getItem('token')) as string;
+    const res = await api.post(`api/daily/create`, 
+      {}, {
       headers: {
         Authorization: `Bearer ${JSON.parse(token)}`,
       },

@@ -8,5 +8,6 @@ export type DailyRewardClaimRes = {
     longestStreak: number;
     streakBroken: boolean;
     totalCoinPointsToday: number;
+    reaminingCoins: number;
   };
 };

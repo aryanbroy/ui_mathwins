@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import BackgroundTexture from '@/components/Texture/BackgroundTexture';
 import Header from '@/components/Header';
 import HomeBtn from '@/components/Home/HomeBtn';
@@ -10,7 +10,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import AdBanner from '@/components/Ads/Banner';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { router } from 'expo-router';
+import { useFeedback } from '@/context/useFeedback';
 
 export const dummyUsers = [
   {
@@ -69,6 +71,17 @@ export default function Index() {
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const { playFeedback, stopFeedback, ready } = useFeedback();
+  useFocusEffect(
+    useCallback(() => {
+      if (!ready) return;
+      playFeedback('lobby', { loop: true });
+
+      return () => {
+        stopFeedback('lobby');
+      };
+    }, [ready])
+  );
 
   return (
     <ScrollView
@@ -79,12 +92,12 @@ export default function Index() {
       contentContainerStyle={styles.contentContainer}
     >
       <SafeAreaView style={styles.safe}>
+        <AdBanner/>
         <View style={styles.topSection}>
           <BackgroundTexture />
           <Header />
           <TournamentCards />
         </View>
-        <AdBanner/>
         <LinearGradient
           colors={colors.gradients.surface}
           start={{ x: 0, y: 0 }}
@@ -100,7 +113,7 @@ export default function Index() {
             />
           ))}
           <HomeBtn onPress={() => {
-            console.log('PRESSED');
+            router.navigate('../../(tabs)/leaderBoard');
             // navigation.navigate('');
           }} />
         </LinearGradient>
@@ -113,11 +126,12 @@ const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     scroll: {
       flex: 1,
-      backgroundColor: colors.bgPrimary,
+      backgroundColor: colors.bgIndex,
     },
     safe: {
       flex: 1,
-      backgroundColor: colors.bgPrimary,
+      backgroundColor: colors.bgIndex,
+      marginBottom: -30,
     },
     contentContainer: {
       backgroundColor: colors.bg,
@@ -126,16 +140,17 @@ const makeStyles = (colors: ColorScheme) =>
     },
     topSection: {
       width: '100%',
-      paddingHorizontal: 20,
+      paddingHorizontal: 10,
       paddingBottom: 10,
     },
     bottomGradient: {
       width: '100%',
-      borderTopRightRadius: 20,
-      borderTopLeftRadius: 20,
+      borderRadius: 20,
       overflow: 'hidden',
+      marginTop: 10,
       paddingTop: 10,
       paddingBottom: 20,
       paddingHorizontal: 16,
     },
   });
+

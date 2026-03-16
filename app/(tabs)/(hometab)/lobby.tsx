@@ -25,6 +25,7 @@ import { useInterstitialAd } from '@/components/Ads/InterstitialAd';
 import AdBanner from '@/components/Ads/Banner';
 import { useConfig } from '@/context/useConfig';
 import { router } from 'expo-router';
+import { useFeedback } from '@/context/useFeedback';
 
 export type SessionInfo = {
   userId: string;
@@ -64,6 +65,7 @@ export default function SoloScreen() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const config = useConfig();
+  const {stopFeedback} = useFeedback();
   const [totalAttempt, setTotalAttempt] = useState(
     config.single_player.daily_free_attempts
   );
@@ -88,6 +90,8 @@ export default function SoloScreen() {
             setTotalAttempt(300);
             setRemainingAttempt(300 - attempts);
             setLoading(false);
+          }).catch(()=>{
+            router.navigate('/errorScreen');
           });
           break;
         case SessionType.SOLO:
@@ -96,7 +100,9 @@ export default function SoloScreen() {
             setTotalAttempt(res?.data?.totalDailyAttempts);
             setRemainingAttempt(res?.data?.remainingAttempts);
             setLoading(false);
-          }).catch(()=>{
+          }).catch((err)=>{
+            console.log("ERROR : ________ ",err);
+            
             router.navigate('/errorScreen');
           });
           break;
@@ -160,6 +166,7 @@ export default function SoloScreen() {
 
   async function startGame() {
     const { sessionType } = route.params;
+    
     console.log(`Start game for ${sessionType} tournament`);
     switch (sessionType) {
       case SessionType.DAILY:
@@ -175,25 +182,22 @@ export default function SoloScreen() {
         break;
     }
   }
-  const startGameWithAd = () => {
-    showAd();
-    startGame();
+  const startGameWithAd = async () => {
+    await showAd();
+    await startGame();
   };
 
   return (
     <SafeAreaView style={styles.safe}>
-      <AdBanner />
       <LinearGradient
-        colors={colors.gradients.background}
+        colors={colors.gradients.surface}
         start={{ x: 0, y: 0 }}
         end={{ x: 0, y: 1 }}
         style={styles.grediantBg}
       >
+        <AdBanner />
         <View style={styles.container}>
-          <LinearGradient
-            colors={colors.gradients.surface}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
+          <View
             style={styles.grediant}
           >
             <View style={styles.box}>
@@ -218,7 +222,7 @@ export default function SoloScreen() {
                 )}
               </TouchableOpacity>
             </View>
-          </LinearGradient>
+          </View>
         </View>
       </LinearGradient>
     </SafeAreaView>
@@ -229,31 +233,20 @@ const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     safe: {
       backgroundColor: colors.primary,
-      width: '100%',
-      height: '100%',
-    },
-    adArea1: {
-      marginBottom: 10,
-      backgroundColor: '#a1a1a1',
-      width: '100%',
-      height: 50,
-    },
-    adArea2: {
-      marginTop: 10,
-      backgroundColor: '#a1a1a1',
-      width: '100%',
-      height: 200,
+      marginBottom: -30,
+      flex: 1
     },
     container: {},
     grediant: {
-      height: 500,
+      backgroundColor: colors.bg,
+      minHeight: 400,
       margin: 20,
       borderRadius: 20,
+      borderWidth: 2,
+      borderColor: colors.divider,
     },
     grediantBg: {
-      // flex: 1,
-      // alignItems: "center",
-      // justifyContent: "space-between"
+      flex: 1,
     },
     box: {
       flex: 1,
@@ -270,9 +263,9 @@ const makeStyles = (colors: ColorScheme) =>
     },
     attemptsText: {
       fontSize: 15,
-      fontWeight: '600',
-      color: colors.textSecondary,
-      marginTop: 12,
+      // fontWeight: '600',
+      fontFamily: 'Saira-Medium',
+      color: colors.text,      marginTop: 12,
       marginBottom: 20,
     },
     bannerAd: {

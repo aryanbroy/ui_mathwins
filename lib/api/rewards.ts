@@ -33,8 +33,8 @@ export const redeemReward = async () => {
         Authorization: `Bearer ${JSON.parse(token)}`,
       },
     });
-    console.log('Response: ', res);
-    const resData: DailyRewardClaimRes = res.data;
+    console.log('claim_request Response ::::', res.data);
+    const resData = res.data;
     return resData;
   } catch (err: any) {
     const { message, status } = parseApiError(err);

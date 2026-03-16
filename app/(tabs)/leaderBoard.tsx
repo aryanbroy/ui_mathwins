@@ -12,6 +12,9 @@ import { InstantParticipant } from '@/types/api/instant';
 import TopThreePodium from '@/components/Leaderboard/TopThreePodium';
 import { useNavigation } from 'expo-router';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
+import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
+import React from 'react';
+import { getReactNavigationConfig } from 'expo-router/build/getReactNavigationConfig';
 
 type TabKey = 'allTime' | 'daily' | 'instant';
 type RankedLeaderboard = {
@@ -22,7 +25,10 @@ type RankedLeaderboard = {
 };
 
 export default function LeaderBoard() {
-  const [activeTab, setActiveTab] = useState<TabKey>('daily');
+  const { colors } = useAppTheme();
+  const styles = React.useMemo(() => makeStyles(colors), [colors]);
+
+  const [activeTab, setActiveTab] = useState<TabKey>('allTime');
   const [page, setPage] = useState<number>(1);
   const [dailyLeaderBoard, setDailyLeaderboard] = useState<RankedLeaderboard[]>(
     []
@@ -155,13 +161,6 @@ export default function LeaderBoard() {
   };
 
   return (
-    <LinearGradient
-      colors={['#6315FF', '#FFCCD7']}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
-      style={styles.gradient}
-    >
-      <StatusBar barStyle={'light-content'} />
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.tabsRow}>
           <Tab
@@ -187,7 +186,7 @@ export default function LeaderBoard() {
           style={{ flex: 1 }}
         >
           <LinearGradient
-            colors={['#FEE1F3', '#DAB7FF', '#A88BFF']}
+            colors={[colors.gradients.surface[1], colors.gradients.surface[0]]}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
             style={styles.bottomGradient}
@@ -205,20 +204,21 @@ export default function LeaderBoard() {
           </LinearGradient>
         </ScrollView>
       </SafeAreaView>
-    </LinearGradient>
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ColorScheme) => StyleSheet.create({
   gradient: {
     flex: 1,
   },
   safeArea: {
     flex: 1,
+    marginBottom: -30,
+    backgroundColor: colors.bgPrimary
   },
   tabsRow: {
     flexDirection: 'row',
-    marginTop: 40,
+    marginTop: 80,
     marginBottom: 24,
     justifyContent: 'space-between',
     alignItems: 'center',

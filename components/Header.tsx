@@ -67,7 +67,7 @@ const makeStyles = (colors: ColorScheme) =>
     },
     progressBarFill: {
       height: '100%',
-      backgroundColor: colors.primary,
+      backgroundColor: colors.secondary,
       borderRadius: 10,
     },
     leftSection: {
@@ -78,23 +78,24 @@ const makeStyles = (colors: ColorScheme) =>
     welcomeContainer: {
       flexDirection: 'row',
       alignItems: 'baseline',
-      marginBottom: 6,
       columnGap: 6,
     },
     welcomeText: {
       fontSize: 24,
-      fontWeight: 'bold',
+      // fontWeight: 'bold',
+      fontFamily: 'Rubik-Medium',
       color: colors.textSecondary,
     },
     username: {
       fontSize: 16,
-      fontWeight: '500',
+      fontFamily: 'Rubik-Medium',
       color: colors.textSecondary,
     },
-
+    
     coinContainer: {
       flexDirection: 'row',
       alignItems: 'center',
+      // justifyContent: 'center',
       marginBottom: 12,
     },
     coinEmoji: {
@@ -102,9 +103,12 @@ const makeStyles = (colors: ColorScheme) =>
       marginRight: 6,
     },
     coinText: {
-      fontSize: 14,
+      fontSize: 12,
       color: colors.textSecondary,
-      fontWeight: '400',
+      fontFamily: 'Poppins-Medium',
+      marginTop: 3,
+      // fontWeight: '400',
+
     },
 
     avatarContainer: {
@@ -116,7 +120,7 @@ const makeStyles = (colors: ColorScheme) =>
       width: 60,
       height: 60,
       borderRadius: 30,
-      backgroundColor: colors.surface,
+      backgroundColor: colors.bg,
       padding: 3,
 
       // theme-aware shadow

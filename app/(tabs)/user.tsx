@@ -8,6 +8,8 @@ import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
 import { useNavigation } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import * as Clipboard from 'expo-clipboard';
+import BackgroundTextTexture from '@/components/Texture/BackgroundTextTexture';
+import { useRouter } from 'expo-router';
 
 export default function UserProfileScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -24,6 +26,7 @@ export default function UserProfileScreen() {
   // const decoded = Jwt.verify(userToken, 'super-secret-key-change-this');
   console.log('userT : ', userToken);
   console.log('user : ', user);
+  const router = useRouter();
 
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
@@ -39,13 +42,12 @@ export default function UserProfileScreen() {
   };
   function loginHandle(){
     console.log("login");
-    // setLoading(true);
     navigation.navigate('login');
   }
   function handleEditProfile() {
     console.log('Edit-Profile');
-    navigation.navigate('editProfile');
-  }
+    router.navigate('/editProfile'); 
+  } 
   function handleEditConfig(){
     console.log("Edit-Config");
     navigation.navigate('editConfig');
@@ -65,6 +67,7 @@ export default function UserProfileScreen() {
           end={{ x: 0, y: 1 }}
           style={styles.headerGradient}
         >
+          <BackgroundTextTexture />
           <View style={styles.header}>
             <View style={styles.avatarWrapper}>
               <Image
@@ -73,8 +76,6 @@ export default function UserProfileScreen() {
               />
             </View>
             {
-              loading ? 
-              <ActivityIndicator /> :
               user ?
                 <View style={styles.screenContainer}>
                   <Text style={styles.nameText}>{user?.username || 'User'}</Text>
@@ -92,26 +93,30 @@ export default function UserProfileScreen() {
                       <Feather name="copy" size={14} color={colors.text} />
                     </TouchableOpacity>
                   </View>
+                  <TouchableOpacity
+                    onPress={handleEditProfile}
+                    style={styles.editProfileButton}
+                  >
+                    <View style={styles.editIconWrapper}>
+                      <MaterialCommunityIcons
+                        name="account-edit"
+                        size={24}
+                        color={colors.textSecondary}
+                      />
+                    </View>
+                    <Text style={styles.editProfileText}>Edit Profile</Text>
+                  </TouchableOpacity>
                 </View> : 
-                <View style={styles.screenContainer}>
-                    <TouchableOpacity onPress={loginHandle} style={styles.startBtn}>
+                <View style={styles.screenContainer}> 
+                {
+                  loading ?
+                  <ActivityIndicator /> :
+                  <TouchableOpacity onPress={loginHandle} style={styles.startBtn}>
                       <Text style={styles.btnText}>LOGIN</Text>
-                    </TouchableOpacity>
+                  </TouchableOpacity>
+                }
                 </View>
             }
-            <TouchableOpacity
-              onPress={handleEditProfile}
-              style={styles.editProfileButton}
-            >
-              <View style={styles.editIconWrapper}>
-                <MaterialCommunityIcons
-                  name="account-edit"
-                  size={24}
-                  color={colors.textOnPrimary}
-                />
-              </View>
-              <Text style={styles.editProfileText}>Edit Profile</Text>
-            </TouchableOpacity>
           </View>
 
           {/* Settings Panel */}
@@ -317,7 +322,7 @@ export default function UserProfileScreen() {
 const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     scroll: { flex: 1, backgroundColor: colors.primary },
-    safe: { flex: 1, backgroundColor: colors.primary },
+    safe: { flex: 1, backgroundColor: colors.primary, marginBottom: -30 },
     contentContainer: {
       backgroundColor: colors.bg,
       padding: 0,
@@ -337,7 +342,7 @@ const makeStyles = (colors: ColorScheme) =>
       borderWidth: 3,
       borderColor: colors.border,
       overflow: 'hidden',
-      backgroundColor: colors.surface,
+      backgroundColor: colors.bg,
       justifyContent: 'center',
       alignItems: 'center',
       marginBottom: 16,
@@ -355,13 +360,14 @@ const makeStyles = (colors: ColorScheme) =>
 
     nameText: {
       fontSize: 24,
-      fontWeight: '800',
+      // fontWeight: '800',
+      fontFamily: 'Rubik-Medium',
       color: colors.textSecondary,
-      marginBottom: 1,
     },
     emailText: {
       fontSize: 16,
-      fontWeight: '300',
+      // fontWeight: '300',
+      fontFamily: 'Rubik-Light',
       color: colors.textSecondary,
       opacity: 0.9,
     },
@@ -385,7 +391,8 @@ const makeStyles = (colors: ColorScheme) =>
     },
     referralText: {
       fontSize: 16,
-      fontWeight: '700',
+      // fontWeight: '700',
+      fontFamily: 'Saira-Medium',
       color: colors.textSecondary,
       borderWidth: 1,
       borderColor: colors.textSecondary,
@@ -407,14 +414,13 @@ const makeStyles = (colors: ColorScheme) =>
       borderRadius: 8,
       alignItems: 'center',
       justifyContent: 'center',
-      borderWidth: 2,
-      borderColor: colors.text,
     },
     btnText: {
       fontSize: 20,
       fontWeight: 900,
       letterSpacing: 2,
       color: colors.text,
+      fontFamily: 'Rubik-Medium'
     },
     editProfileButton: {
       flexDirection: 'row',
@@ -423,20 +429,21 @@ const makeStyles = (colors: ColorScheme) =>
       paddingVertical: 10,
       borderRadius: 100,
       marginBottom: 40,
-      backgroundColor: 'rgba(255,255,255,0.15)',
+      backgroundColor: 'rgba(255,255,255,0.10)',
     },
     editIconWrapper: {
       width: 30,
       height: 30,
       borderRadius: 100,
-      backgroundColor: colors.surface,
+      backgroundColor: '#000',
       justifyContent: 'center',
       alignItems: 'center',
       marginRight: 8,
     },
     editProfileText: {
-      color: colors.textOnPrimary,
-      fontWeight: '600',
+      color: colors.textSecondary,
+      fontWeight: 'bold',
+      fontFamily: 'Rubik-Medium',
     },
 
     gradientPanel: {
@@ -478,6 +485,7 @@ const makeStyles = (colors: ColorScheme) =>
       fontSize: 16,
       fontWeight: '500',
       color: colors.text,
+      fontFamily: 'Rubik-Medium'
     },
 
     togglePill: {

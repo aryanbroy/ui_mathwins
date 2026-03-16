@@ -13,49 +13,56 @@ const appOpenAd = AppOpenAd.createForAdRequest(
 
 let isLoaded = false;
 let isShowing = false;
+let isSuppressed = false;
 
 export function loadAppOpenAd() {
-  if (!isLoaded) {
-    console.log('[AppOpen] load');
-    appOpenAd.load();
-  }
+  // if (!isLoaded && !isShowing) {
+  //   console.log('[AppOpen] load');
+  //   appOpenAd.load();
+  // }
 }
+export function suppressAppOpenAd(duration = 3000) {
+  // isSuppressed = true;
 
+  // setTimeout(() => {
+  //   isSuppressed = false;
+  // }, duration);
+}
 export function showAppOpenAd() {
-  console.log('[AppOpen] show attempt', { isLoaded, isShowing });
+  // console.log('[AppOpen] show attempt', {
+  //   isLoaded,
+  //   isShowing,
+  //   isSuppressed,
+  // });
 
-  if (isLoaded && !isShowing) {
-    isShowing = true;
-    appOpenAd.show();
-  }
+  // if (isSuppressed) return;
+
+  // if (isLoaded && !isShowing) {
+  //   isShowing = true;
+  //   appOpenAd.show();
+  // }
 }
 
-// EVENTS
 appOpenAd.addAdEventListener(AdEventType.LOADED, () => {
-  console.log('[AppOpen] LOADED');
-  isLoaded = true;
+  // console.log('[AppOpen] LOADED');
+  // isLoaded = true;
 });
 
 appOpenAd.addAdEventListener(AdEventType.OPENED, () => {
-  console.log('[AppOpen] OPENED');
+  // console.log('[AppOpen] OPENED');
+  // isShowing = true;
 });
 
 appOpenAd.addAdEventListener(AdEventType.CLOSED, () => {
-  console.log('[AppOpen] CLOSED');
-  isLoaded = false;
-  isShowing = false;
-
-  loadAppOpenAd();
+  // console.log('[AppOpen] CLOSED');
+  // isShowing = false;
+  // isLoaded = false;
+  // loadAppOpenAd();
 });
 
-appOpenAd.addAdEventListener(AdEventType.ERROR, () => {
-  console.log('[AppOpen] failed (no fill)');
-
-  // 🔥 reset state safely
-  isLoaded = false;
-  isShowing = false;
-
-  // preload next silently
-  setTimeout(loadAppOpenAd, 2000);
+appOpenAd.addAdEventListener(AdEventType.ERROR, (error) => {
+  // console.log('[AppOpen] ERROR', error);
+  // isLoaded = false;
+  // isShowing = false;
+  // setTimeout(loadAppOpenAd, 2000);
 });
-

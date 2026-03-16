@@ -8,44 +8,38 @@ import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { HomeScreenNavigationProp } from '@/types/tabTypes';
 import { SessionType } from '@/app/(tabs)/(hometab)/lobby';
+import { useFeedback } from '@/context/useFeedback';
 
 export default function TournamentCards() {
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   const navigation = useNavigation<HomeScreenNavigationProp>();
+  const {stopFeedback} = useFeedback();
 
   return (
     <View style={styles.container}>
-      <View style={styles.lifelineCard}>
-        <LinearGradient
-          colors={colors.gradients.muted}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={styles.gradient}
-        >
-          <Text style={styles.lifelineLabel}>
-            Lifelines- <Text style={styles.lifelineValue}>10/10</Text>
-            {/* <Text style={styles.lifelineSubText}>Lorem Ipsum dolor sit</Text> */}
-          </Text>
-        </LinearGradient>
-      </View>
       {/*  navigate to lobby (solo) */}
       <DailyCard
         onPress={() => {
+          stopFeedback('lobby');
           navigation.navigate('lobby', {
             sessionType: SessionType.DAILY,
           });
         }}
-      />
+        />
       <View style={styles.bottomRow}>
         <SoloCard
-          onPress={() =>
+          onPress={async () => {
+            await stopFeedback('lobby');
             navigation.navigate('lobby', {
               sessionType: SessionType.SOLO,
             })
-          }
-        />
-        <InstantCard onPress={() => navigation.navigate('Instant')} />
+          }}
+          />
+        <InstantCard onPress={async () => {
+          await stopFeedback('lobby');
+          navigation.navigate('Instant')
+        }} />
       </View>
     </View>
   );
@@ -90,5 +84,6 @@ const makeStyles = (colors: ColorScheme) =>
       flexDirection: 'row',
       gap: 10,
       justifyContent: 'space-between',
+      marginVertical: 5,
     },
   });

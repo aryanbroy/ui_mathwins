@@ -2,9 +2,11 @@ import { View, Text, StyleSheet, Dimensions  } from 'react-native';
 import Entypo from '@expo/vector-icons/Entypo';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import AntDesign from '@expo/vector-icons/AntDesign';
+import useAppTheme from '@/context/useAppTheme';
 
 export default function BackgroundTextTexture() {
     const { width } = Dimensions.get("window");
+    const {isDarkMode} = useAppTheme();
     const d = `
         M 0 170
         C 90 260, 260 330, 400 260
@@ -12,7 +14,12 @@ export default function BackgroundTextTexture() {
     `;
 
     return (
-        <View style={styles.page}>
+        <View style={[
+            styles.page, 
+            isDarkMode ? 
+            {opacity: 0.02} : 
+            {opacity: 0.06} 
+            ]}>
             <View style={styles.header}>
                 <MaterialCommunityIcons name="math-compass" size={70} color="#FFF" style={styles.compass} />
                 <AntDesign name="code-sandbox" size={90} color="#FFF" style={styles.sandbox}/>
@@ -38,7 +45,7 @@ const styles = StyleSheet.create({
         width: "100%",
         position: "absolute",
         paddingHorizontal: 10,
-        opacity: 0.04,
+        
     },
     header: {
         marginBottom: 2,

@@ -49,8 +49,9 @@ const makeStyles = (colors: ColorScheme) =>
     },
 
     text: {
-      fontSize: 13,
-      fontWeight: '700',
+      fontSize: 14,
+      fontWeight: 'bold',
+      fontFamily: 'Poppins-Medium',
       color: colors.primary, // violet/purple like your UI
     },
   });

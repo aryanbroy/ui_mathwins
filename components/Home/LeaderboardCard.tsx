@@ -81,18 +81,19 @@ const makeStyles = (colors: ColorScheme) =>
     },
 
     rankCircle: {
-      width: 28,
-      height: 28,
-      borderRadius: 14,
-      borderWidth: 2,
-      borderColor: colors.border,
+      width: 25,
+      height: 25,
+      borderRadius: 100,
+      borderWidth: 1,
+      borderColor: colors.textMuted,
       alignItems: 'center',
       justifyContent: 'center',
       marginRight: 10,
     },
     rankText: {
       fontSize: 13,
-      fontWeight: '700',
+      // fontWeight: '700',
+      fontFamily: 'Saira-Medium',
       color: colors.textMuted,
     },
 
@@ -104,8 +105,8 @@ const makeStyles = (colors: ColorScheme) =>
       height: 52,
       borderRadius: 26,
       borderWidth: 2,
-      borderColor: colors.border,
-      backgroundColor: colors.surface,
+      borderColor: colors.primary,
+      backgroundColor: colors.bg,
     },
 
     textWrapper: {
@@ -114,12 +115,14 @@ const makeStyles = (colors: ColorScheme) =>
     name: {
       fontSize: 15,
       fontWeight: '700',
+      fontFamily: 'Rubik-Medium',
       color: colors.text,
     },
     points: {
       marginTop: 4,
       fontSize: 11,
       fontWeight: '500',
+      fontFamily: 'Rubik-Medium',
       color: colors.textMuted,
     },
 

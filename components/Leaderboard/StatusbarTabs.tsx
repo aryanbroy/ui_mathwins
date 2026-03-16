@@ -1,3 +1,5 @@
+import useAppTheme, { ColorScheme } from '@/context/useAppTheme';
+import React from 'react';
 import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 type TabProps = {
@@ -6,7 +8,10 @@ type TabProps = {
   onPress?: () => void;
 };
 
+
 export default function Tab({ label, active = false, onPress }: TabProps) {
+  const { colors } = useAppTheme();
+  const styles = React.useMemo(() => makeStyles(colors), [colors]);
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -17,21 +22,23 @@ export default function Tab({ label, active = false, onPress }: TabProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ColorScheme) => StyleSheet.create({
   tab: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 5,
   },
   activeTab: {
-    backgroundColor: 'white',
+    backgroundColor: colors.gradients.surface[1],
   },
   text: {
-    color: 'rgba(255,255,255,0.7)',
-    fontWeight: '600',
+    color: colors.textSecondary,
+    fontWeight: '400',
+    fontFamily: 'Saira-Medium',
     fontSize: 12,
   },
   activeText: {
-    color: '#6315FF',
+    fontWeight: '700',
+    color: '#FFF',
   },
 });

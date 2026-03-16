@@ -1,4 +1,4 @@
-import { getConfig, saveConfig } from "@/lib/api/config";
+import { createDaily, getConfig, saveConfig } from "@/lib/api/config";
 import React, { JSX, useEffect, useState } from "react";
 import {
   View,
@@ -9,6 +9,7 @@ import {
   ScrollView,
   Platform,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -37,8 +38,9 @@ export default function AdminPanelScreen() {
     async function getCurrentConfig() {
       try {
         const res = await getConfig().then((res)=>{
-          console.log("config :- ", res.config);
+          console.log("config :- ",res, "\n", res.isDailyActive);
           setConfig(res.config);
+          setIsDailyActive(res.isDailyActive);
         }); 
       } catch (err) {
         console.error(err);
@@ -76,17 +78,6 @@ export default function AdminPanelScreen() {
     });
   };
   
-  const parseNumber = (text: string, previousValue: number) => {
-    if (text === "" || text === "-" || text === ".") {
-      return previousValue;
-    }
-
-    const num = Number(text);
-    return Number.isNaN(num) ? previousValue : num;
-  };
-  const isDecimal = (value: number) => {
-    return !Number.isInteger(value);
-  };
   const [numberDrafts, setNumberDrafts] = useState<Record<string, string>>({});
 
   const renderConfig = (
@@ -235,9 +226,21 @@ export default function AdminPanelScreen() {
     (key) => !HIDDEN_TOP_LEVEL_KEYS.has(key)
   );
 
-  function handleActivateDaily(){
-    console.log("Created");
-    setIsDailyActive(!isDailyActive);
+  async function handleActivateDaily(){
+    // console.log('CALLED ------');
+    
+    try {
+      await createDaily().then((res)=>{
+        console.log("RES :- ", res.message);
+        setIsDailyActive(true);
+        Alert.alert(`${res.message}`);
+      }); 
+    } catch (err) {
+      console.error(err);
+      setIsDailyActive(false);
+      Alert.alert(`${err}`);
+    }
+    // setIsDailyActive(!isDailyActive);
   }
   async function handleSave(){
     console.log("NOTE :- ",note);
@@ -283,16 +286,17 @@ export default function AdminPanelScreen() {
             <Text style={styles.dailyTourSecondaryText}>Date : {formalDate}</Text>
           </View>
           <TouchableOpacity
-          style={isDailyActive ? styles.dailyTourButton : styles.dailyTourButtonDisabled}
-          disabled={!isDailyActive}
+          style={!isDailyActive ? styles.dailyTourButton : styles.dailyTourButtonDisabled}
+          disabled={isDailyActive}
           onPress={handleActivateDaily}>
             <Text 
             style={
-              isDailyActive ? 
-              styles.dailyTourButtonText : 
-              {
-                color:"#FFFFFF70",
-              }}
+              // isDailyActive ? 
+              styles.dailyTourButtonText 
+              // {
+              //   color:"#FFFFFF",
+              // }
+            }
             >
               CREATE
             </Text>

@@ -13,7 +13,8 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Platform,
-  Alert
+  Alert,
+  Image
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
@@ -34,7 +35,7 @@ export default function UserRewardScreen() {
   React.useEffect(()=>{
     reloadRewardScreen();
   },[])
-  const [today, setToday] = useState(5);
+  const [today, setToday] = useState(1);
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { colors } = useAppTheme();
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
@@ -44,9 +45,8 @@ export default function UserRewardScreen() {
   const {user} = useAuth();
   const [coins, setCoins] = useState(user?.coins || 0);
   const [maxCoins, setMaxCoins] = useState(2000);
+  const logoSource = require("@/assets/images/Fire.gif");
 
-
-  
   const claimBtnPress = async () => {
     console.log('claim btn pressed');
     setIsClaimBtnLoading(true);
@@ -64,9 +64,12 @@ export default function UserRewardScreen() {
   const handleRedeemButton = async ()=>{
     console.log("handleRedeemButton : ", 'HELLO');
     redeemReward().then((res)=>{
-      console.log(res);
+      // console.log(res);
+      setCoins(res?.data.newUser?.coins)
+      Alert.alert(`${res.message}`);
     }).catch((err)=>{
       console.log(err);
+      Alert.alert(`${err}`);
     })
   }
 
@@ -96,7 +99,9 @@ export default function UserRewardScreen() {
               <View style={styles.streakCard}>
                 <View style={styles.streakContent}>
                   <View style={styles.emojiBox}>
-                    <Text style={styles.emoji}>🔥</Text>
+                    <Image 
+                    source={logoSource} 
+                    style={styles.avatarImage}/>
                   </View>
                   <View style={styles.streakTextContainer}>
                     <Text style={styles.streakTitle}>
@@ -114,7 +119,6 @@ export default function UserRewardScreen() {
                             >
                             <Text style={[styles.streakDayText]}>{day}</Text>
                           </View>
-                          {day < 7 && <View style={styles.streakConnector} />}
                         </View>
                       ))}
                     </View>
@@ -124,7 +128,10 @@ export default function UserRewardScreen() {
               <View style={styles.dailyLoginCard}>
                 <View style={styles.dailyLoginContent}>
                   <MaterialCommunityIcons name="calendar-clock-outline" size={30} color={colors.text} />
-                  <Text style={styles.dailyLoginText}>DAILY LOGIN REWARD</Text>
+                  <Text 
+                  style={styles.dailyLoginText}
+                  numberOfLines={1}
+                  ellipsizeMode="tail">DAILY LOGIN REWARD</Text>
                 </View>
                 <TouchableOpacity
                   style={styles.claimButton}
@@ -191,11 +198,10 @@ const makeStyles = (colors: ColorScheme) =>
       flex: 1,
     },
     gradient2: {
-      // width: '100%',
       width: '100%',
       flex: 1,
-      borderTopEndRadius: 10,
-      borderTopLeftRadius: 10,
+      borderTopRightRadius: 20,
+      borderTopLeftRadius: 20,
       paddingHorizontal: 10,
       paddingVertical: 20,
     },
@@ -221,12 +227,14 @@ const makeStyles = (colors: ColorScheme) =>
     headerTitle: {
       fontSize: 30,
       fontWeight: 900,
+      fontFamily: 'Rubik-Medium',
       color: '#FFF',
       textAlign: 'center',
       marginTop: 40,
     },
     headerSubtitle: {
       fontSize: 12,
+      fontFamily: 'Rubik-Medium',
       color: colors.textSecondary,
       textAlign: 'center',
       marginBottom: 40,
@@ -243,38 +251,38 @@ const makeStyles = (colors: ColorScheme) =>
       marginBottom: 16,
     },
     streakContent: {
-      paddingHorizontal: 10,
-      paddingVertical: 20,
+      paddingHorizontal: 20,
+      paddingVertical: 10,
       borderRadius: 20,
-      backgroundColor: colors.card,
-      flex: 1,
-      gap: 0,
-      flexDirection: 'row',
+      // backgroundColor: colors.card,
+      // flex: 1,
+      flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'space-between',
     },
     emojiBox: {
-      width: 50,
       // backgroundColor: "#cacaca",
     },
-    emoji: {
-      fontSize: 40,
+    avatarImage: {
+      marginBottom: -20,
+      // backgroundColor: "#FF0000"
     },
     streakTextContainer: {
-      flex: 1,
-      alignItems: 'flex-end',
+      // backgroundColor: '#ff0000'
     },
     streakTitle: {
-      fontSize: 12,
+      textAlign: 'center',
+      fontSize: 14,
+      fontFamily: 'Rubik-Medium',
       fontWeight: '600',
       color: colors.text,
-      marginBottom: 16,
+      marginVertical: 10,
     },
     streakProgressContainer: {
+      width: '100%',
       flexDirection: 'row',
       alignItems: 'center',
-      // justifyContent: 'space-between',
-      gap: 1,
+      justifyContent: 'space-between',
     },
     streakDayWrapper: {
       flexDirection: 'row',
@@ -287,30 +295,37 @@ const makeStyles = (colors: ColorScheme) =>
       backgroundColor: '#E5E7EB',
       alignItems: 'center',
       justifyContent: 'center',
+      borderWidth: 2,
+      borderColor: '#FFF',
     },
     streakDayActive: {
       backgroundColor: '#FF6B9D',
+      color: '#FFF'
     },
     streakDayNext: {
       backgroundColor: '#FFC0CB',
     },
     streakDayText: {
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: 'bold',
+      fontFamily: 'Ribik-Medium',
       color: '#000',
     },
     streakDayTextActive: {
       color: '#FFF',
     },
     streakConnector: {
-      width: 10,
+      width: '100%',
       height: 3,
-      backgroundColor: '#E5E7EB',
-      marginHorizontal: 2,
+      backgroundColor: '#ffffff',
+      position: 'relative',
+      borderRadius: "100%"
+      // marginHorizontal: 2,
     },
     dailyLoginCard: {
-      borderRadius: 20,
-      padding: 20,
+      borderRadius: 5,
+      paddingHorizontal: 20,
+      paddingVertical: 5,
       marginBottom: 16,
       minHeight: 80,
       flexDirection: 'row',
@@ -331,7 +346,7 @@ const makeStyles = (colors: ColorScheme) =>
     },
     dailyLoginText: {
       fontSize: 16,
-      fontWeight: 'bold',
+      fontFamily: 'Saira-SemiBold',
       color: colors.text,
       flexShrink: 1,
       lineHeight: 22,
@@ -341,8 +356,6 @@ const makeStyles = (colors: ColorScheme) =>
       backgroundColor: colors.secondary,
       paddingHorizontal: 22,
       borderRadius: 12,
-      borderWidth: 2,
-      borderColor: colors.bg,
       height: 44,
       minWidth: 90,
       alignItems: 'center',
@@ -350,12 +363,13 @@ const makeStyles = (colors: ColorScheme) =>
     },
     claimButtonText: {
       fontSize: 15,
-      fontWeight: 700,
+      fontWeight: 'bold',
+      fontFamily: 'Rubik-Medium',
       color: colors.textSecondary,
     },
     coinsCard: {
       backgroundColor: colors.card,
-      borderRadius: 20,
+      borderRadius: 5,
       padding: 20,
       marginBottom: 24,
     },
@@ -383,7 +397,8 @@ const makeStyles = (colors: ColorScheme) =>
     },
     coinsText: {
       fontSize: 14,
-      fontWeight: 700,
+      // fontWeight: 700,
+      fontFamily: 'Saira-Medium',
       color: colors.text,
     },
     redeemButton: {
@@ -391,8 +406,6 @@ const makeStyles = (colors: ColorScheme) =>
       paddingVertical: 10,
       borderRadius: 12,
       alignItems: 'center',
-      borderWidth: 2,
-      borderColor: colors.bg,
     },
     redeemButtonDis: {
       backgroundColor: colors.textMuted,
@@ -406,6 +419,7 @@ const makeStyles = (colors: ColorScheme) =>
     redeemButtonText: {
       fontSize: 16,
       fontWeight: 'bold',
+      fontFamily: 'Rubik-Medium',
       color: '#FFF',
     },
     historyButton: {
@@ -413,14 +427,12 @@ const makeStyles = (colors: ColorScheme) =>
       paddingVertical: 10,
       paddingHorizontal: 30,
       borderRadius: 10,
-      borderWidth: 2,
-      borderColor: colors.bg,
       alignSelf: 'center',
-      marginVertical: 20,
     },
     historyButtonText: {
       fontSize: 16,
       fontWeight: '600',
+      fontFamily: 'Rubik-Medium',
       color: '#FFF',
     },
     adArea2: {

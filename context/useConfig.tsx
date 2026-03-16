@@ -8,14 +8,11 @@ import React, {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getConfig } from "@/lib/api/config";
 
-/* ======================================================
-   Types
-====================================================== */
+/*Types*/
 
 export type AppConfig = {
   id: string;
   version: string;
-
   daily_tournament: any;
   instant_tournament: any;
   single_player: any;
@@ -35,18 +32,16 @@ export type AppConfig = {
   analytics: any;
   leaderboard: any;
   qa: any;
-
   isActive: boolean;
   createdAt: string;
+  isDailyActive: boolean
 };
 
 const CONFIG_KEY = "GAME_CONFIG";
-const CONFIG_TIME_KEY = "GAME_CONFIG_TIME";
 
 const DEFAULT_CONFIG: AppConfig = {
   id: "local",
   version: "0",
-
   daily_tournament: {},
   instant_tournament: {},
   single_player: {},
@@ -66,73 +61,71 @@ const DEFAULT_CONFIG: AppConfig = {
   analytics: {},
   leaderboard: {},
   qa: {},
-
   isActive: true,
+  isDailyActive: false,
   createdAt: "",
 };
 
 const ConfigContext = createContext<{
   config: AppConfig;
+  error: string | null;
   refresh: () => Promise<void>;
 }>({
   config: DEFAULT_CONFIG,
+  error: null,
   refresh: async () => {},
 });
 
-const TTL = 6 * 60 * 60 * 1000; // 6 hours
-
 export function ConfigProvider({ children }: { children: ReactNode }) {
-  const [config, setConfig] = useState<AppConfig>(DEFAULT_CONFIG);
+  const [config, setConfig] = useState<AppConfig | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log("INIT called");
-    
     init();
   }, []);
 
   const init = async () => {
-    // 1. Load cached instantly
-    const cached = await AsyncStorage.getItem(CONFIG_KEY);
-    if (cached) {
-      setConfig(JSON.parse(cached));
-    }
+    setError(null);
 
-    // 2. Check TTL
-    // const lastTime = await AsyncStorage.getItem(CONFIG_TIME_KEY);
-    // const isExpired =
-    //   !lastTime || Date.now() - Number(lastTime) > TTL;
-
-    // if (isExpired) {
-    //   fetchLatest();
-    // }
-    fetchLatest();
-  };
-
-  const fetchLatest = async () => {
     try {
-    //   const res = await getConfig();
-      const res = await getConfig().then(async (res)=>{
-        console.log("config :- ", res.config);
-        setConfig(res.config);
-        const data: AppConfig = res.config;
-        await AsyncStorage.multiSet([
-          [CONFIG_KEY, JSON.stringify(data)],
-          [CONFIG_TIME_KEY, Date.now().toString()],
-        ]);
-      }).catch((error)=>{
-        console.log(error);
-      }); 
+      
+      const res = await getConfig();
+      const data: AppConfig = res.config;
+      data.isDailyActive = res.isDailyActive;
+      console.log("CHECK SERVER ----------------- WOW - ",data);
+      console.log("CHECK SERVER ----------------- WOW - ",data?.isDailyActive);
 
-    } catch {
-      console.log("Using cached config (offline)");
+      setConfig(data);
+      
+      await AsyncStorage.setItem(CONFIG_KEY, JSON.stringify(data));
+      return;
+    } catch (serverErr) {
+      console.warn("Server config fetch failed, trying cache...", serverErr);
     }
+
+    // try {
+    //   console.log("CHECK LOCAL -----------------");
+    //   const cached = await AsyncStorage.getItem(CONFIG_KEY);
+    //   if (cached) {
+    //     setConfig(JSON.parse(cached));
+    //     return;
+    //   }
+    // } catch (cacheErr) {
+    //   console.warn("Cache read failed", cacheErr);
+    // }
+
+    setError("Failed to load config. Please check your connection and restart the app.");
   };
+
+  // Show nothing (or a loader) until config resolves
+  if (config === null && error === null) return null;
 
   return (
     <ConfigContext.Provider
       value={{
-        config,
-        refresh: fetchLatest,
+        config: config ?? DEFAULT_CONFIG,
+        error,
+        refresh: init,
       }}
     >
       {children}
@@ -140,15 +133,16 @@ export function ConfigProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/* ======================================================
-   Hook
-====================================================== */
+/*Hooks*/
 
 export function useConfig() {
   return useContext(ConfigContext).config;
 }
 
-/* Optional manual refresh hook */
+export function useConfigError() {
+  return useContext(ConfigContext).error;
+}
+
 export function useRefreshConfig() {
   return useContext(ConfigContext).refresh;
 }
