@@ -41,6 +41,7 @@ export type HomeTabStackParamList = {
   contactUs: undefined;
   otpScreen: otpParams;
   rewardHistoryScreen: undefined;
+  referAndEarn: undefined;
 };
 
 export type HomeScreenNavigationProp =

@@ -81,14 +81,14 @@ export default function RootLayout() {
   }
 
   return (
-          <AuthProvider>
+    <AuthProvider>
       <FeedbackProvider>
-    <ConfigProvider>
-        <ThemeProvider>
+        <ConfigProvider>
+          <ThemeProvider>
             <RootNavigator />
-        </ThemeProvider>
-    </ConfigProvider>
+          </ThemeProvider>
+        </ConfigProvider>
       </FeedbackProvider>
-          </AuthProvider>
+    </AuthProvider>
   );
 }

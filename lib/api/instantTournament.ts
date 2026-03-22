@@ -98,6 +98,8 @@ export const submitQuestion = async (
       },
     });
     const resData: submitQuestionResponse = res.data;
+    console.log('insatant : res for next qs : ', res.data);
+    
     return resData;
   } catch (err: any) {
     console.log(err);

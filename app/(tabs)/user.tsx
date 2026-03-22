@@ -223,7 +223,12 @@ export default function UserProfileScreen() {
               </TouchableOpacity>
 
               {/* Refer */}
-              <TouchableOpacity style={styles.row}>
+              <TouchableOpacity 
+              style={styles.row}
+              onPress={()=>{
+                navigation.navigate('referAndEarn');
+              }}
+              >
                 <View style={styles.rowLeft}>
                   <Feather name="share-2" size={22} style={styles.rowIcon} />
                   <Text style={styles.rowLabel}>Refer to earn</Text>

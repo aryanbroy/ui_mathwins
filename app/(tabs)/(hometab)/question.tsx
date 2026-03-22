@@ -32,6 +32,7 @@ import Error404Screen from '@/app/errorScreen';
 import { useRewardedAd } from '@/components/Ads/Rewarded';
 import { useInterstitialAd } from '@/components/Ads/InterstitialAd';
 import AdBanner from '@/components/Ads/Banner';
+import { useConfig } from '@/context/useConfig';
 
 type sanitizedQuestionType = {
   id: string;
@@ -71,7 +72,6 @@ type QuestionRouteParams = {
   sanitizedQuestion: any;
 };
 
-const dailyTimer = 30000;
 
 export default function QuestionScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -79,7 +79,10 @@ export default function QuestionScreen() {
   const styles = React.useMemo(() => makeStyles(colors), [colors]);
   const route = useRoute<RouteProp<{ params: QuestionRouteParams }>>();
   const { playFeedback } = useFeedback();
-
+  const config = useConfig();
+  const dailyTimer = config.daily_tournament.duration_sec*1000;
+  const INITIAL_TIME = config.single_player.round_timeout_sec*1000;
+  
   // Question and Session State
   const [sanitizedQuestion, setSanitizedQuestion] = useState(
     route.params.sanitizedQuestion as sanitizedQuestionType
@@ -87,38 +90,52 @@ export default function QuestionScreen() {
   const [session, setSession] = useState<SessionInfo>(route.params.session);
   const [answer, setAnswer] = useState<number | null>(null);
   const [round, setRound] = useState(1);
-
+  
   // UI State
   const [loading, setLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [correctAnswer, setCorrectAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
-
+  
   // Timer State
   const [elapsedTime, setElapsedTime] = useState(0);
   const [remainingMs, setRemainingMs] = useState(dailyTimer); // convert this to 5 mins later
   const [isPaused, setIsPaused] = useState(false);
   const pausedRemainingRef = useRef(remainingMs);
-
+  
+  // "free_daily": {
+  //   "plus_30s": 0,
+  //   "level_down": 1,
+  //   "fifty_fifty": 1
+  // },
+  // "max_per_session": {
+  //   "plus_30s": 1,
+  //   "level_down": 2,
+  //   "fifty_fifty": 3
+  // }
   // Lifeline State
-  const [isFiftyFiftyAvailable, setIsFiftyFiftyAvailable] = useState(true);
-  const [isThirtySecAvailable, setIsThirtySecAvailable] = useState(true);
-  const [isLevelDownAvailable, setIsLevelDownAvailable] = useState(true);
+  const maxLifeline = 5;
+  const freeLifeline = 2;
+  const [isFiftyFiftyAvailable, setIsFiftyFiftyAvailable] = useState(config.lifelines.max_per_session.fifty_fifty || maxLifeline);
+  const [isThirtySecAvailable, setIsThirtySecAvailable] = useState(config.lifelines.max_per_session.plus_30s || maxLifeline);
+  const [isLevelDownAvailable, setIsLevelDownAvailable] = useState(config.lifelines.max_per_session.level_down || maxLifeline);
+  const [isFreeFiftyFiftyAvailable, setIsFreeFiftyFiftyAvailable] = useState(config.lifelines.free_daily.fifty_fifty || freeLifeline);
+  const [isFreeThirtySecAvailable, setIsFreeThirtySecAvailable] = useState(config.lifelines.free_daily.plus_30s || freeLifeline);
+  const [isFreeLevelDownAvailable, setIsFreeLevelDownAvailable] = useState(config.lifelines.free_daily.level_down || freeLifeline);
   const [disabledOptions, setDisabledOptions] = useState<number[]>([]);
   const [extraTime, setExtraTime] = useState(0);
-
+  
   const [screenState, setScreenState] = useState('playing');
   const [currentScore, setCurrentScore] = useState<number>(0);
-
+  
   const [showPopup, setShowPopup] = useState(false);
   const [showAdPopup, setShowAdPopup] = useState(false);
-
+  
   // console.log("fifty : ", isFiftyFiftyAvailable);
   // console.log("check : ", isChecking);
   // console.log("show ans : ", showResult);
-
+  
   // timer variable
-  const INITIAL_TIME = 30000;
   const [remainingTime, setRemainingTime] = useState(INITIAL_TIME);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<number | null>(null);
@@ -201,13 +218,13 @@ export default function QuestionScreen() {
 
   const handleDailyEnd = async () => {
     console.log('Daily timer finished');
-
-    // later
-
-    setScreenState('finished');
-    // navigation.navigate("DailyResults", {
-    //   sessionId: session.sessionId,
-    // });
+    setAnswer(null);
+    setCorrectAnswer(null);
+    setShowPopup(true);
+    setTimeout(() => {
+      setShowPopup(false);
+      navigation.navigate('homeMain');
+    }, 1500);
   };
 
   const pauseDailyTimer = () => {
@@ -337,6 +354,13 @@ export default function QuestionScreen() {
   };
   const onTimerFinish = () => {
     console.log('Timer finished!');
+    setAnswer(null);
+    setCorrectAnswer(null);
+    setShowPopup(true);
+    setTimeout(() => {
+      setShowPopup(false);
+      navigation.navigate('homeMain');
+    }, 1500);
   };
   const formattedTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);
@@ -611,7 +635,12 @@ export default function QuestionScreen() {
       if (res.success && res.disabledOptions) {
         setDisabledOptions(res.disabledOptions);
         startTimer();
-        setIsFiftyFiftyAvailable(false);
+        const remainingFiftyFifty = isFiftyFiftyAvailable - 1;
+        setIsFiftyFiftyAvailable(remainingFiftyFifty < 0 ? 0 : remainingFiftyFifty);
+        if(remainingFiftyFifty <= (maxLifeline - freeLifeline)){
+          console.log("🔴 LIMIT REACHED.");
+          setIsFreeFiftyFiftyAvailable(false);
+        }
       }
     })
       .catch((err) => {
@@ -644,7 +673,11 @@ export default function QuestionScreen() {
       setRemainingMs((prev) => prev + 30000);
     }
     // addExtraTime(+30000);
-    setIsThirtySecAvailable(false);
+    const remainingThirtySec = isThirtySecAvailable - 1;
+    setIsThirtySecAvailable(remainingThirtySec < 0 ? 0 : remainingThirtySec);
+    if(remainingThirtySec <= (maxLifeline - freeLifeline)){
+      setIsFreeThirtySecAvailable(false);
+    }
   };
 
   // Lifeline: Level Down
@@ -672,7 +705,11 @@ export default function QuestionScreen() {
           resetQuestion();
           startTimer();
           setSanitizedQuestion(res.data.newQuestion);
-          setIsLevelDownAvailable(false);
+          const remainingLevelDown = isLevelDownAvailable - 1; 
+          setIsLevelDownAvailable(remainingLevelDown < 0 ? 0 : remainingLevelDown);
+          if(remainingLevelDown <= (maxLifeline - freeLifeline)){
+            setIsFreeLevelDownAvailable(false);
+          }
         }
       })
       .catch((err) => {
@@ -804,15 +841,15 @@ export default function QuestionScreen() {
               <View style={styles.lifelineBox}>
                 <TouchableOpacity
                   style={styles.lifelineBtn}
-                  disabled={isChecking || showResult}
+                  disabled={isChecking || showResult || isFiftyFiftyAvailable==0}
                   onPress={
-                    isFiftyFiftyAvailable
+                    isFreeFiftyFiftyAvailable
                       ? handleFiftyfiftySubmit
                       : handleFiftyfiftySubmitWithAd
                   }
                 >
                   <Text style={styles.lifelineBtnText}>50-50</Text>
-                  {!isFiftyFiftyAvailable ? (
+                  {!isFreeFiftyFiftyAvailable ? (
                     <Text style={styles.adText}>Ad</Text>
                   ) : (
                     <></>
@@ -820,15 +857,15 @@ export default function QuestionScreen() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.lifelineBtn}
-                  disabled={isChecking || showResult}
+                  disabled={isChecking || showResult || isThirtySecAvailable==0}
                   onPress={
-                    isThirtySecAvailable
+                    isFreeThirtySecAvailable
                       ? handleThirtyPlusSubmit
                       : handleThirtyPlusSubmitWithAd
                   }
                 >
                   <Text style={styles.lifelineBtnText}>+30 Sec</Text>
-                  {!isThirtySecAvailable ? (
+                  {!isFreeThirtySecAvailable ? (
                     <Text style={styles.adText}>Ad</Text>
                   ) : (
                     <></>
@@ -836,15 +873,15 @@ export default function QuestionScreen() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.lifelineBtn}
-                  disabled={isChecking || showResult}
+                  disabled={isChecking || showResult || isLevelDownAvailable==0}
                   onPress={
-                    isLevelDownAvailable
+                    isFreeLevelDownAvailable
                       ? handleLevelDownSubmit
                       : handleLevelDownWithAd
                   }
                 >
                   <Text style={styles.lifelineBtnText}>Level Down</Text>
-                  {!isLevelDownAvailable ? (
+                  {!isFreeLevelDownAvailable ? (
                     <Text style={styles.adText}>Ad</Text>
                   ) : (
                     <></>
@@ -855,7 +892,7 @@ export default function QuestionScreen() {
               <ResultPopup
                 key={sanitizedQuestion.id}
                 visible={showPopup}
-                isCorrect={answer === correctAnswer}
+                isCorrect={answer !== null && answer === correctAnswer}
                 correctAnswer={correctAnswer ?? 0}
                 userAnswer={answer}
                 onClose={() => setShowPopup(false)}

@@ -17,6 +17,7 @@ import Contactus from '@/app/contactUs';
 import OtpScreen from '@/app/otpScreen';
 import RewardHistoryScreen from '../../rewardHistory';
 import EditProfileScreen from '@/app/editProfile';
+import ReferEarnScreen from '@/app/referAndEarn';
 
 const Stack = createNativeStackNavigator<HomeTabStackParamList>();
 
@@ -86,6 +87,11 @@ export default function HomeTabLayout() {
         name="privacyPolicy"
         component={PrivacyPolicy}
         options={{ title: 'PrivacyPolicy' }}
+      />
+      <Stack.Screen
+        name="referAndEarn"
+        component={ReferEarnScreen}
+        options={{ title: 'R&E' }}
       />
       <Stack.Screen
         name="termsAndCondition"
