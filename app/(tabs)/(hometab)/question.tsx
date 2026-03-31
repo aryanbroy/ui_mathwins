@@ -116,12 +116,16 @@ export default function QuestionScreen() {
   // Lifeline State
   const maxLifeline = 5;
   const freeLifeline = 2;
+
   const [isFiftyFiftyAvailable, setIsFiftyFiftyAvailable] = useState(config.lifelines.max_per_session.fifty_fifty || maxLifeline);
   const [isThirtySecAvailable, setIsThirtySecAvailable] = useState(config.lifelines.max_per_session.plus_30s || maxLifeline);
   const [isLevelDownAvailable, setIsLevelDownAvailable] = useState(config.lifelines.max_per_session.level_down || maxLifeline);
+  
   const [isFreeFiftyFiftyAvailable, setIsFreeFiftyFiftyAvailable] = useState(config.lifelines.free_daily.fifty_fifty || freeLifeline);
   const [isFreeThirtySecAvailable, setIsFreeThirtySecAvailable] = useState(config.lifelines.free_daily.plus_30s || freeLifeline);
   const [isFreeLevelDownAvailable, setIsFreeLevelDownAvailable] = useState(config.lifelines.free_daily.level_down || freeLifeline);
+  
+  const [lifelineBlock , setLifelineBlock] = useState(false);
   const [disabledOptions, setDisabledOptions] = useState<number[]>([]);
   const [extraTime, setExtraTime] = useState(0);
   
@@ -145,6 +149,9 @@ export default function QuestionScreen() {
   const [isSubmittingSession, setIsSubmittingSession] =
     useState<boolean>(false);
   const questionStartRemainingRef = useRef<number>(0);
+
+    // console.log('lifelineBlock ========== ',lifelineBlock);
+
   
   const handleDailySessionSubmit = async () => {
     setIsSubmittingSession(true);
@@ -214,8 +221,7 @@ export default function QuestionScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
-
+  // Timer function - DAILY & instant
   const handleDailyEnd = async () => {
     console.log('Daily timer finished');
     setAnswer(null);
@@ -547,12 +553,14 @@ export default function QuestionScreen() {
             session.sessionType === SessionType.DAILY ||
             session.sessionType === SessionType.INSTANT
           ) {
+            
             setCurrentScore(response.data.currentScore);
             setCorrectAnswer(response.data.correctAnswer);
             setTimeout(() => {
               setShowPopup(false);
               resetQuestion();
               setSanitizedQuestion(response.data.nextQuestion);
+              setLifelineBlock(false);
               questionStartRemainingRef.current = remainingMs;
               resumeDailyTimer();
             }, 1200);
@@ -572,6 +580,7 @@ export default function QuestionScreen() {
               } else {
                 resetQuestion();
                 setSanitizedQuestion(response.data.nextQuestion);
+                setLifelineBlock(false);
                 startTimer();
               }
             }, 1500);
@@ -618,10 +627,17 @@ export default function QuestionScreen() {
     handleFiftyfiftySubmit();
   };
   const handleFiftyfiftySubmit = () => {
-    if (!isFiftyFiftyAvailable || isChecking || showResult) {
+    // if (!isFiftyFiftyAvailable || isChecking || showResult) {
+    //   pauseTimer();
+    // }
+    if (
+      session.sessionType === SessionType.DAILY ||
+      session.sessionType === SessionType.INSTANT
+    ) {
+      pauseDailyTimer();
+    } else {
       pauseTimer();
     }
-    resumeTimer();
     setLoading(true);
     const payload = {
       sessionType: session.sessionType,
@@ -634,13 +650,22 @@ export default function QuestionScreen() {
       console.log('50-50 response:', res);
       if (res.success && res.disabledOptions) {
         setDisabledOptions(res.disabledOptions);
-        startTimer();
+        if (
+          session.sessionType === SessionType.DAILY ||
+          session.sessionType === SessionType.INSTANT
+        ) {
+          console.log("🟢 resumeDailyTimer");
+          resumeDailyTimer();
+        } else {
+          startTimer();
+        }
         const remainingFiftyFifty = isFiftyFiftyAvailable - 1;
         setIsFiftyFiftyAvailable(remainingFiftyFifty < 0 ? 0 : remainingFiftyFifty);
         if(remainingFiftyFifty <= (maxLifeline - freeLifeline)){
           console.log("🔴 LIMIT REACHED.");
           setIsFreeFiftyFiftyAvailable(false);
         }
+        setLifelineBlock(true);
       }
     })
       .catch((err) => {
@@ -658,19 +683,28 @@ export default function QuestionScreen() {
     handleThirtyPlusSubmit();
   };
   const handleThirtyPlusSubmit = () => {
-    if (!isThirtySecAvailable || isChecking || showResult) {
+    // if (!isThirtySecAvailable || isChecking || showResult) {
+    //   pauseTimer();
+    // }
+    if (
+      session.sessionType === SessionType.DAILY ||
+      session.sessionType === SessionType.INSTANT
+    ) {
+      pauseDailyTimer();
+    } else {
       pauseTimer();
     }
 
-    resumeTimer();
     if (session.sessionType === SessionType.SOLO) {
       addTime(30000);
+      resumeTimer();
     } else if (
       session.sessionType === SessionType.DAILY ||
       session.sessionType === SessionType.INSTANT
     ) {
       pausedRemainingRef.current += 30000;
       setRemainingMs((prev) => prev + 30000);
+      resumeDailyTimer();
     }
     // addExtraTime(+30000);
     const remainingThirtySec = isThirtySecAvailable - 1;
@@ -678,6 +712,7 @@ export default function QuestionScreen() {
     if(remainingThirtySec <= (maxLifeline - freeLifeline)){
       setIsFreeThirtySecAvailable(false);
     }
+    setLifelineBlock(true);
   };
 
   // Lifeline: Level Down
@@ -685,12 +720,17 @@ export default function QuestionScreen() {
     showAd();
     handleLevelDownSubmit();
   };
+  
   const handleLevelDownSubmit = () => {
-    if (!isLevelDownAvailable || isChecking || showResult) {
+    console.log(':::::::::::: Level Down CALLED ',isChecking , showResult , isLevelDownAvailable, lifelineBlock);
+    if (
+      session.sessionType === SessionType.DAILY ||
+      session.sessionType === SessionType.INSTANT
+    ) {
+      pauseDailyTimer();
+    } else {
       pauseTimer();
     }
-
-    resumeTimer();
     setLoading(true);
     const payload = {
       sessionType: session.sessionType,
@@ -701,15 +741,28 @@ export default function QuestionScreen() {
     LevelDown(payload)
       .then((res) => {
         console.log('Level Down response:', res);
+
         if (res.success && res.data?.newQuestion) {
           resetQuestion();
-          startTimer();
+
           setSanitizedQuestion(res.data.newQuestion);
-          const remainingLevelDown = isLevelDownAvailable - 1; 
+
+          const remainingLevelDown = isLevelDownAvailable - 1;
           setIsLevelDownAvailable(remainingLevelDown < 0 ? 0 : remainingLevelDown);
-          if(remainingLevelDown <= (maxLifeline - freeLifeline)){
+
+          if (remainingLevelDown <= (maxLifeline - freeLifeline)) {
             setIsFreeLevelDownAvailable(false);
           }
+          if (
+            session.sessionType === SessionType.DAILY ||
+            session.sessionType === SessionType.INSTANT
+          ) {
+            console.log("🟢 resumeDailyTimer");
+            resumeDailyTimer();
+          } else {
+            startTimer();
+          }
+          setLifelineBlock(true);
         }
       })
       .catch((err) => {
@@ -838,10 +891,10 @@ export default function QuestionScreen() {
                 </View>
               </View>
 
-              <View style={styles.lifelineBox}>
+              <View style={[styles.lifelineBox, lifelineBlock && { opacity: 0.6 }]}>
                 <TouchableOpacity
                   style={styles.lifelineBtn}
-                  disabled={isChecking || showResult || isFiftyFiftyAvailable==0}
+                  disabled={isChecking || showResult || lifelineBlock}
                   onPress={
                     isFreeFiftyFiftyAvailable
                       ? handleFiftyfiftySubmit
@@ -857,7 +910,7 @@ export default function QuestionScreen() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.lifelineBtn}
-                  disabled={isChecking || showResult || isThirtySecAvailable==0}
+                  disabled={isChecking || showResult  || lifelineBlock}
                   onPress={
                     isFreeThirtySecAvailable
                       ? handleThirtyPlusSubmit
@@ -873,7 +926,7 @@ export default function QuestionScreen() {
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.lifelineBtn}
-                  disabled={isChecking || showResult || isLevelDownAvailable==0}
+                  disabled={isChecking || showResult || lifelineBlock}
                   onPress={
                     isFreeLevelDownAvailable
                       ? handleLevelDownSubmit

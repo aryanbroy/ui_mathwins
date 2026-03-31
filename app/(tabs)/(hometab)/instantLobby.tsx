@@ -43,7 +43,7 @@ export default function InstantTournamentLobby() {
   const [joinedCount, setJoinedCount] = useState<number>(0);
   const [players, setPlayers] = useState<Player[] | null>(null);
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
-  const [disableStartBtn, setDisableStartBtn] = useState<boolean>(false);
+  const [disableStartBtn, setDisableStartBtn] = useState<boolean>(true);
   const [roomId, setRoomId] = useState<string | null>(null);
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [currentScore, setCurrentScore] = useState<number>(0);
@@ -71,6 +71,7 @@ export default function InstantTournamentLobby() {
         await fetchTournamentPlayers(tournamentId);
       setJoinedCount(playersCount.playersCount);
       setPlayers(firstFivePlayers);
+      setDisableStartBtn(false);
     } catch (err: any) {
       setErrMsg(err?.message ?? 'Failed to load daily attempts');
     } finally {
