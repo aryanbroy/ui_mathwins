@@ -72,7 +72,6 @@ type QuestionRouteParams = {
   sanitizedQuestion: any;
 };
 
-
 export default function QuestionScreen() {
   const navigation = useNavigation<HomeScreenNavigationProp>();
   const { colors } = useAppTheme();
@@ -80,9 +79,9 @@ export default function QuestionScreen() {
   const route = useRoute<RouteProp<{ params: QuestionRouteParams }>>();
   const { playFeedback } = useFeedback();
   const config = useConfig();
-  const dailyTimer = config.daily_tournament.duration_sec*1000;
-  const INITIAL_TIME = config.single_player.round_timeout_sec*1000;
-  
+  const dailyTimer = config.daily_tournament.duration_sec * 1000;
+  const INITIAL_TIME = config.single_player.round_timeout_sec * 1000;
+
   // Question and Session State
   const [sanitizedQuestion, setSanitizedQuestion] = useState(
     route.params.sanitizedQuestion as sanitizedQuestionType
@@ -90,19 +89,42 @@ export default function QuestionScreen() {
   const [session, setSession] = useState<SessionInfo>(route.params.session);
   const [answer, setAnswer] = useState<number | null>(null);
   const [round, setRound] = useState(1);
-  
+
   // UI State
   const [loading, setLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [correctAnswer, setCorrectAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
-  
+
   // Timer State
   const [elapsedTime, setElapsedTime] = useState(0);
   const [remainingMs, setRemainingMs] = useState(dailyTimer); // convert this to 5 mins later
   const [isPaused, setIsPaused] = useState(false);
   const pausedRemainingRef = useRef(remainingMs);
-  
+
+  const lastAdMinuteRef = useRef<number>(0);
+
+  const shouldShowAd = (): boolean => {
+    if (session.sessionType !== SessionType.DAILY) {
+      return false;
+    }
+
+    const elapsedMs = dailyTimer - remainingMs;
+
+    const currentMinute = Math.floor(elapsedMs / 60000);
+
+    if (currentMinute <= 0) {
+      return false;
+    }
+
+    if (currentMinute > lastAdMinuteRef.current) {
+      lastAdMinuteRef.current = currentMinute;
+      return true;
+    }
+
+    return false;
+  };
+
   // "free_daily": {
   //   "plus_30s": 0,
   //   "level_down": 1,
@@ -117,28 +139,40 @@ export default function QuestionScreen() {
   const maxLifeline = 5;
   const freeLifeline = 2;
 
-  const [isFiftyFiftyAvailable, setIsFiftyFiftyAvailable] = useState(config.lifelines.max_per_session.fifty_fifty || maxLifeline);
-  const [isThirtySecAvailable, setIsThirtySecAvailable] = useState(config.lifelines.max_per_session.plus_30s || maxLifeline);
-  const [isLevelDownAvailable, setIsLevelDownAvailable] = useState(config.lifelines.max_per_session.level_down || maxLifeline);
-  
-  const [isFreeFiftyFiftyAvailable, setIsFreeFiftyFiftyAvailable] = useState(config.lifelines.free_daily.fifty_fifty || freeLifeline);
-  const [isFreeThirtySecAvailable, setIsFreeThirtySecAvailable] = useState(config.lifelines.free_daily.plus_30s || freeLifeline);
-  const [isFreeLevelDownAvailable, setIsFreeLevelDownAvailable] = useState(config.lifelines.free_daily.level_down || freeLifeline);
-  
-  const [lifelineBlock , setLifelineBlock] = useState(false);
+  const [isFiftyFiftyAvailable, setIsFiftyFiftyAvailable] = useState(
+    config.lifelines.max_per_session.fifty_fifty || maxLifeline
+  );
+  const [isThirtySecAvailable, setIsThirtySecAvailable] = useState(
+    config.lifelines.max_per_session.plus_30s || maxLifeline
+  );
+  const [isLevelDownAvailable, setIsLevelDownAvailable] = useState(
+    config.lifelines.max_per_session.level_down || maxLifeline
+  );
+
+  const [isFreeFiftyFiftyAvailable, setIsFreeFiftyFiftyAvailable] = useState(
+    config.lifelines.free_daily.fifty_fifty || freeLifeline
+  );
+  const [isFreeThirtySecAvailable, setIsFreeThirtySecAvailable] = useState(
+    config.lifelines.free_daily.plus_30s || freeLifeline
+  );
+  const [isFreeLevelDownAvailable, setIsFreeLevelDownAvailable] = useState(
+    config.lifelines.free_daily.level_down || freeLifeline
+  );
+
+  const [lifelineBlock, setLifelineBlock] = useState(false);
   const [disabledOptions, setDisabledOptions] = useState<number[]>([]);
   const [extraTime, setExtraTime] = useState(0);
-  
+
   const [screenState, setScreenState] = useState('playing');
   const [currentScore, setCurrentScore] = useState<number>(0);
-  
+
   const [showPopup, setShowPopup] = useState(false);
   const [showAdPopup, setShowAdPopup] = useState(false);
-  
+
   // console.log("fifty : ", isFiftyFiftyAvailable);
   // console.log("check : ", isChecking);
   // console.log("show ans : ", showResult);
-  
+
   // timer variable
   const [remainingTime, setRemainingTime] = useState(INITIAL_TIME);
   const [isRunning, setIsRunning] = useState(false);
@@ -150,9 +184,8 @@ export default function QuestionScreen() {
     useState<boolean>(false);
   const questionStartRemainingRef = useRef<number>(0);
 
-    // console.log('lifelineBlock ========== ',lifelineBlock);
+  // console.log('lifelineBlock ========== ',lifelineBlock);
 
-  
   const handleDailySessionSubmit = async () => {
     setIsSubmittingSession(true);
     // setErr(null);
@@ -203,7 +236,7 @@ export default function QuestionScreen() {
     userId: session.userId,
     sessionId: session.sessionId,
   };
-  const {stopFeedback} = useFeedback();
+  const { stopFeedback } = useFeedback();
 
   useEffect(() => {
     // stopFeedback('lobby');
@@ -285,7 +318,7 @@ export default function QuestionScreen() {
     }
 
     setIsRunning(true);
-    
+
     startTimeRef.current = Date.now();
     pausedTimeRef.current = initialTime;
     setRemainingTime(initialTime);
@@ -393,7 +426,6 @@ export default function QuestionScreen() {
   const blinkAnims = useRef(
     Array.from({ length: 10 }, () => new Animated.Value(1))
   ).current;
-
 
   const scaleAnims = useRef(
     Array.from({ length: 10 }, () => new Animated.Value(1))
@@ -553,16 +585,27 @@ export default function QuestionScreen() {
             session.sessionType === SessionType.DAILY ||
             session.sessionType === SessionType.INSTANT
           ) {
-            
             setCurrentScore(response.data.currentScore);
             setCorrectAnswer(response.data.correctAnswer);
             setTimeout(() => {
               setShowPopup(false);
-              resetQuestion();
-              setSanitizedQuestion(response.data.nextQuestion);
-              setLifelineBlock(false);
-              questionStartRemainingRef.current = remainingMs;
-              resumeDailyTimer();
+              if (session.sessionType === SessionType.DAILY && shouldShowAd()) {
+                setShowAdPopup(true);
+                setTimeout(() => {
+                  setShowAdPopup(false);
+                  resetQuestion();
+                  setSanitizedQuestion(response.data.nextQuestion);
+                  setLifelineBlock(false);
+                  questionStartRemainingRef.current = remainingMs;
+                  resumeDailyTimer();
+                }, 3000);
+              } else {
+                resetQuestion();
+                setSanitizedQuestion(response.data.nextQuestion);
+                setLifelineBlock(false);
+                questionStartRemainingRef.current = remainingMs;
+                resumeDailyTimer();
+              }
             }, 1200);
           } else if (session.sessionType === SessionType.SOLO) {
             setTimeout(() => {
@@ -644,30 +687,32 @@ export default function QuestionScreen() {
       sessionId: session.sessionId,
       questionId: sanitizedQuestion.id,
     };
-    
+
     applyFiftyfifty(payload)
-    .then((res) => {
-      console.log('50-50 response:', res);
-      if (res.success && res.disabledOptions) {
-        setDisabledOptions(res.disabledOptions);
-        if (
-          session.sessionType === SessionType.DAILY ||
-          session.sessionType === SessionType.INSTANT
-        ) {
-          console.log("🟢 resumeDailyTimer");
-          resumeDailyTimer();
-        } else {
-          startTimer();
+      .then((res) => {
+        console.log('50-50 response:', res);
+        if (res.success && res.disabledOptions) {
+          setDisabledOptions(res.disabledOptions);
+          if (
+            session.sessionType === SessionType.DAILY ||
+            session.sessionType === SessionType.INSTANT
+          ) {
+            console.log('🟢 resumeDailyTimer');
+            resumeDailyTimer();
+          } else {
+            startTimer();
+          }
+          const remainingFiftyFifty = isFiftyFiftyAvailable - 1;
+          setIsFiftyFiftyAvailable(
+            remainingFiftyFifty < 0 ? 0 : remainingFiftyFifty
+          );
+          if (remainingFiftyFifty <= maxLifeline - freeLifeline) {
+            console.log('🔴 LIMIT REACHED.');
+            setIsFreeFiftyFiftyAvailable(false);
+          }
+          setLifelineBlock(true);
         }
-        const remainingFiftyFifty = isFiftyFiftyAvailable - 1;
-        setIsFiftyFiftyAvailable(remainingFiftyFifty < 0 ? 0 : remainingFiftyFifty);
-        if(remainingFiftyFifty <= (maxLifeline - freeLifeline)){
-          console.log("🔴 LIMIT REACHED.");
-          setIsFreeFiftyFiftyAvailable(false);
-        }
-        setLifelineBlock(true);
-      }
-    })
+      })
       .catch((err) => {
         console.error('50-50 error:', err);
         alert('Error applying 50-50. Please try again.');
@@ -709,7 +754,7 @@ export default function QuestionScreen() {
     // addExtraTime(+30000);
     const remainingThirtySec = isThirtySecAvailable - 1;
     setIsThirtySecAvailable(remainingThirtySec < 0 ? 0 : remainingThirtySec);
-    if(remainingThirtySec <= (maxLifeline - freeLifeline)){
+    if (remainingThirtySec <= maxLifeline - freeLifeline) {
       setIsFreeThirtySecAvailable(false);
     }
     setLifelineBlock(true);
@@ -720,9 +765,15 @@ export default function QuestionScreen() {
     showAd();
     handleLevelDownSubmit();
   };
-  
+
   const handleLevelDownSubmit = () => {
-    console.log(':::::::::::: Level Down CALLED ',isChecking , showResult , isLevelDownAvailable, lifelineBlock);
+    console.log(
+      ':::::::::::: Level Down CALLED ',
+      isChecking,
+      showResult,
+      isLevelDownAvailable,
+      lifelineBlock
+    );
     if (
       session.sessionType === SessionType.DAILY ||
       session.sessionType === SessionType.INSTANT
@@ -748,16 +799,18 @@ export default function QuestionScreen() {
           setSanitizedQuestion(res.data.newQuestion);
 
           const remainingLevelDown = isLevelDownAvailable - 1;
-          setIsLevelDownAvailable(remainingLevelDown < 0 ? 0 : remainingLevelDown);
+          setIsLevelDownAvailable(
+            remainingLevelDown < 0 ? 0 : remainingLevelDown
+          );
 
-          if (remainingLevelDown <= (maxLifeline - freeLifeline)) {
+          if (remainingLevelDown <= maxLifeline - freeLifeline) {
             setIsFreeLevelDownAvailable(false);
           }
           if (
             session.sessionType === SessionType.DAILY ||
             session.sessionType === SessionType.INSTANT
           ) {
-            console.log("🟢 resumeDailyTimer");
+            console.log('🟢 resumeDailyTimer');
             resumeDailyTimer();
           } else {
             startTimer();
@@ -779,185 +832,192 @@ export default function QuestionScreen() {
       case 'playing':
       default:
         return (
-          <View
-            style={styles.container}
-          >
+          <View style={styles.container}>
             <ScrollView
               bounces={false}
               alwaysBounceVertical={false}
               showsVerticalScrollIndicator={false}
               style={styles.scrollView}
             >
-            <SafeAreaView style={styles.safe}>
-              <AdBanner />
-              <View style={styles.detailsBox}>
-                <View style={styles.questionMeta}>
-                  <Text style={styles.questionNumber}>
-                    Q : <Text>{sanitizedQuestion.questionIndex}</Text>
-                  </Text>
-                  <Text style={styles.questionLevel}>
-                    Level : <Text>{sanitizedQuestion.level}</Text>
-                  </Text>
-                </View>
-                <Text style={styles.question}>{QuestionString}</Text>
-              </View>
-
-              <View style={styles.answerMeta}>
-                <View style={styles.timer}>
-                  <AntDesign
-                    name="clock-circle"
-                    size={20}
-                    color={colors.textSecondary}
-                  />
-                  {session.sessionType === SessionType.SOLO ? (
-                    <Text style={styles.time}>
-                      {formattedTime(remainingTime)}
+              <SafeAreaView style={styles.safe}>
+                <AdBanner />
+                <View style={styles.detailsBox}>
+                  <View style={styles.questionMeta}>
+                    <Text style={styles.questionNumber}>
+                      Q : <Text>{sanitizedQuestion.questionIndex}</Text>
                     </Text>
-                  ) : (
-                    <Text style={styles.time}>{formatTime(remainingMs)}</Text>
-                  )}
+                    <Text style={styles.questionLevel}>
+                      Level : <Text>{sanitizedQuestion.level}</Text>
+                    </Text>
+                  </View>
+                  <Text style={styles.question}>{QuestionString}</Text>
                 </View>
-                <View style={styles.hintBox}>
-                  <Text style={styles.hintText}>
-                    {isChecking
-                      ? 'Checking... 🤔'
-                      : showResult
-                        ? answer === correctAnswer
-                          ? 'Correct! 🎉'
-                          : 'Wrong! 😢'
-                        : 'Are you sure 💭 ?'}
-                  </Text>
+
+                <View style={styles.answerMeta}>
+                  <View style={styles.timer}>
+                    <AntDesign
+                      name="clock-circle"
+                      size={20}
+                      color={colors.textSecondary}
+                    />
+                    {session.sessionType === SessionType.SOLO ? (
+                      <Text style={styles.time}>
+                        {formattedTime(remainingTime)}
+                      </Text>
+                    ) : (
+                      <Text style={styles.time}>{formatTime(remainingMs)}</Text>
+                    )}
+                  </View>
+                  <View style={styles.hintBox}>
+                    <Text style={styles.hintText}>
+                      {isChecking
+                        ? 'Checking... 🤔'
+                        : showResult
+                          ? answer === correctAnswer
+                            ? 'Correct! 🎉'
+                            : 'Wrong! 😢'
+                          : 'Are you sure 💭 ?'}
+                    </Text>
+                  </View>
                 </View>
-              </View>
 
-              <View style={styles.questionArea}>
-                <View style={styles.optionsContainer}>
-                  {keypadLayout.map((row, rowIndex) => (
-                    <View key={rowIndex} style={styles.row}>
-                      {row.map((value) => {
-                        const isDisabled = disabledOptions.includes(value);
-                        const isSelected = answer === value;
-                        const isCorrect = showResult && value === correctAnswer;
-                        const isWrong =
-                          showResult &&
-                          value === answer &&
-                          value !== correctAnswer;
+                <View style={styles.questionArea}>
+                  <View style={styles.optionsContainer}>
+                    {keypadLayout.map((row, rowIndex) => (
+                      <View key={rowIndex} style={styles.row}>
+                        {row.map((value) => {
+                          const isDisabled = disabledOptions.includes(value);
+                          const isSelected = answer === value;
+                          const isCorrect =
+                            showResult && value === correctAnswer;
+                          const isWrong =
+                            showResult &&
+                            value === answer &&
+                            value !== correctAnswer;
 
-                        return (
-                          <Animated.View
-                            key={value}
-                            style={{
-                              opacity: isChecking
-                                ? blinkAnims[value]
-                                : isDisabled
-                                  ? 0.3
-                                  : 1,
-                              transform: [
-                                { scale: isChecking ? scaleAnims[value] : 1 },
-                              ],
-                            }}
-                          >
-                            <TouchableOpacity
-                              disabled={isChecking || showResult || isDisabled}
-                              style={[
-                                styles.optionBtn,
-                                isSelected &&
-                                  !showResult &&
-                                  styles.optionBtnSelected,
-                                isCorrect && styles.optionBtnCorrect,
-                                isWrong && styles.optionBtnWrong,
-                                isDisabled && styles.optionBtnDisabled,
-                              ]}
-                              onPress={() => handleSelect(value)}
+                          return (
+                            <Animated.View
+                              key={value}
+                              style={{
+                                opacity: isChecking
+                                  ? blinkAnims[value]
+                                  : isDisabled
+                                    ? 0.3
+                                    : 1,
+                                transform: [
+                                  { scale: isChecking ? scaleAnims[value] : 1 },
+                                ],
+                              }}
                             >
-                              <Text
+                              <TouchableOpacity
+                                disabled={
+                                  isChecking || showResult || isDisabled
+                                }
                                 style={[
-                                  styles.optionText,
+                                  styles.optionBtn,
                                   isSelected &&
                                     !showResult &&
-                                    styles.optionTextSelected,
-                                  (isCorrect || isWrong) &&
-                                    styles.optionTextResult,
+                                    styles.optionBtnSelected,
+                                  isCorrect && styles.optionBtnCorrect,
+                                  isWrong && styles.optionBtnWrong,
+                                  isDisabled && styles.optionBtnDisabled,
                                 ]}
+                                onPress={() => handleSelect(value)}
                               >
-                                {value}
-                              </Text>
-                            </TouchableOpacity>
-                          </Animated.View>
-                        );
-                      })}
-                    </View>
-                  ))}
+                                <Text
+                                  style={[
+                                    styles.optionText,
+                                    isSelected &&
+                                      !showResult &&
+                                      styles.optionTextSelected,
+                                    (isCorrect || isWrong) &&
+                                      styles.optionTextResult,
+                                  ]}
+                                >
+                                  {value}
+                                </Text>
+                              </TouchableOpacity>
+                            </Animated.View>
+                          );
+                        })}
+                      </View>
+                    ))}
+                  </View>
                 </View>
-              </View>
 
-              <View style={[styles.lifelineBox, lifelineBlock && { opacity: 0.6 }]}>
-                <TouchableOpacity
-                  style={styles.lifelineBtn}
-                  disabled={isChecking || showResult || lifelineBlock}
-                  onPress={
-                    isFreeFiftyFiftyAvailable
-                      ? handleFiftyfiftySubmit
-                      : handleFiftyfiftySubmitWithAd
-                  }
+                <View
+                  style={[
+                    styles.lifelineBox,
+                    lifelineBlock && { opacity: 0.6 },
+                  ]}
                 >
-                  <Text style={styles.lifelineBtnText}>50-50</Text>
-                  {!isFreeFiftyFiftyAvailable ? (
-                    <Text style={styles.adText}>Ad</Text>
-                  ) : (
-                    <></>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.lifelineBtn}
-                  disabled={isChecking || showResult  || lifelineBlock}
-                  onPress={
-                    isFreeThirtySecAvailable
-                      ? handleThirtyPlusSubmit
-                      : handleThirtyPlusSubmitWithAd
-                  }
-                >
-                  <Text style={styles.lifelineBtnText}>+30 Sec</Text>
-                  {!isFreeThirtySecAvailable ? (
-                    <Text style={styles.adText}>Ad</Text>
-                  ) : (
-                    <></>
-                  )}
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.lifelineBtn}
-                  disabled={isChecking || showResult || lifelineBlock}
-                  onPress={
-                    isFreeLevelDownAvailable
-                      ? handleLevelDownSubmit
-                      : handleLevelDownWithAd
-                  }
-                >
-                  <Text style={styles.lifelineBtnText}>Level Down</Text>
-                  {!isFreeLevelDownAvailable ? (
-                    <Text style={styles.adText}>Ad</Text>
-                  ) : (
-                    <></>
-                  )}
-                </TouchableOpacity>
-              </View>
+                  <TouchableOpacity
+                    style={styles.lifelineBtn}
+                    disabled={isChecking || showResult || lifelineBlock}
+                    onPress={
+                      isFreeFiftyFiftyAvailable
+                        ? handleFiftyfiftySubmit
+                        : handleFiftyfiftySubmitWithAd
+                    }
+                  >
+                    <Text style={styles.lifelineBtnText}>50-50</Text>
+                    {!isFreeFiftyFiftyAvailable ? (
+                      <Text style={styles.adText}>Ad</Text>
+                    ) : (
+                      <></>
+                    )}
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.lifelineBtn}
+                    disabled={isChecking || showResult || lifelineBlock}
+                    onPress={
+                      isFreeThirtySecAvailable
+                        ? handleThirtyPlusSubmit
+                        : handleThirtyPlusSubmitWithAd
+                    }
+                  >
+                    <Text style={styles.lifelineBtnText}>+30 Sec</Text>
+                    {!isFreeThirtySecAvailable ? (
+                      <Text style={styles.adText}>Ad</Text>
+                    ) : (
+                      <></>
+                    )}
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={styles.lifelineBtn}
+                    disabled={isChecking || showResult || lifelineBlock}
+                    onPress={
+                      isFreeLevelDownAvailable
+                        ? handleLevelDownSubmit
+                        : handleLevelDownWithAd
+                    }
+                  >
+                    <Text style={styles.lifelineBtnText}>Level Down</Text>
+                    {!isFreeLevelDownAvailable ? (
+                      <Text style={styles.adText}>Ad</Text>
+                    ) : (
+                      <></>
+                    )}
+                  </TouchableOpacity>
+                </View>
 
-              <ResultPopup
-                key={sanitizedQuestion.id}
-                visible={showPopup}
-                isCorrect={answer !== null && answer === correctAnswer}
-                correctAnswer={correctAnswer ?? 0}
-                userAnswer={answer}
-                onClose={() => setShowPopup(false)}
-                colors={colors}
-              />
-              {showAdPopup ? (
-                <View style={styles.adScreen}>ad here</View>
-              ) : (
-                <></>
-              )}
-            </SafeAreaView>
+                <ResultPopup
+                  key={sanitizedQuestion.id}
+                  visible={showPopup}
+                  isCorrect={answer !== null && answer === correctAnswer}
+                  correctAnswer={correctAnswer ?? 0}
+                  userAnswer={answer}
+                  onClose={() => setShowPopup(false)}
+                  colors={colors}
+                />
+              </SafeAreaView>
             </ScrollView>
+            {showAdPopup && (
+              <View style={styles.adScreen}>
+                <Text style={styles.adTitle}>Advertisement</Text>
+                <Text style={styles.adSubtitle}>Dummy Ad Screen</Text>
+              </View>
+            )}
           </View>
         );
       case 'finished':
@@ -984,7 +1044,7 @@ const makeStyles = (colors: ColorScheme) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.bgPrimary
+      backgroundColor: colors.bgPrimary,
     },
     safe: {
       padding: 16,
@@ -1135,7 +1195,7 @@ const makeStyles = (colors: ColorScheme) =>
       borderRadius: 10,
       alignItems: 'center',
       justifyContent: 'center',
-      overflow: 'hidden'
+      overflow: 'hidden',
     },
     adText: {
       position: 'absolute',
@@ -1150,16 +1210,16 @@ const makeStyles = (colors: ColorScheme) =>
       // backgroundColor: colors.border,
       opacity: 0.8,
     },
-    adScreen: {
-      position: 'absolute',
-      width: '100%',
-      height: '100%',
-      backgroundColor: 'rgba(0, 0, 0, 0.8)',
-      alignItems: 'center',
-      justifyContent: 'center',
-      color: '#fff',
-      opacity: 50,
-    },
+    // adScreen: {
+    //   position: 'absolute',
+    //   width: '100%',
+    //   height: '100%',
+    //   backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    //   alignItems: 'center',
+    //   justifyContent: 'center',
+    //   color: '#fff',
+    //   opacity: 50,
+    // },
     lifelineBtnText: {
       fontSize: 16,
       fontWeight: 'bold',
@@ -1184,5 +1244,29 @@ const makeStyles = (colors: ColorScheme) =>
       color: colors.textSecondary,
       fontSize: 20,
       fontWeight: '700',
+    },
+    adScreen: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'black',
+      justifyContent: 'center',
+      alignItems: 'center',
+      zIndex: 9999,
+      elevation: 9999,
+    },
+
+    adTitle: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      color: 'white',
+    },
+
+    adSubtitle: {
+      marginTop: 10,
+      fontSize: 18,
+      color: 'white',
     },
   });
