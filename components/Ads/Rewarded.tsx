@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   RewardedAd,
   RewardedAdEventType,
-  AdEventType,           // ✅ IMPORT THIS
+  AdEventType,
   TestIds,
 } from 'react-native-google-mobile-ads';
 
