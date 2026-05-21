@@ -8,6 +8,7 @@ import {
 import { api } from './client';
 import { ApiHandledError, parseApiError } from './parseApiError';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 export const getDailyAttempts = async () => {
   try {
@@ -44,7 +45,8 @@ export const getDailyTournamentDetails = async () => {
   }
 };
 
-export const createDailySession = async (): Promise<createDailySessionResponse> => {
+export const createDailySession =
+  async (): Promise<createDailySessionResponse> => {
     try {
       const token = (await AsyncStorage.getItem('token')) as string;
       const res = await api({
@@ -133,6 +135,27 @@ export const fetchDailyLeaderboard = async (page: number) => {
     const resData: LeaderboardRes = res.data;
     const { leaderboard } = resData.data;
     return leaderboard;
+  } catch (err: any) {
+    console.log('Error fetching leaderboard: ', err);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
+  }
+};
+
+export const fetchAllTimeLeaderboard = async () => {
+  try {
+    console.log('get request to fetch all time leaderboard...');
+    const token = (await AsyncStorage.getItem('token')) as string;
+    const res = await api({
+      method: 'get',
+      url: 'api/cron/dailyUserLeaderboard',
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      },
+    });
+    const resData = res.data;
+    const { result } = resData.data;
+    return result;
   } catch (err: any) {
     console.log('Error fetching leaderboard: ', err);
     const { status, message } = parseApiError(err);

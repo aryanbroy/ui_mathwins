@@ -5,9 +5,15 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { dummyUsers } from './(hometab)';
 import LeaderboardCard from '@/components/Home/LeaderboardCard';
 import { useEffect, useState } from 'react';
-import { fetchDailyLeaderboard } from '@/lib/api/dailyTournament';
+import {
+  fetchAllTimeLeaderboard,
+  fetchDailyLeaderboard,
+} from '@/lib/api/dailyTournament';
 import { InstantTournamentCard } from '@/components/Home/InstantTournamentCard';
-import { fetchInstantSessionLeaderboard, fetchPastTournaments } from '@/lib/api/instantTournament';
+import {
+  fetchInstantSessionLeaderboard,
+  fetchPastTournaments,
+} from '@/lib/api/instantTournament';
 import { InstantParticipant } from '@/types/api/instant';
 import TopThreePodium from '@/components/Leaderboard/TopThreePodium';
 import { useNavigation } from 'expo-router';
@@ -22,6 +28,15 @@ type RankedLeaderboard = {
   bestScore: number;
   user: { username: string };
   rank: number;
+};
+
+type AllTimeLeaderboardUser = {
+  userId: string;
+  rank: number;
+  totalCoinPoints: number;
+  user: {
+    username: string;
+  };
 };
 
 export default function LeaderBoard() {
@@ -40,6 +55,9 @@ export default function LeaderBoard() {
   >(null);
   const [showInstantSessions, setShowInstantSessions] = useState(true);
   const [instantLeaderoard, setInstantLearboard] = useState<any>([]);
+  const [allTimeLeaderboardUsers, setAllTimeLeaderboardUsers] = useState<
+    AllTimeLeaderboardUser[]
+  >([]);
 
   useEffect(() => {
     const getDailyLeaderboard = async () => {
@@ -73,8 +91,10 @@ export default function LeaderBoard() {
       setErrMsg(null);
       console.log('fetching instant tournaments');
       try {
-        const tournaments: InstantParticipant[] = await fetchPastTournaments();
-        setInstantTournamentsPlayed(tournaments);
+        console.log('fetching all time leaderboard');
+        const leaderboard: AllTimeLeaderboardUser[] =
+          await fetchAllTimeLeaderboard();
+        setAllTimeLeaderboardUsers(leaderboard);
       } catch (err: any) {
         setErrMsg(err?.message ?? 'Failed to load daily attempts');
       }
@@ -85,35 +105,45 @@ export default function LeaderBoard() {
     } else if (activeTab === 'instant') {
       getInstantTournaments();
     } else if (activeTab === 'allTime') {
-      getInstantTournaments();
+      getAllTimeLeaderboard();
     }
   }, [activeTab, page]);
 
   const onClickInstantCard = (tournamentId: string) => {
-    fetchInstantSessionLeaderboard(tournamentId).then((res)=>{
-      console.log("onClickInstantCard : ",res);
-      setInstantLearboard(res);
-      setShowInstantSessions(false);
-    }).catch(
-
-    );
+    fetchInstantSessionLeaderboard(tournamentId)
+      .then((res) => {
+        console.log('onClickInstantCard : ', res);
+        setInstantLearboard(res);
+        setShowInstantSessions(false);
+      })
+      .catch();
   };
 
   const renderContent = () => {
     console.log('active tab: ', activeTab);
     switch (activeTab) {
       case 'allTime':
-        return dummyUsers.length > 3 ? (
+        return allTimeLeaderboardUsers.length > 3 ? (
           <>
             <TopThreePodium />
-            {dummyUsers.slice(3).map((u) => (
-              <LeaderboardCard key={`all-${u.rank}`} {...u} />
+            {allTimeLeaderboardUsers.slice(3).map((u) => (
+              <LeaderboardCard
+                rank={u.rank}
+                key={u.userId}
+                name={u.user.username}
+                points={u.totalCoinPoints}
+              />
             ))}
           </>
         ) : (
           <>
-            {dummyUsers.map((u) => (
-              <LeaderboardCard key={`all-${u.rank}`} {...u} />
+            {allTimeLeaderboardUsers.map((u) => (
+              <LeaderboardCard
+                rank={u.rank}
+                key={u.userId}
+                name={u.user.username}
+                points={u.totalCoinPoints}
+              />
             ))}
           </>
         );
@@ -133,113 +163,111 @@ export default function LeaderBoard() {
       case 'instant':
         return (
           <>
-            {
-              showInstantSessions ?
-              instantTournamentsPlayed?.map((tournament) => (
-                <InstantTournamentCard
-                  key={tournament.tournamentId}
-                  joinedCount={tournament.tournament.playersCount}
-                  maxPlayers={tournament.tournament.maxPlayers}
-                  expiresAt={tournament.tournament.expiresAt}
-                  status={tournament.tournament.status}
-                  onPress={() => onClickInstantCard(tournament.tournamentId)}
-                /> 
-              ))
-              :
-              instantLeaderoard?.map((item:any)=>(
-                <LeaderboardCard
-                  rank={item.rank}
-                  key={item.userId}
-                  name={item.user.username}
-                  points={item.bestScore}
-                />
-              ))
-            }
+            {showInstantSessions
+              ? instantTournamentsPlayed?.map((tournament) => (
+                  <InstantTournamentCard
+                    key={tournament.tournamentId}
+                    joinedCount={tournament.tournament.playersCount}
+                    maxPlayers={tournament.tournament.maxPlayers}
+                    expiresAt={tournament.tournament.expiresAt}
+                    status={tournament.tournament.status}
+                    onPress={() => onClickInstantCard(tournament.tournamentId)}
+                  />
+                ))
+              : instantLeaderoard?.map((item: any) => (
+                  <LeaderboardCard
+                    rank={item.rank}
+                    key={item.userId}
+                    name={item.user.username}
+                    points={item.bestScore}
+                  />
+                ))}
           </>
         );
     }
   };
 
   return (
-      <SafeAreaView style={styles.safeArea}>
-        <View style={styles.tabsRow}>
-          <Tab
-            label="All Time"
-            onPress={() => setActiveTab('allTime')}
-            active={activeTab === 'allTime'}
-          />
-          <Tab
-            label="Daily Mode"
-            onPress={() => setActiveTab('daily')}
-            active={activeTab === 'daily'}
-          />
-          <Tab
-            label="Instant"
-            onPress={() => setActiveTab('instant')}
-            active={activeTab === 'instant'}
-          />
-        </View>
+    <SafeAreaView style={styles.safeArea}>
+      <View style={styles.tabsRow}>
+        <Tab
+          label="All Time"
+          onPress={() => setActiveTab('allTime')}
+          active={activeTab === 'allTime'}
+        />
+        <Tab
+          label="Daily Mode"
+          onPress={() => setActiveTab('daily')}
+          active={activeTab === 'daily'}
+        />
+        <Tab
+          label="Instant"
+          onPress={() => setActiveTab('instant')}
+          active={activeTab === 'instant'}
+        />
+      </View>
 
-        <ScrollView
-          contentContainerStyle={styles.scrollContent}
-          showsVerticalScrollIndicator={false}
-          style={{ flex: 1 }}
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1 }}
+      >
+        <LinearGradient
+          colors={[colors.gradients.surface[1], colors.gradients.surface[0]]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 0, y: 1 }}
+          style={styles.bottomGradient}
         >
-          <LinearGradient
-            colors={[colors.gradients.surface[1], colors.gradients.surface[0]]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 0, y: 1 }}
-            style={styles.bottomGradient}
-          >
-            {errMsg != null ? (
-              <>
-                <Text style={styles.placeholder}>
-                  Error fetching leaderboard! Try again later
-                </Text>
-                {/* <TouchableOpacity onPress={retry}>Press me</TouchableOpacity> */}
-              </>
-            ) : (
-              renderContent()
-            )}
-          </LinearGradient>
-        </ScrollView>
-      </SafeAreaView>
+          {errMsg != null ? (
+            <>
+              <Text style={styles.placeholder}>
+                Error fetching leaderboard! Try again later
+              </Text>
+              {/* <TouchableOpacity onPress={retry}>Press me</TouchableOpacity> */}
+            </>
+          ) : (
+            renderContent()
+          )}
+        </LinearGradient>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
-const makeStyles = (colors: ColorScheme) => StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
-  safeArea: {
-    flex: 1,
-    marginBottom: -30,
-    backgroundColor: colors.bgPrimary
-  },
-  tabsRow: {
-    flexDirection: 'row',
-    marginTop: 80,
-    marginBottom: 24,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  bottomGradient: {
-    width: '100%',
-    borderTopRightRadius: 20,
-    borderTopLeftRadius: 20,
-    overflow: 'hidden',
-    paddingVertical: 20,
-    paddingHorizontal: 16,
-    minHeight: '100%',
-  },
-  placeholder: {
-    textAlign: 'center',
-    paddingVertical: 40,
-    color: '#555',
-    fontWeight: '600',
-  },
-});
+const makeStyles = (colors: ColorScheme) =>
+  StyleSheet.create({
+    gradient: {
+      flex: 1,
+    },
+    safeArea: {
+      flex: 1,
+      marginBottom: -30,
+      backgroundColor: colors.bgPrimary,
+    },
+    tabsRow: {
+      flexDirection: 'row',
+      marginTop: 80,
+      marginBottom: 24,
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: 16,
+    },
+    scrollContent: {
+      flexGrow: 1,
+    },
+    bottomGradient: {
+      width: '100%',
+      borderTopRightRadius: 20,
+      borderTopLeftRadius: 20,
+      overflow: 'hidden',
+      paddingVertical: 20,
+      paddingHorizontal: 16,
+      minHeight: '100%',
+    },
+    placeholder: {
+      textAlign: 'center',
+      paddingVertical: 40,
+      color: '#555',
+      fontWeight: '600',
+    },
+  });

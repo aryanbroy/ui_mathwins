@@ -167,7 +167,7 @@ export default function QuestionScreen() {
   const [currentScore, setCurrentScore] = useState<number>(0);
 
   const [showPopup, setShowPopup] = useState(false);
-  const [showAdPopup, setShowAdPopup] = useState(false);
+  // const [showAdPopup, setShowAdPopup] = useState(false);
 
   // console.log("fifty : ", isFiftyFiftyAvailable);
   // console.log("check : ", isChecking);
@@ -587,25 +587,26 @@ export default function QuestionScreen() {
           ) {
             setCurrentScore(response.data.currentScore);
             setCorrectAnswer(response.data.correctAnswer);
-            setTimeout(() => {
+            setTimeout(async () => {
               setShowPopup(false);
               if (session.sessionType === SessionType.DAILY && shouldShowAd()) {
-                setShowAdPopup(true);
-                setTimeout(() => {
-                  setShowAdPopup(false);
-                  resetQuestion();
-                  setSanitizedQuestion(response.data.nextQuestion);
-                  setLifelineBlock(false);
-                  questionStartRemainingRef.current = remainingMs;
-                  resumeDailyTimer();
-                }, 3000);
-              } else {
-                resetQuestion();
-                setSanitizedQuestion(response.data.nextQuestion);
-                setLifelineBlock(false);
-                questionStartRemainingRef.current = remainingMs;
-                resumeDailyTimer();
+                await showAd();
+
+                // setShowAdPopup(true);
+                // setTimeout(() => {
+                //   setShowAdPopup(false);
+                //   resetQuestion();
+                //   setSanitizedQuestion(response.data.nextQuestion);
+                //   setLifelineBlock(false);
+                //   questionStartRemainingRef.current = remainingMs;
+                //   resumeDailyTimer();
+                // }, 3000);
               }
+              resetQuestion();
+              setSanitizedQuestion(response.data.nextQuestion);
+              setLifelineBlock(false);
+              questionStartRemainingRef.current = remainingMs;
+              resumeDailyTimer();
             }, 1200);
           } else if (session.sessionType === SessionType.SOLO) {
             setTimeout(() => {
@@ -1012,12 +1013,12 @@ export default function QuestionScreen() {
                 />
               </SafeAreaView>
             </ScrollView>
-            {showAdPopup && (
-              <View style={styles.adScreen}>
-                <Text style={styles.adTitle}>Advertisement</Text>
-                <Text style={styles.adSubtitle}>Dummy Ad Screen</Text>
-              </View>
-            )}
+            {/* {showAdPopup && ( */}
+            {/*   <View style={styles.adScreen}> */}
+            {/*     <Text style={styles.adTitle}>Advertisement</Text> */}
+            {/*     <Text style={styles.adSubtitle}>Dummy Ad Screen</Text> */}
+            {/*   </View> */}
+            {/* )} */}
           </View>
         );
       case 'finished':

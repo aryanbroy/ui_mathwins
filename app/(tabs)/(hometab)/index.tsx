@@ -92,7 +92,7 @@ export default function Index() {
       contentContainerStyle={styles.contentContainer}
     >
       <SafeAreaView style={styles.safe}>
-        <AdBanner/>
+        <AdBanner />
         <View style={styles.topSection}>
           <BackgroundTexture />
           <Header />
@@ -112,10 +112,12 @@ export default function Index() {
               points={points}
             />
           ))}
-          <HomeBtn onPress={() => {
-            router.navigate('../../(tabs)/leaderBoard');
-            // navigation.navigate('');
-          }} />
+          <HomeBtn
+            onPress={() => {
+              router.navigate('../../(tabs)/leaderBoard');
+              // navigation.navigate('');
+            }}
+          />
         </LinearGradient>
       </SafeAreaView>
     </ScrollView>
@@ -153,4 +155,3 @@ const makeStyles = (colors: ColorScheme) =>
       paddingHorizontal: 16,
     },
   });
-
