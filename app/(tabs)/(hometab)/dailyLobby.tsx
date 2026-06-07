@@ -108,7 +108,7 @@ export default function DailyScreen() {
       }
       const res = await finalSubmission({ sessionId });
       const data = res.data;
-      navigation.navigate('HomeMain');
+      navigation.navigate('homeMain');
       console.log(data);
     } catch (err: any) {
       setErr(err);
