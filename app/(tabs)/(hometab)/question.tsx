@@ -82,7 +82,7 @@ export default function QuestionScreen() {
   const dailyTimer = config.daily_tournament.duration_sec * 1000;
   const INITIAL_TIME = config.single_player.round_timeout_sec * 1000;
 
-  // Question and Session State
+  // ─── Question and Session State ───────────────────────────────────────────
   const [sanitizedQuestion, setSanitizedQuestion] = useState(
     route.params.sanitizedQuestion as sanitizedQuestionType
   );
@@ -90,52 +90,46 @@ export default function QuestionScreen() {
   const [answer, setAnswer] = useState<number | null>(null);
   const [round, setRound] = useState(1);
 
-  // UI State
+  // ─── UI State ─────────────────────────────────────────────────────────────
   const [loading, setLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(false);
   const [correctAnswer, setCorrectAnswer] = useState<number | null>(null);
   const [showResult, setShowResult] = useState(false);
 
-  // Timer State
+  // ─── Timer State ──────────────────────────────────────────────────────────
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [remainingMs, setRemainingMs] = useState(dailyTimer); // convert this to 5 mins later
+  const [remainingMs, setRemainingMs] = useState(dailyTimer);
   const [isPaused, setIsPaused] = useState(false);
   const pausedRemainingRef = useRef(remainingMs);
 
+  // ─── Per-minute ad tracking ───────────────────────────────────────────────
+  // Tracks which elapsed minute we last showed an ad for, so we fire once per minute.
   const lastAdMinuteRef = useRef<number>(0);
 
   const shouldShowAd = (): boolean => {
-    if (session.sessionType !== SessionType.DAILY) {
-      return false;
-    }
+    if (session.sessionType !== SessionType.DAILY) return false;
 
-    const elapsedMs = dailyTimer - remainingMs;
-
+    const elapsedMs = dailyTimer - pausedRemainingRef.current;
     const currentMinute = Math.floor(elapsedMs / 60000);
 
-    if (currentMinute <= 0) {
-      return false;
-    }
-
+    // Never fire at minute 0 (first question), and only fire once per minute mark
+    if (currentMinute <= 0) return false;
     if (currentMinute > lastAdMinuteRef.current) {
       lastAdMinuteRef.current = currentMinute;
       return true;
     }
-
     return false;
   };
 
-  // "free_daily": {
-  //   "plus_30s": 0,
-  //   "level_down": 1,
-  //   "fifty_fifty": 1
-  // },
-  // "max_per_session": {
-  //   "plus_30s": 1,
-  //   "level_down": 2,
-  //   "fifty_fifty": 3
-  // }
-  // Lifeline State
+  // ─── Ad moment state ──────────────────────────────────────────────────────
+  // When true: ResultPopup shows leaderboard + Continue triggers the ad
+  const [isAdMoment, setIsAdMoment] = useState(false);
+
+  // Holds the next question data so handlePopupContinue can access it
+  // after the async .then() closure has resolved
+  const nextQuestionRef = useRef<sanitizedQuestionType | null>(null);
+
+  // ─── Lifeline State ───────────────────────────────────────────────────────
   const maxLifeline = 5;
   const freeLifeline = 2;
 
@@ -167,28 +161,20 @@ export default function QuestionScreen() {
   const [currentScore, setCurrentScore] = useState<number>(0);
 
   const [showPopup, setShowPopup] = useState(false);
-  // const [showAdPopup, setShowAdPopup] = useState(false);
 
-  // console.log("fifty : ", isFiftyFiftyAvailable);
-  // console.log("check : ", isChecking);
-  // console.log("show ans : ", showResult);
-
-  // timer variable
+  // ─── Solo timer variables ─────────────────────────────────────────────────
   const [remainingTime, setRemainingTime] = useState(INITIAL_TIME);
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<number | null>(null);
   const startTimeRef = useRef<number>(0);
   const pausedTimeRef = useRef<number>(INITIAL_TIME);
 
-  const [isSubmittingSession, setIsSubmittingSession] =
-    useState<boolean>(false);
+  const [isSubmittingSession, setIsSubmittingSession] = useState<boolean>(false);
   const questionStartRemainingRef = useRef<number>(0);
 
-  // console.log('lifelineBlock ========== ',lifelineBlock);
-
+  // ─── Session submission ───────────────────────────────────────────────────
   const handleDailySessionSubmit = async () => {
     setIsSubmittingSession(true);
-    // setErr(null);
     console.log('submitting session');
     try {
       const res = await finalSubmission({ sessionId: session.sessionId });
@@ -196,7 +182,6 @@ export default function QuestionScreen() {
       console.log(data);
       navigation.navigate('homeMain');
     } catch (err: any) {
-      // handle error handle
       console.log(err);
     } finally {
       setIsSubmittingSession(false);
@@ -211,15 +196,12 @@ export default function QuestionScreen() {
       console.log('Submitted instant session: ', submissionRes);
       navigation.navigate('homeMain');
     } catch (err: any) {
-      // setErrMsg(err?.message ?? 'Failed to load start game');
       console.log(err);
     } finally {
       setIsSubmittingSession(false);
     }
   };
 
-  // Animation
-  // const blinkAnim = useRef(new Animated.Value(1)).current;
   if (!sanitizedQuestion) {
     const payload = {
       errorCode: 500,
@@ -236,10 +218,10 @@ export default function QuestionScreen() {
     userId: session.userId,
     sessionId: session.sessionId,
   };
+
   const { stopFeedback } = useFeedback();
 
   useEffect(() => {
-    // stopFeedback('lobby');
     if (session.sessionType === SessionType.SOLO) {
       startTimer();
     } else if (
@@ -254,7 +236,7 @@ export default function QuestionScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Timer function - DAILY & instant
+  // ─── Timer: DAILY & INSTANT ───────────────────────────────────────────────
   const handleDailyEnd = async () => {
     console.log('Daily timer finished');
     setAnswer(null);
@@ -271,25 +253,19 @@ export default function QuestionScreen() {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
-
     setIsPaused(true);
-
-    // Lock in the remaining value
     pausedRemainingRef.current = remainingMs;
   };
 
   const resumeDailyTimer = () => {
     if (!isPaused && intervalRef.current) return;
-
     setIsPaused(false);
 
     const resumeStart = Date.now();
 
     intervalRef.current = setInterval(() => {
       const elapsed = Date.now() - resumeStart;
-
       const newRemaining = pausedRemainingRef.current - elapsed;
-
       setRemainingMs(Math.max(newRemaining, 0));
 
       if (newRemaining <= 0) {
@@ -302,23 +278,18 @@ export default function QuestionScreen() {
 
   const startCountdownTimer = () => {
     if (intervalRef.current) return;
-
-    pausedRemainingRef.current = dailyTimer; // or 300000 for prod
+    pausedRemainingRef.current = dailyTimer;
     setRemainingMs(pausedRemainingRef.current);
-
     questionStartRemainingRef.current = pausedRemainingRef.current;
-
     resumeDailyTimer();
   };
 
-  // Timer function - SOLO
+  // ─── Timer: SOLO ──────────────────────────────────────────────────────────
   const startTimer = (initialTime: number = INITIAL_TIME) => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-
     setIsRunning(true);
-
     startTimeRef.current = Date.now();
     pausedTimeRef.current = initialTime;
     setRemainingTime(initialTime);
@@ -331,13 +302,13 @@ export default function QuestionScreen() {
       if (remaining <= 0) {
         setRemainingTime(0);
         stopTimer();
-        // Timer finished - trigger your callback here
         onTimerFinish();
       } else {
         setRemainingTime(remaining);
       }
     }, 10) as unknown as number;
   };
+
   const stopTimer = () => {
     console.log('Timer stopped');
     if (intervalRef.current) {
@@ -346,6 +317,7 @@ export default function QuestionScreen() {
     }
     setIsRunning(false);
   };
+
   const pauseTimer = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
@@ -355,11 +327,11 @@ export default function QuestionScreen() {
     setIsRunning(false);
     console.log('Timer paused at:', remainingTime);
   };
+
   const resumeTimer = () => {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-
     setIsRunning(true);
     startTimeRef.current = Date.now();
 
@@ -377,6 +349,7 @@ export default function QuestionScreen() {
       }
     }, 10) as unknown as number;
   };
+
   const addTime = (extraMs: number) => {
     const newTime = remainingTime + extraMs;
     pausedTimeRef.current = newTime;
@@ -386,11 +359,13 @@ export default function QuestionScreen() {
     }
     console.log(`Added ${extraMs}ms. New time: ${newTime}ms`);
   };
+
   const resetTimer = () => {
     stopTimer();
     setRemainingTime(INITIAL_TIME);
     pausedTimeRef.current = INITIAL_TIME;
   };
+
   const onTimerFinish = () => {
     console.log('Timer finished!');
     setAnswer(null);
@@ -401,6 +376,7 @@ export default function QuestionScreen() {
       navigation.navigate('homeMain');
     }, 1500);
   };
+
   const formattedTime = (ms: number) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -422,7 +398,7 @@ export default function QuestionScreen() {
     return INITIAL_TIME - remainingTime;
   };
 
-  // Animation Functions
+  // ─── Animation ────────────────────────────────────────────────────────────
   const blinkAnims = useRef(
     Array.from({ length: 10 }, () => new Animated.Value(1))
   ).current;
@@ -430,6 +406,7 @@ export default function QuestionScreen() {
   const scaleAnims = useRef(
     Array.from({ length: 10 }, () => new Animated.Value(1))
   ).current;
+
   const startPulseWave = () => {
     blinkAnims.forEach((anim) => anim.stopAnimation());
     scaleAnims.forEach((anim) => anim.stopAnimation());
@@ -442,28 +419,12 @@ export default function QuestionScreen() {
         Animated.loop(
           Animated.parallel([
             Animated.sequence([
-              Animated.timing(opacityAnim, {
-                toValue: 0.3,
-                duration: 600,
-                useNativeDriver: true,
-              }),
-              Animated.timing(opacityAnim, {
-                toValue: 1,
-                duration: 600,
-                useNativeDriver: true,
-              }),
+              Animated.timing(opacityAnim, { toValue: 0.3, duration: 600, useNativeDriver: true }),
+              Animated.timing(opacityAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
             ]),
             Animated.sequence([
-              Animated.timing(scaleAnim, {
-                toValue: 1.2,
-                duration: 600,
-                useNativeDriver: true,
-              }),
-              Animated.timing(scaleAnim, {
-                toValue: 1,
-                duration: 600,
-                useNativeDriver: true,
-              }),
+              Animated.timing(scaleAnim, { toValue: 1.2, duration: 600, useNativeDriver: true }),
+              Animated.timing(scaleAnim, { toValue: 1, duration: 600, useNativeDriver: true }),
             ]),
           ])
         ).start();
@@ -478,6 +439,7 @@ export default function QuestionScreen() {
     });
   };
 
+  // ─── Answer selection ─────────────────────────────────────────────────────
   const handleSelect = (value: number) => {
     console.log('Value: ', value);
     if (!isChecking && !showResult && !disabledOptions.includes(value)) {
@@ -532,8 +494,33 @@ export default function QuestionScreen() {
     }
   };
 
+  // ─── ResultPopup Continue handler ─────────────────────────────────────────
+  // This fires when the user taps "Continue" on the ResultPopup.
+  // For DAILY: if it's an ad moment, show the ad first, then load next question.
+  // Timer stays paused throughout — it only resumes after everything is done.
+  const handlePopupContinue = async () => {
+    setShowPopup(false);
+
+    if (isAdMoment) {
+      setIsAdMoment(false);
+      await showAd(); // ad plays here, after user explicitly tapped Continue
+    }
+
+    // Load next question and resume timer
+    resetQuestion();
+    if (nextQuestionRef.current) {
+      setSanitizedQuestion(nextQuestionRef.current);
+      nextQuestionRef.current = null;
+    }
+    setLifelineBlock(false);
+    questionStartRemainingRef.current = remainingMs;
+    resumeDailyTimer();
+  };
+
+  // ─── Submit answer ────────────────────────────────────────────────────────
   const handleSubmit = async (selectedAnswer: number) => {
     await playFeedback('submit');
+
     if (
       session.sessionType === SessionType.DAILY ||
       session.sessionType === SessionType.INSTANT
@@ -566,9 +553,9 @@ export default function QuestionScreen() {
 
         console.log('Response: ', response);
         console.log('answer: ', answer);
-        setShowPopup(true);
-        // Avoid double checking for session.sessionType === SessionType.?
-        let check =
+
+        // Determine success depending on session type
+        const check =
           session.sessionType === SessionType.SOLO
             ? response.data.success
             : response.success;
@@ -578,37 +565,34 @@ export default function QuestionScreen() {
         } else {
           await playFeedback('wrong');
         }
-        // if (response.data.success) {
+
         if (check) {
-          // previously response.data.success: later today
           if (
             session.sessionType === SessionType.DAILY ||
             session.sessionType === SessionType.INSTANT
           ) {
             setCurrentScore(response.data.currentScore);
             setCorrectAnswer(response.data.correctAnswer);
-            setTimeout(async () => {
-              setShowPopup(false);
-              if (session.sessionType === SessionType.DAILY && shouldShowAd()) {
-                await showAd();
 
-                // setShowAdPopup(true);
-                // setTimeout(() => {
-                //   setShowAdPopup(false);
-                //   resetQuestion();
-                //   setSanitizedQuestion(response.data.nextQuestion);
-                //   setLifelineBlock(false);
-                //   questionStartRemainingRef.current = remainingMs;
-                //   resumeDailyTimer();
-                // }, 3000);
-              }
-              resetQuestion();
-              setSanitizedQuestion(response.data.nextQuestion);
-              setLifelineBlock(false);
-              questionStartRemainingRef.current = remainingMs;
-              resumeDailyTimer();
-            }, 1200);
+            // ── KEY CHANGE ──────────────────────────────────────────────────
+            // Store the next question so handlePopupContinue can access it.
+            nextQuestionRef.current = response.data.nextQuestion;
+
+            // Decide now (while elapsed time is accurate) whether this answer
+            // crossed a 1-minute mark. The flag drives ResultPopup to show
+            // the leaderboard, and handlePopupContinue to fire the ad.
+            const adMoment =
+              session.sessionType === SessionType.DAILY && shouldShowAd();
+            setIsAdMoment(adMoment);
+            // ────────────────────────────────────────────────────────────────
+
+            // Show the popup. Timer stays paused — it only resumes inside
+            // handlePopupContinue after the user taps Continue (and the ad
+            // plays if adMoment is true).
+            setShowPopup(true);
+
           } else if (session.sessionType === SessionType.SOLO) {
+            setShowPopup(true);
             setTimeout(() => {
               setShowPopup(false);
               if (response.data.isRoundCompleted) {
@@ -630,6 +614,8 @@ export default function QuestionScreen() {
             }, 1500);
           }
         } else {
+          // Wrong answer — show popup briefly then navigate home
+          setShowPopup(true);
           setTimeout(async () => {
             setShowPopup(false);
             navigation.navigate('homeMain');
@@ -640,8 +626,6 @@ export default function QuestionScreen() {
         console.error('nextQuestion error:', err);
         stopBlinking();
         setIsChecking(false);
-        // redirect to errorScreen
-        // alert('');
         const payload = {
           errorCode: 500,
           errorMessage: 'Error submitting answer. Please try again.',
@@ -665,15 +649,13 @@ export default function QuestionScreen() {
 
   const { showAd } = useInterstitialAd();
 
-  // Lifeline: 50-50
+  // ─── Lifeline: 50-50 ──────────────────────────────────────────────────────
   const handleFiftyfiftySubmitWithAd = () => {
     showAd();
     handleFiftyfiftySubmit();
   };
+
   const handleFiftyfiftySubmit = () => {
-    // if (!isFiftyFiftyAvailable || isChecking || showResult) {
-    //   pauseTimer();
-    // }
     if (
       session.sessionType === SessionType.DAILY ||
       session.sessionType === SessionType.INSTANT
@@ -704,9 +686,7 @@ export default function QuestionScreen() {
             startTimer();
           }
           const remainingFiftyFifty = isFiftyFiftyAvailable - 1;
-          setIsFiftyFiftyAvailable(
-            remainingFiftyFifty < 0 ? 0 : remainingFiftyFifty
-          );
+          setIsFiftyFiftyAvailable(remainingFiftyFifty < 0 ? 0 : remainingFiftyFifty);
           if (remainingFiftyFifty <= maxLifeline - freeLifeline) {
             console.log('🔴 LIMIT REACHED.');
             setIsFreeFiftyFiftyAvailable(false);
@@ -723,15 +703,13 @@ export default function QuestionScreen() {
       });
   };
 
-  // Lifeline: +30 Seconds
+  // ─── Lifeline: +30 Seconds ────────────────────────────────────────────────
   const handleThirtyPlusSubmitWithAd = () => {
     showAd();
     handleThirtyPlusSubmit();
   };
+
   const handleThirtyPlusSubmit = () => {
-    // if (!isThirtySecAvailable || isChecking || showResult) {
-    //   pauseTimer();
-    // }
     if (
       session.sessionType === SessionType.DAILY ||
       session.sessionType === SessionType.INSTANT
@@ -752,7 +730,7 @@ export default function QuestionScreen() {
       setRemainingMs((prev) => prev + 30000);
       resumeDailyTimer();
     }
-    // addExtraTime(+30000);
+
     const remainingThirtySec = isThirtySecAvailable - 1;
     setIsThirtySecAvailable(remainingThirtySec < 0 ? 0 : remainingThirtySec);
     if (remainingThirtySec <= maxLifeline - freeLifeline) {
@@ -761,7 +739,7 @@ export default function QuestionScreen() {
     setLifelineBlock(true);
   };
 
-  // Lifeline: Level Down
+  // ─── Lifeline: Level Down ─────────────────────────────────────────────────
   const handleLevelDownWithAd = () => {
     showAd();
     handleLevelDownSubmit();
@@ -796,13 +774,10 @@ export default function QuestionScreen() {
 
         if (res.success && res.data?.newQuestion) {
           resetQuestion();
-
           setSanitizedQuestion(res.data.newQuestion);
 
           const remainingLevelDown = isLevelDownAvailable - 1;
-          setIsLevelDownAvailable(
-            remainingLevelDown < 0 ? 0 : remainingLevelDown
-          );
+          setIsLevelDownAvailable(remainingLevelDown < 0 ? 0 : remainingLevelDown);
 
           if (remainingLevelDown <= maxLifeline - freeLifeline) {
             setIsFreeLevelDownAvailable(false);
@@ -828,6 +803,7 @@ export default function QuestionScreen() {
       });
   };
 
+  // ─── Render ───────────────────────────────────────────────────────────────
   const renderContent = () => {
     switch (screenState) {
       case 'playing':
@@ -889,8 +865,7 @@ export default function QuestionScreen() {
                         {row.map((value) => {
                           const isDisabled = disabledOptions.includes(value);
                           const isSelected = answer === value;
-                          const isCorrect =
-                            showResult && value === correctAnswer;
+                          const isCorrect = showResult && value === correctAnswer;
                           const isWrong =
                             showResult &&
                             value === answer &&
@@ -911,14 +886,10 @@ export default function QuestionScreen() {
                               }}
                             >
                               <TouchableOpacity
-                                disabled={
-                                  isChecking || showResult || isDisabled
-                                }
+                                disabled={isChecking || showResult || isDisabled}
                                 style={[
                                   styles.optionBtn,
-                                  isSelected &&
-                                    !showResult &&
-                                    styles.optionBtnSelected,
+                                  isSelected && !showResult && styles.optionBtnSelected,
                                   isCorrect && styles.optionBtnCorrect,
                                   isWrong && styles.optionBtnWrong,
                                   isDisabled && styles.optionBtnDisabled,
@@ -928,11 +899,8 @@ export default function QuestionScreen() {
                                 <Text
                                   style={[
                                     styles.optionText,
-                                    isSelected &&
-                                      !showResult &&
-                                      styles.optionTextSelected,
-                                    (isCorrect || isWrong) &&
-                                      styles.optionTextResult,
+                                    isSelected && !showResult && styles.optionTextSelected,
+                                    (isCorrect || isWrong) && styles.optionTextResult,
                                   ]}
                                 >
                                   {value}
@@ -946,12 +914,7 @@ export default function QuestionScreen() {
                   </View>
                 </View>
 
-                <View
-                  style={[
-                    styles.lifelineBox,
-                    lifelineBlock && { opacity: 0.6 },
-                  ]}
-                >
+                <View style={[styles.lifelineBox, lifelineBlock && { opacity: 0.6 }]}>
                   <TouchableOpacity
                     style={styles.lifelineBtn}
                     disabled={isChecking || showResult || lifelineBlock}
@@ -962,12 +925,11 @@ export default function QuestionScreen() {
                     }
                   >
                     <Text style={styles.lifelineBtnText}>50-50</Text>
-                    {!isFreeFiftyFiftyAvailable ? (
+                    {!isFreeFiftyFiftyAvailable && (
                       <Text style={styles.adText}>Ad</Text>
-                    ) : (
-                      <></>
                     )}
                   </TouchableOpacity>
+
                   <TouchableOpacity
                     style={styles.lifelineBtn}
                     disabled={isChecking || showResult || lifelineBlock}
@@ -978,12 +940,11 @@ export default function QuestionScreen() {
                     }
                   >
                     <Text style={styles.lifelineBtnText}>+30 Sec</Text>
-                    {!isFreeThirtySecAvailable ? (
+                    {!isFreeThirtySecAvailable && (
                       <Text style={styles.adText}>Ad</Text>
-                    ) : (
-                      <></>
                     )}
                   </TouchableOpacity>
+
                   <TouchableOpacity
                     style={styles.lifelineBtn}
                     disabled={isChecking || showResult || lifelineBlock}
@@ -994,33 +955,36 @@ export default function QuestionScreen() {
                     }
                   >
                     <Text style={styles.lifelineBtnText}>Level Down</Text>
-                    {!isFreeLevelDownAvailable ? (
+                    {!isFreeLevelDownAvailable && (
                       <Text style={styles.adText}>Ad</Text>
-                    ) : (
-                      <></>
                     )}
                   </TouchableOpacity>
                 </View>
 
+                {/*
+                  ResultPopup is now driven entirely by handlePopupContinue.
+                  - onClose fires when user taps "Continue"
+                  - currentScore shows "Your Score: N" badge in the popup
+                  - showLeaderboard shows TOP 3 section only on per-minute ad moments
+                  - leaderboard is fetched live inside ResultPopup using sessionId
+                */}
                 <ResultPopup
                   key={sanitizedQuestion.id}
                   visible={showPopup}
                   isCorrect={answer !== null && answer === correctAnswer}
                   correctAnswer={correctAnswer ?? 0}
                   userAnswer={answer}
-                  onClose={() => setShowPopup(false)}
+                  onClose={handlePopupContinue}
                   colors={colors}
+                  currentScore={currentScore}
+                  showLeaderboard={isAdMoment}
+                  sessionId={session.sessionId}
                 />
               </SafeAreaView>
             </ScrollView>
-            {/* {showAdPopup && ( */}
-            {/*   <View style={styles.adScreen}> */}
-            {/*     <Text style={styles.adTitle}>Advertisement</Text> */}
-            {/*     <Text style={styles.adSubtitle}>Dummy Ad Screen</Text> */}
-            {/*   </View> */}
-            {/* )} */}
           </View>
         );
+
       case 'finished':
         return (
           <>

@@ -162,3 +162,30 @@ export const fetchAllTimeLeaderboard = async () => {
     throw new ApiHandledError(status, message);
   }
 };
+
+export const fetchTopThreeLeaderboard = async ({ sessionId }: { sessionId: string }) => {
+  try {
+    console.log('fetching top 3 leaderboard');
+    console.log("Session id, daily: ", sessionId)
+    const token = (await AsyncStorage.getItem('token')) as string;
+    const res = await api({
+      method: 'post',
+      url: 'api/daily/topThreeLeaderboard',
+      data: {
+        sessionId
+      },
+      headers: {
+        Authorization: `Bearer ${JSON.parse(token)}`,
+      }
+    })
+    console.log("Response: ", res)
+    const resData = res.data
+    const { leaderboard } = resData.data;
+    return leaderboard;
+  } catch (err: any) {
+    console.log('Error fetching leaderboard: ', err);
+    const { status, message } = parseApiError(err);
+    throw new ApiHandledError(status, message);
+
+  }
+}
